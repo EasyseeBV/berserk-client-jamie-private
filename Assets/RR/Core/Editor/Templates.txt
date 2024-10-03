@@ -1,0 +1,11 @@
+/// Editor menu item toggle
+
+[MenuItem("RedRift/PATH " +
+#if // SOME_DIRECTIVE
+                  "(✔)"
+#else
+                  "(✘)"
+#endif
+)]
+
+-------------------------------------

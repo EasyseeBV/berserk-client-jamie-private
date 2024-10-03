@@ -1,0 +1,602 @@
+[
+  {
+    "Id": "ServerWebhook_WrongSecret",
+    "Text": "Wrong secret."
+  },
+  {
+    "Id": "ServerWebhook_URLInvalid",
+    "Text": "The provided URL seems to be invalid. Cannot parse provided URL."
+  },
+  {
+    "Id": "ServerWebhook_SuccessfullyCreated",
+    "Text": "Successfully created hook on {0} with ID: {0}."
+  },
+  {
+    "Id": "ServerWebhook_SameEventName",
+    "Text": "A hook with the same event name and callback URL already exists. You may want to edit it instead."
+  },
+  {
+    "Id": "ServerWebhook_NoWebhook",
+    "Text": "There is no webhook with the provided ID."
+  },
+  {
+    "Id": "ServerSocial_ValidationFailed",
+    "Text": "IdToken validation failed. Action forbidden."
+  },
+  {
+    "Id": "ServerSocial_NotSupported",
+    "Text": "{0}: {1} is not supported."
+  },
+  {
+    "Id": "ServerSocial_NoDataToSignUp",
+    "Text": "{0} must be provided to perform sign-up."
+  },
+  {
+    "Id": "ServerPractice_CreateRoomDenied_CantCreateNonPractice",
+    "Text": "You can't create a non practice session through practice mode."
+  },
+  {
+    "Id": "ServerPractice_CreateRoomDenied_BotNotFound",
+    "Text": "Bot user not found on server. Server error."
+  },
+  {
+    "Id": "ServerPlayer_EmptyId",
+    "Text": "Empty ID passed."
+  },
+  {
+    "Id": "ServerNotify_NotFound",
+    "Text": "User not found."
+  },
+  {
+    "Id": "ServerNotify_NoSub",
+    "Text": "User does not have a subscription."
+  },
+  {
+    "Id": "ServerLobby_UserInActiveSession",
+    "Text": "User is already in an active session."
+  },
+  {
+    "Id": "ServerLobby_StartSession_RoomNotFound",
+    "Text": "No rooms where user is host found or the current room has already started."
+  },
+  {
+    "Id": "ServerLobby_StartSession_NotEnoughPlayers",
+    "Text": "Not enough players to start session."
+  },
+  {
+    "Id": "ServerLeague_ValidateDeckDenied_NotEnoughFractionCardsInDeck",
+    "Text": "Can't enter league {0}. Deck should contain at least {1} faction cards."
+  },
+  {
+    "Id": "ServerLeague_ValidateDeckDenied_IllegalVulcaniteInDeck",
+    "Text": "Can't enter league with owned Vulcanite: {0} of level {1}. Level must be between: {2} and {3}."
+  },
+  {
+    "Id": "ServerLeague_ValidateDeckDenied_HasNotGotCards",
+    "Text": "Deck does not have the required cards."
+  },
+  {
+    "Id": "ServerLeague_ValidateDeckDenied_HasNonLeagueCards",
+    "Text": "Can't enter league {0} with rejected cards: {1}."
+  },
+  {
+    "Id": "ServerLeague_JoinAutoMatchDenied_ProvideCorrectLeagueId",
+    "Text": "Must provide correct league ID."
+  },
+  {
+    "Id": "ServerLeague_JoinAutoMatchDenied_NoLeague",
+    "Text": "There is no league on the server with ID: {0}."
+  },
+  {
+    "Id": "ServerLeague_JoinAutoMatchDenied_LeagueEnded",
+    "Text": "Leagues have ended."
+  },
+  {
+    "Id": "ServerLeague_JoinAutoMatchDenied_AlreadyInMatchMaking",
+    "Text": "User is already in the matchmaking queue."
+  },
+  {
+    "Id": "ServerLeague_AcceptGameDenied_UserNotInQueue",
+    "Text": "The user is not in the queue for auto matchmaking."
+  },
+  {
+    "Id": "ServerLeague_AcceptGameDenied_NoGameToAccept",
+    "Text": "There is no game for the user yet."
+  },
+  {
+    "Id": "ServerLeague_AcceptGameDenied_GameAlreadyExpired",
+    "Text": "You have not accepted the game due to the expiration of the confirmation time."
+  },
+  {
+    "Id": "ServerLeague_AcceptGameDenied_GameAlreadyAccepted",
+    "Text": "The user has already accepted the match."
+  },
+  {
+    "Id": "ServerLeaderBoard_BadRRSecret",
+    "Text": "Bad RRSecret."
+  },
+  {
+    "Id": "ServerIdentity_SignUp",
+    "Text": "{0} must be provided to perform sign-up."
+  },
+  {
+    "Id": "ServerIdentity_ResetPass",
+    "Text": "{0} must be provided to reset password."
+  },
+  {
+    "Id": "ServerIdentity_IncorrectTesterPass",
+    "Text": "Incorrect tester password."
+  },
+  {
+    "Id": "ServerIdentity_ForgotPass",
+    "Text": "{0} must be provided to perform forgot password."
+  },
+  {
+    "Id": "ServerIdentity_EmptyTesterPass",
+    "Text": "Tester password cannot be empty."
+  },
+  {
+    "Id": "ServerHealth_WrongAccessCode",
+    "Text": "Wrong access code for getting request token."
+  },
+  {
+    "Id": "ServerGame_ReportModel",
+    "Text": "Client must send report model."
+  },
+  {
+    "Id": "ServerGame_EmotionModel",
+    "Text": "Client must send emotion model."
+  },
+  {
+    "Id": "ServerGame_CommedModel",
+    "Text": "Client must send commend model."
+  },
+  {
+    "Id": "ServerDuel_StartDuelFailed_RoomNotAvailable",
+    "Text": "Failed to start a duel, the game has already started or duels have been closed."
+  },
+  {
+    "Id": "ServerDuel_StartDuelFailed_NotEnoughPlayers",
+    "Text": "Not enough players to start session."
+  },
+  {
+    "Id": "ServerDuel_LeaveDuelFailed_RoomNotAvailable",
+    "Text": "You can't leave the duel, the game has already started!"
+  },
+  {
+    "Id": "ServerDuel_KickPlayerDenied_RoomNotFound",
+    "Text": "User is not a host or no relevant non-terminated room found."
+  },
+  {
+    "Id": "ServerDuel_KickPlayerDenied_RoomNotAvailable",
+    "Text": "You can't kick a player out of a game that's already started!"
+  },
+  {
+    "Id": "ServerDuel_KickPlayerDenied_NotInRoom",
+    "Text": "User to kick not found in your room."
+  },
+  {
+    "Id": "ServerDuel_JoinRoomDenied_WrongPassword",
+    "Text": "Wrong password."
+  },
+  {
+    "Id": "ServerDuel_JoinRoomDenied_RoomIsFull",
+    "Text": "Room is full. Spectating is not supported at the moment."
+  },
+  {
+    "Id": "ServerDuel_JoinRoomDenied_NotFound",
+    "Text": "The dueling room has started or closed."
+  },
+  {
+    "Id": "ServerDuel_JoinRoomDenied_MustBeValid",
+    "Text": "{0} or {1} must be valid."
+  },
+  {
+    "Id": "ServerDuel_JoinRoomDenied_AlreadyJoined",
+    "Text": "Already joined this room."
+  },
+  {
+    "Id": "ServerDuel_CreateRoomDenied_NameMustBeValid",
+    "Text": "{0} must be valid."
+  },
+  {
+    "Id": "ServerDuel_CreateRoomDenied_CantCreateNonDuel",
+    "Text": "You can't create a non duel session through duel mode."
+  },
+  {
+    "Id": "ServerDeck_Denied_VulcaniteNotAvailable",
+    "Text": "The vulcanite '{0}' is not available."
+  },
+  {
+    "Id": "ServerDeck_Denied_NoVulcanite",
+    "Text": "There is no such owned vulcanite."
+  },
+  {
+    "Id": "ServerDeck_Denied_NoMatchingCards",
+    "Text": "Your deck has cards you don't own or are not allowed to play."
+  },
+  {
+    "Id": "ServerDeck_Denied_MoreThanMax",
+    "Text": "Maximum {0} cards in the deck."
+  },
+  {
+    "Id": "ServerDeck_Denied_LessThanMin",
+    "Text": "Minimun {0} cards in the deck."
+  },
+  {
+    "Id": "ServerDeck_Denied_InvalidDeckValue",
+    "Text": "Invalid deck value, recreate your deck."
+  },
+  {
+    "Id": "ServerDeck_Denied_DeckNotFound",
+    "Text": "No relevant owned deck found."
+  },
+  {
+    "Id": "ServerDeck_Denied_DeckEmpty",
+    "Text": "Cannot create empty deck. Provide at least one card with a count greater than zero."
+  },
+  {
+    "Id": "ServerCustomisations_NoIds",
+    "Text": "No customization asset IDs passed."
+  },
+  {
+    "Id": "ResurrectCardsX",
+    "Text": "Select X cards to resurrect."
+  },
+  {
+    "Id": "ResurrectCardsOne",
+    "Text": "Select one card to resurrect."
+  },
+  {
+    "Id": "ResurrectCardsAny",
+    "Text": "Select {0} cards to resurrect."
+  },
+  {
+    "Id": "ResignSurrender",
+    "Text": "If you resign, you will lose this match. Are you sure?"
+  },
+  {
+    "Id": "NetworkLoose",
+    "Text": "Internet connection not established. Try again."
+  },
+  {
+    "Id": "MulliganStartsInBig",
+    "Text": "The game will start in: <size=120%>{0}</size>s"
+  },
+  {
+    "Id": "MatchWaitingOpponentTitle",
+    "Text": "Match accepted!"
+  },
+  {
+    "Id": "MatchStartingTitle",
+    "Text": "Match ready!"
+  },
+  {
+    "Id": "MatchStartingDescription",
+    "Text": "The players are ready, the game's coming up!"
+  },
+  {
+    "Id": "MatchSearchForAnOpponent",
+    "Text": "Searching for an opponent."
+  },
+  {
+    "Id": "MatchMakingDisconnectedTitle",
+    "Text": "   Network..."
+  },
+  {
+    "Id": "MatchMakingDisconnectedDescription",
+    "Text": "Sorry you were disconnected from the search due to connection problems."
+  },
+  {
+    "Id": "MatchLoadingTitle",
+    "Text": "   Loading..."
+  },
+  {
+    "Id": "MatchLoadingStartQueueDescription",
+    "Text": "   Connecting to the matchmaking..."
+  },
+  {
+    "Id": "MatchLoadingEndQueueDescription",
+    "Text": "   Leaving the queue..."
+  },
+  {
+    "Id": "MatchLoadingDeclinedAndQuitingDescription",
+    "Text": "You didn't accept the match, you're leaving the queue."
+  },
+  {
+    "Id": "MatchFoundDescription",
+    "Text": "Accept or decline the match. Time remaining:"
+  },
+  {
+    "Id": "MatchDeclinedOpponentDescription",
+    "Text": "The other player did not accept the match, you're returning to queue."
+  },
+  {
+    "Id": "MatchCurrWaiting",
+    "Text": "Currently waiting."
+  },
+  {
+    "Id": "MatchAcceptingTitle",
+    "Text": "Match found!"
+  },
+  {
+    "Id": "MatchAcceptedDescription",
+    "Text": "   Waiting for another player..."
+  },
+  {
+    "Id": "LeaguePopUpTitle",
+    "Text": "SEASON 6 / PHASE 2<br>MAY 2024 - JULE 2024"
+  },
+  {
+    "Id": "LeaguePopUpDescription",
+    "Text": null
+  },
+  {
+    "Id": "InvalidAction.TableIsFull",
+    "Text": "There is no space on the table!"
+  },
+  {
+    "Id": "InvalidAction.ShouldTargetTaunt",
+    "Text": "Can't attack, there's a Taunt card on the field!"
+  },
+  {
+    "Id": "InvalidAction.NoSpellTarget",
+    "Text": "This spell doesn't have any available targets."
+  },
+  {
+    "Id": "InvalidAction.NoAvailableTargets",
+    "Text": "There are no available targets!"
+  },
+  {
+    "Id": "InvalidAction.ImNotAvailable",
+    "Text": "I am not available for this action."
+  },
+  {
+    "Id": "InvalidAction.ImmuneToKeyword",
+    "Text": "Can't attack, the card is immune to effects."
+  },
+  {
+    "Id": "InvalidAction.ImmuneToDamage",
+    "Text": "Can't attack, the card is immune to damage."
+  },
+  {
+    "Id": "InvalidAction.Immune",
+    "Text": "Can't attack an immune card."
+  },
+  {
+    "Id": "InvalidAction.EmotionsNotCustomised",
+    "Text": "Customize your emotions in your profile."
+  },
+  {
+    "Id": "InvalidAction.DeckIsEmpty",
+    "Text": "No cards left in the deck!"
+  },
+  {
+    "Id": "InvalidAction.CantTargetStealth",
+    "Text": "Can't attack, the minion has stealth!"
+  },
+  {
+    "Id": "GameStartOpponentNotConnected",
+    "Text": "The opponent was unable to join the game. This game will not be counted."
+  },
+  {
+    "Id": "GameStartOpponentConnection",
+    "Text": "Waiting for opponent to connect <color=yellow>{0}</color>"
+  },
+  {
+    "Id": "GameStartNotConnected",
+    "Text": "The time to connect to the game has expired. This game will not be counted."
+  },
+  {
+    "Id": "GameStartConnection",
+    "Text": "Waiting for connection <color=yellow>{0}</color>"
+  },
+  {
+    "Id": "GameEndTutorialAbandoned",
+    "Text": "Tutorial was abandoned."
+  },
+  {
+    "Id": "GameEndTechReason",
+    "Text": "The match ended due to technical reasons."
+  },
+  {
+    "Id": "GameEndSurrendered",
+    "Text": "{0} surrendered."
+  },
+  {
+    "Id": "GameEndMaintenance",
+    "Text": "<color=«#ffa500ff»>The server</color> is under maintenance."
+  },
+  {
+    "Id": "GameEndGG",
+    "Text": "Good game!"
+  },
+  {
+    "Id": "GameEndFailed",
+    "Text": "Match failed to start."
+  },
+  {
+    "Id": "GameEndDodged",
+    "Text": "Match dodged."
+  },
+  {
+    "Id": "GameEndDisconnected",
+    "Text": "{0} has left the game."
+  },
+  {
+    "Id": "GameEndAfk",
+    "Text": "{0} was kicked for being AFK."
+  },
+  {
+    "Id": "GameEndAbandoned",
+    "Text": "Session abandoned."
+  },
+  {
+    "Id": "ErrorTutorialTryAgain",
+    "Text": "Tutorial can't retrieve the data. Try again or make a report if it happens again."
+  },
+  {
+    "Id": "ErrorTutorial",
+    "Text": "Tutorial can't retrieve the data. Please make a report."
+  },
+  {
+    "Id": "ErrorNoWinner",
+    "Text": "There is no winner at the end of the gaming session! Please leave the game through the settings menu."
+  },
+  {
+    "Id": "ErrorNoLoose",
+    "Text": "There is no defeated player at the end of the gaming session! Please leave the game through the settings menu."
+  },
+  {
+    "Id": "ErrorDeleteDeck",
+    "Text": "Can't delete the last deck!"
+  },
+  {
+    "Id": "DiscardCardsX",
+    "Text": "Select X cards to discard."
+  },
+  {
+    "Id": "DiscardCardsOne",
+    "Text": "Select one card to discard."
+  },
+  {
+    "Id": "DiscardCardsAny",
+    "Text": "Select {0} cards to discard."
+  },
+  {
+    "Id": "DeckUnsaved",
+    "Text": "You have some unsaved changes. Are you sure you want to go back?"
+  },
+  {
+    "Id": "DeckUnavailableVulcanite",
+    "Text": "The selected vulcanite is not available. Please change the vulcanite."
+  },
+  {
+    "Id": "DeckUnavailableCards",
+    "Text": "There are unavailable cards in your deck. Check your deck for cards highlighted in red."
+  },
+  {
+    "Id": "DeckName",
+    "Text": "Enter deck name."
+  },
+  {
+    "Id": "DeckMinCards",
+    "Text": "At least {0} cards must be in the deck to save it!"
+  },
+  {
+    "Id": "DeckMaxCards",
+    "Text": "You can't build a deck of more than {0} cards!"
+  },
+  {
+    "Id": "DeckDelete",
+    "Text": "Are you sure you want to delete this deck?"
+  },
+  {
+    "Id": "DeckChooseVulcanite",
+    "Text": "Choose a vulcanite for this deck."
+  },
+  {
+    "Id": "ClientSignalR_ResponseTimeout_Exception",
+    "Text": "Response timeout exceeded."
+  },
+  {
+    "Id": "ClientDuels_ValidateDeck_NotValidVulcanite",
+    "Text": "Change the vulcanite in this deck. This vulcanite is not available on your account."
+  },
+  {
+    "Id": "ClientDuels_ValidateDeck_NotValidCards",
+    "Text": "There are unavailable cards in your deck, check your deck."
+  },
+  {
+    "Id": "ClientDuels_ValidateDeck_NotEnoughCards",
+    "Text": "Please add at least {0} cards to your deck before continue."
+  },
+  {
+    "Id": "ClientDuels_ValidateDeck_NoDeckSelected",
+    "Text": "Choose a deck to join in the duel."
+  },
+  {
+    "Id": "ClientDuels_StartDuelFailed_NoResponse",
+    "Text": "Failed to receive a response from the server. Try again."
+  },
+  {
+    "Id": "ClientDuels_SelectDeckFailed_NoDeckExist",
+    "Text": "The deck doesn't exist."
+  },
+  {
+    "Id": "ClientDuels_PracticeDuelFailed_NoResponse",
+    "Text": "Failed to receive a response from the server. Refresh the duel to repeat or update the duel state."
+  },
+  {
+    "Id": "ClientDuels_LeaveDuelFailed_NoResponse",
+    "Text": "Failed to receive a response from the server. Refresh the duel to repeat or update the duel state."
+  },
+  {
+    "Id": "ClientDuels_KickPlayerFailed_NoResponse",
+    "Text": "Failed to receive a response from the server. Refresh the duel to repeat or update the duel state."
+  },
+  {
+    "Id": "ClientDuels_JoinDuelFailed_NoResponse",
+    "Text": "Failed to receive a response from the server. Try again."
+  },
+  {
+    "Id": "ClientDuels_CreateDuelFailed_NoResponse",
+    "Text": "Failed to receive a response from the server. Refresh the duel to repeat or update the duel state."
+  },
+  {
+    "Id": "ClientAuth_AppleFailed_NoConnection",
+    "Text": "Connection is unstable, authorisation failed."
+  },
+  {
+    "Id": "Client_Overcharge_Header",
+    "Text": "Select the amount of lava to cast this card"
+  },
+  {
+    "Id": "BlockedInfoShouldTargetTaunt",
+    "Text": "Can't attack, there's a Taunt card on the field!"
+  },
+  {
+    "Id": "BlockedInfoOpponentDisconnect",
+    "Text": "Opponent is disconnected. Please wait."
+  },
+  {
+    "Id": "BlockedInfoOpponentConnect",
+    "Text": "Opponent is connected."
+  },
+  {
+    "Id": "BlockedInfoNoSpellTarget",
+    "Text": "This spell doesn't have any available targets."
+  },
+  {
+    "Id": "BlockedInfoNoCreatureTarget",
+    "Text": "This creature doesn't have any available targets."
+  },
+  {
+    "Id": "BlockedInfoImmuneCantTargetTaunt",
+    "Text": "Can't target a Taunt card with Immune!"
+  },
+  {
+    "Id": "BlockedInfoImmune",
+    "Text": "Can't attack an immune card."
+  },
+  {
+    "Id": "BlockedInfoDeckExhausted",
+    "Text": "No cards left in the deck!"
+  },
+  {
+    "Id": "BlockedInfoAbilityStunned",
+    "Text": "Can't use the ability while stunned!"
+  },
+  {
+    "Id": "BlockedInfoAbilityHasBeenUsed",
+    "Text": "Can't use the ability, it has already been used!"
+  },
+  {
+    "Id": "AuthRemember",
+    "Text": "Do you want to remember your login and log in automatically next time?"
+  },
+  {
+    "Id": "AccountLogout",
+    "Text": "Do you want to log out of Berserk or your account?"
+  }
+]

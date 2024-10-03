@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f9095462ce5484499d3e8a28c418d6a, type: 3}
+  m_Name: 26_Session_GameTimer
+  m_EditorClassIdentifier: 
+  hint:
+    id: 
+    data:
+      nextBlock: {fileID: 11400000, guid: 192be9ac25bf76a49ab2a485874c7688, type: 2}
+      delayBeforeInvoke: 0
+      delayAfterClose: 0
+      pauseRequired: 0
+      isSyncRequired: 0
+      keywordTriggers:
+      - GameTimer
+      - BotContinue
+      requiredCompletedHints: []
+      completeDependedHints: []
+    popup:
+      title: Turn timer
+      text: The duration of each turn is 60 seconds. During your turn you can summon
+        cards, beasts and spells. When the timer runs out, your turn is over. Be
+        sure to end your turn early when you are finished. This will keep gameplay
+        fast-paced and will be appreciated by your opponents
+      continueButtonText: Next
+      position: {x: 0, y: 0}
+      sizeDelta: {x: 0, y: 0}
+      delayBeforShow: 0
+      arrowRequired: 0
+      continueButton: 1
+      backButton: 1
+      backHinder: 0
+      autoSize: 1
+      enabled: 1
+    pointer:
+      startPosition: {x: 0, y: 0, z: 0}
+      endPosition: {x: 0, y: 0, z: 0}
+      enabled: 0
+    conditions:
+    - id: AtInvokeBlockRaycast
+      meta: true
+    - id: BotContinue
+      meta: 1
+    unmasks:
+    - position: {x: 0, y: 0}
+      size: {x: 0, y: 0}
+      meta: 
+      hideIfMissTarget: 1
+      autoRefresh: 1
+      fitTargetSize: 1
+      fitTargetPosition: 1
+      disableReposition: 0
+      disableResize: 0
+    defaultId: 

@@ -1,0 +1,494 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8733212907016290357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ead25bb55e9b4e068a9a787c3db54197, type: 3}
+  m_Name: Try Hero Attack Opponent
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 392, y: 40}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: -8733212907016290357}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 2364269735481228235}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 70}
+--- !u!114 &-7802455152401625822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa207a77629243078a2477cc691d5e69, type: 3}
+  m_Name: Try Hero Attack Creature
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 376, y: -40}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: -7802455152401625822}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 2364269735481228235}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 70}
+--- !u!114 &-5625377522729305568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6930a8eb96e4509a53631b567e5343a, type: 3}
+  m_Name: Try Play Positive Card
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -744, y: 136}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: -5625377522729305568}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 3735756290870914929}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 70}
+--- !u!114 &-5507312223889819007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cbd789fe3304147b4281bc98f4d7281, type: 3}
+  m_Name: Next Turn
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 584, y: -216}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: -5507312223889819007}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 5351030756027975527}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 70}
+--- !u!114 &-839529155941623584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51db2daa624f43aea6341bac20e7ced4, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 56, y: -216}
+  ports:
+    keys:
+    - Nodes
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Nodes
+      _node: {fileID: -839529155941623584}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Enter
+        node: {fileID: 7664360460855105777}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: 5136338508639445080}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: -839529155941623584}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 5351030756027975527}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 90}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb63f12b96fc2c34bb53e3936d3097a7, type: 3}
+  m_Name: Normal
+  m_EditorClassIdentifier: 
+  path: Assets/Scripts/UI/_autogenerated/
+  forceWriteToPath: 0
+  nodes:
+  - {fileID: 3735756290870914929}
+  - {fileID: 296622299191337045}
+  - {fileID: -5625377522729305568}
+  - {fileID: 3674318461478474217}
+  - {fileID: 5351030756027975527}
+  - {fileID: -839529155941623584}
+  - {fileID: 7664360460855105777}
+  - {fileID: 5136338508639445080}
+  - {fileID: 2364269735481228235}
+  - {fileID: -7802455152401625822}
+  - {fileID: -8733212907016290357}
+  - {fileID: -5507312223889819007}
+  enterNode: {fileID: 5351030756027975527}
+--- !u!114 &296622299191337045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a915a3fea214826a2ec4a790a2c097f, type: 3}
+  m_Name: Try Play Creature
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -744, y: 56}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 296622299191337045}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 3735756290870914929}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 90}
+  model:
+    CardId: 
+    TargetCardId: 
+--- !u!114 &2364269735481228235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51db2daa624f43aea6341bac20e7ced4, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 328, y: -216}
+  ports:
+    keys:
+    - Nodes
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Nodes
+      _node: {fileID: 2364269735481228235}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Enter
+        node: {fileID: -7802455152401625822}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: -8733212907016290357}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 2364269735481228235}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 5351030756027975527}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 90}
+--- !u!114 &3674318461478474217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64ca8c53c8bb4a9b8b1bd064a5e78a0d, type: 3}
+  m_Name: Try Play Negative Card
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -712, y: 200}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 3674318461478474217}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 3735756290870914929}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 70}
+--- !u!114 &3735756290870914929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51db2daa624f43aea6341bac20e7ced4, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -792, y: -40}
+  ports:
+    keys:
+    - Nodes
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Nodes
+      _node: {fileID: 3735756290870914929}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Enter
+        node: {fileID: 296622299191337045}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: -5625377522729305568}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: 3674318461478474217}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 3735756290870914929}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: 5351030756027975527}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 90}
+--- !u!114 &5136338508639445080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b474791291be47ce80ec78ee4ee7808b, type: 3}
+  m_Name: Try Creature Attack Opponent
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 104, y: -24}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 5136338508639445080}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: -839529155941623584}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 70}
+--- !u!114 &5351030756027975527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51db2daa624f43aea6341bac20e7ced4, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -72, y: -392}
+  ports:
+    keys:
+    - Nodes
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Nodes
+      _node: {fileID: 5351030756027975527}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Enter
+        node: {fileID: -839529155941623584}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: 2364269735481228235}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: -5507312223889819007}
+        reroutePoints: []
+      - fieldName: Enter
+        node: {fileID: 3735756290870914929}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 5351030756027975527}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 90}
+--- !u!114 &7664360460855105777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4275633dd7841f4b9b0f1dec0482197, type: 3}
+  m_Name: Try Creature Attack
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 72, y: -120}
+  ports:
+    keys:
+    - Enter
+    values:
+    - _portType: 
+      _fieldName: Enter
+      _node: {fileID: 7664360460855105777}
+      _typeQualifiedName: BerserkV3.GameCore.AiBehaviour.Nodes.BaseNodes.Empty, Vulcan.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: Nodes
+        node: {fileID: -839529155941623584}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  size: {x: 208, y: 90}
+  model:
+    CardId: 
+    TargetCardId: 

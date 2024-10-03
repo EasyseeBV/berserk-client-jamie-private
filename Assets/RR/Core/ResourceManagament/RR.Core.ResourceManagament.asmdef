@@ -1,0 +1,33 @@
+{
+    "name": "RR.Core.ResourceManagament",
+    "rootNamespace": "",
+    "references": [
+        "RR.Core",
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "UniTask",
+        "UniTask.Addressables",
+        "UniTask.Linq",
+        "RR.Core.Utilities.DiscSpaceUtils"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.addressables",
+            "expression": "1.21.9",
+            "define": "ADDRESSABLES_INCLUDED"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "2.3.1",
+            "define": "UNITASK_INCLUDED"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f9095462ce5484499d3e8a28c418d6a, type: 3}
+  m_Name: 32_Session_CreatureAttack
+  m_EditorClassIdentifier: 
+  hint:
+    id: 
+    data:
+      nextBlock: {fileID: 11400000, guid: 1bfaab59358b22846b3c9cc0bc7230de, type: 2}
+      delayBeforeInvoke: 0
+      delayAfterClose: 0
+      pauseRequired: 0
+      isSyncRequired: 0
+      keywordTriggers:
+      - CreatureAttack_Opponent_44
+      requiredCompletedHints: []
+      completeDependedHints: []
+    popup:
+      title: Attack
+      text: This is a creatures Attack value. This is the damage dealt whenever it
+        attacks or defends.
+      continueButtonText: Next
+      position: {x: 375, y: 180}
+      sizeDelta: {x: 0, y: 0}
+      delayBeforShow: 0
+      arrowRequired: 0
+      continueButton: 1
+      backButton: 1
+      backHinder: 0
+      autoSize: 1
+      enabled: 1
+    pointer:
+      startPosition: {x: 0, y: 0, z: 0}
+      endPosition: {x: 0, y: 0, z: 0}
+      enabled: 0
+    conditions:
+    - id: AtInvokeBlockRaycast
+      meta: true
+    unmasks:
+    - position: {x: 0, y: 0}
+      size: {x: 0, y: 0}
+      meta: 
+      hideIfMissTarget: 1
+      autoRefresh: 1
+      fitTargetSize: 1
+      fitTargetPosition: 1
+      disableReposition: 0
+      disableResize: 0
+    defaultId: 32_Session_CreatureAttack

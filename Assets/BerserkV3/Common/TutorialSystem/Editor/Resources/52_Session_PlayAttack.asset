@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f9095462ce5484499d3e8a28c418d6a, type: 3}
+  m_Name: 52_Session_PlayAttack
+  m_EditorClassIdentifier: 
+  hint:
+    id: 
+    data:
+      nextBlock: {fileID: 11400000, guid: 698114b9ae44d0147a02efa67e6265de, type: 2}
+      delayBeforeInvoke: 0
+      delayAfterClose: 0
+      pauseRequired: 0
+      isSyncRequired: 0
+      keywordTriggers:
+      - HeroBounds_Opponent
+      - CreatureBounds_Self_42
+      - EffectPlay
+      requiredCompletedHints: []
+      completeDependedHints: []
+    popup:
+      title: Attack
+      text: Select your Warrior of Ares and drag arrow to enemy Vulcanite to attach
+        them
+      continueButtonText: 
+      position: {x: 520, y: 0}
+      sizeDelta: {x: 0, y: 0}
+      delayBeforShow: 0
+      arrowRequired: 0
+      continueButton: 0
+      backButton: 0
+      backHinder: 0
+      autoSize: 1
+      enabled: 1
+    pointer:
+      startPosition: {x: 0, y: 0, z: 0}
+      endPosition: {x: 0, y: 0, z: 0}
+      enabled: 0
+    conditions:
+    - id: AtInvokeBlockRaycast
+      meta: false
+    - id: AtCloseBlockRaycast
+      meta: true
+    - id: EffectPlay
+      meta: system-GenericAttack
+    unmasks:
+    - position: {x: 0, y: 0}
+      size: {x: 0, y: 0}
+      meta: 
+      hideIfMissTarget: 1
+      autoRefresh: 1
+      fitTargetSize: 1
+      fitTargetPosition: 1
+      disableReposition: 0
+      disableResize: 0
+    - position: {x: 0, y: 0}
+      size: {x: 0, y: 0}
+      meta: 
+      hideIfMissTarget: 1
+      autoRefresh: 0
+      fitTargetSize: 1
+      fitTargetPosition: 1
+      disableReposition: 0
+      disableResize: 0
+    defaultId: 52_Session_PlayAttack

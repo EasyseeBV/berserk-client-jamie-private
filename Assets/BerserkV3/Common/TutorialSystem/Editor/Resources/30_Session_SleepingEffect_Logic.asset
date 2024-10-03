@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f9095462ce5484499d3e8a28c418d6a, type: 3}
+  m_Name: 30_Session_SleepingEffect_Logic
+  m_EditorClassIdentifier: 
+  hint:
+    id: 
+    data:
+      nextBlock: {fileID: 11400000, guid: 404543bdeda2ae24b885043b5f7056cf, type: 2}
+      delayBeforeInvoke: 0
+      delayAfterClose: 1
+      pauseRequired: 0
+      isSyncRequired: 0
+      keywordTriggers:
+      - EffectPlay
+      requiredCompletedHints: []
+      completeDependedHints: []
+    popup:
+      title: 
+      text: 
+      continueButtonText: 
+      position: {x: 0, y: 0}
+      sizeDelta: {x: 0, y: 0}
+      delayBeforShow: 0
+      arrowRequired: 0
+      continueButton: 0
+      backButton: 0
+      backHinder: 0
+      autoSize: 0
+      enabled: 0
+    pointer:
+      startPosition: {x: 0, y: 0, z: 0}
+      endPosition: {x: 0, y: 0, z: 0}
+      enabled: 0
+    conditions:
+    - id: AtInvokeBlockRaycast
+      meta: true
+    - id: EffectPlay
+      meta: system-Sleeping
+    unmasks: []
+    defaultId: 30_Session_SleepingEffect_Logic
