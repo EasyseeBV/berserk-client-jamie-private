@@ -2,7 +2,7 @@
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking;
 using Berserk.Shared.SignalR.Enums;
 using BerserkV3.Common.ProgressDrawer;
 using BerserkV3.Common.SceneService;

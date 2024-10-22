@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.Commands.Cmd;
+using Berserk.Shared.GameCore.Commands.Cmd.DebugCmd;
 using Berserk.Shared.GameCore.Models;
 using BerserkV3.GameCore.Network.Abstraction;
 using Cysharp.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace BerserkV3.GameCore.Controllers
 			RRConsole.AddCommand(nameof(AddMana), AddMana, "Add manna to self");
 			RRConsole.AddCommand(nameof(FullHp), FullHp, "Restore all Hp self");
 			RRConsole.AddCommand(nameof(Timer), Timer, "Set timer pause/unpause");
+			RRConsole.AddCommand(nameof(Manna), Manna, "Remove 100% mana enable/disable o/s");
 			RRConsole.AddCommand(nameof(ClearTable), ClearTable, "Clear whole table o/s/n");
 			RRConsole.AddCommand(nameof(SilenceTable), SilenceTable, "Silence whole table o/s/n");
 		}
@@ -120,6 +122,15 @@ namespace BerserkV3.GameCore.Controllers
 				return "Need parameter one of the following is required : ".Red() + "pause, stop, break, resume, play, unpause";
 			
 			gameHub.PerformCommandAsync<TimerCmd>(new CmdParamsModel(runtimeTimer.RuntimeData.TimeHash, args)).Forget();
+			return GetDefaultRemoteResponce();
+		}
+
+		private string Manna(string[] args)
+		{
+			if (args == null || args.Length == 0)
+				return "Need parameter one of the following is required : ".Red() + "disable, pause, stop, enable, unpause, play";
+			
+			gameHub.PerformCommandAsync<MannaCmd>(new CmdParamsModel(runtimeTimer.RuntimeData.TimeHash, args)).Forget();
 			return GetDefaultRemoteResponce();
 		}
 	}

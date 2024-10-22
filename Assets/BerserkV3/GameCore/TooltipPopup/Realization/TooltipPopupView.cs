@@ -4,6 +4,7 @@ using System.Threading;
 using BerserkV3.GameCore.Cards.EffectHints;
 using BerserkV3.GameCore.TooltipPopup.Data;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 

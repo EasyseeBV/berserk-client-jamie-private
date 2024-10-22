@@ -1,5 +1,4 @@
 ﻿using BerserkV3.Common.Utils;
-using BerserkV3.GameCore.Cards;
 using BerserkV3.GameCore.Cards.EffectHints;
 using BerserkV3.GameCore.Controllers;
 using BerserkV3.GameCore.Controllers.Graveyard;
@@ -9,6 +8,7 @@ using BerserkV3.GameCore.Emotions;
 using BerserkV3.GameCore.Prediction.Realizations;
 using BerserkV3.GameCore.Repository;
 using BerserkV3.GameCore.Settings;
+using BerserkV3.GameCore.UI.BerserkV3.Lobby.Home;
 using BerserkV3.Startup.Applications;
 using Zenject;
 
@@ -108,6 +108,11 @@ namespace BerserkV3.GameCore.Infrastructure
 			Container.BindInterfacesTo<PredictProcessor>()
 				.AsSingle()
 				.NonLazy();
+			
+			Container.BindInterfacesTo<SetupGameUIGroup>()
+				.AsSingle()
+				.NonLazy();
+			
 		}
 	}
 }

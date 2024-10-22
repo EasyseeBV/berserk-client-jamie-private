@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
+using Berserk.Shared.Data.Consumables;
 using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Game;
@@ -18,6 +19,7 @@ namespace Berserk.Shared.GameCore.LogicContext
 		public CardData[] Cards { get; set; }
 		public HeroData[] Heroes { get; set; }
 		public EffectData[] Effects { get; set; }
+		public ConsumableData[] Consumables { get; set; }
 		public KeywordData[] Keywords { get; set; }
 		public CustomisationData[] Customisations { get; set; }
 		public LocalizationData[] Localizations { get; set; }
@@ -31,6 +33,7 @@ namespace Berserk.Shared.GameCore.LogicContext
 		protected Dictionary<string, CardData> Cards = new();
 		protected Dictionary<string, HeroData> Heroes = new();
 		protected Dictionary<string, EffectData> Effects = new();
+		protected Dictionary<string, ConsumableData> Consumables = new();
 		protected Dictionary<string, KeywordData> Keywords = new();
 		protected Dictionary<string, CustomisationData> Customisations = new();
 		protected Dictionary<string, LocalizationData> Localizations = new();
@@ -62,6 +65,7 @@ namespace Berserk.Shared.GameCore.LogicContext
 				Cards = data.Cards?.ToDictionary(v => v.Id) ?? new Dictionary<string, CardData>();
 				Heroes = data.Heroes?.ToDictionary(v => v.Id) ?? new Dictionary<string, HeroData>();
 				Effects = data.Effects?.ToDictionary(v => v.Id) ?? new Dictionary<string, EffectData>();
+				Consumables = data.Consumables?.ToDictionary(v => v.Id) ?? new Dictionary<string, ConsumableData>();
 				Keywords = data.Keywords?.ToDictionary(v => v.Id) ?? new Dictionary<string, KeywordData>();
 				Customisations = data.Customisations?.ToDictionary(v => v.Id) ?? new Dictionary<string, CustomisationData>();
 				Localizations = data.Localizations?.ToDictionary(v => v.Id) ?? new Dictionary<string, LocalizationData>();
@@ -140,10 +144,15 @@ namespace Berserk.Shared.GameCore.LogicContext
 		#endregion
 
 		#region Cards
-		public IEnumerable<CardData> AllCards()
+		public IEnumerable<CardData> AllCards(params string[] except)
 		{
-			if (Cards == null) return new List<CardData>();
-			return Cards.Values;
+			if (Cards == null) 
+				return new List<CardData>();
+
+			if (except.Length == 0)
+				return Cards.Values;
+			
+			return Cards.Values.Where(x => !except.Contains(x.Id)).ToArray();
 		}
 		
 		public CardData GetCard(string id)
@@ -197,6 +206,25 @@ namespace Berserk.Shared.GameCore.LogicContext
 		public IEnumerable<EffectData> GetEffects(IEnumerable<string> ids)
 		{
 			return GetByIds(ids, Effects);
+		}
+		#endregion
+		
+		#region Consumables
+		public IEnumerable<ConsumableData> AllConsumables()
+		{
+			if (Consumables == null) return Enumerable.Empty<ConsumableData>();
+			return Consumables.Values;
+		}
+		
+		public IEnumerable<ConsumableData> GetConsumables(IEnumerable<string> ids)
+		{
+			return GetByIds(ids, Consumables);
+		}
+		
+		public ConsumableData GetConsumable(string id)
+		{
+			return !string.IsNullOrEmpty(id) 
+			       && Consumables.TryGetValue(id, out var consumable) ? consumable : null;
 		}
 		#endregion
 

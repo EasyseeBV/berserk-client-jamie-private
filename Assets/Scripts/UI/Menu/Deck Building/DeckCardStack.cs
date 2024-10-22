@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Game;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using Berserk.Shared.GameCore.Utils;
 
 namespace UI

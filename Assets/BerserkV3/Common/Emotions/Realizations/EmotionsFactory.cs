@@ -1,7 +1,6 @@
 using System;
 using Berserk.Shared.Data.Abstraction;
 using BerserkV3.Generic.Customisation;
-using Vulcan.Data;
 
 namespace BerserkV3.Generic.Emotions
 {

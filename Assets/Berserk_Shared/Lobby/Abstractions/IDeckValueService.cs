@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 
 namespace Berserk.Shared.Lobby.Abstractions
 {

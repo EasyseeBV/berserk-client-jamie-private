@@ -9,6 +9,11 @@ namespace BerserkV3.Init.Infrastructure
 		public override void InstallBindings()
 		{
 			Container
+				.BindInterfacesTo<SetupInitUIGroup>()
+				.AsSingle()
+				.NonLazy();
+			
+			Container
 				.BindInterfacesTo<InitApplication>()
 				.AsSingle()
 				.NonLazy();
@@ -20,6 +25,11 @@ namespace BerserkV3.Init.Infrastructure
 			
 			Container
 				.BindInterfacesTo<MessageApplication>()
+				.AsSingle()
+				.NonLazy();
+			
+			Container
+				.BindInterfacesTo<ServerChoiseApplication>()
 				.AsSingle()
 				.NonLazy();
 		}

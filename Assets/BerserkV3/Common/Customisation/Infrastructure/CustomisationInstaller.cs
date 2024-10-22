@@ -1,5 +1,4 @@
-﻿using BerserkV3.GameCore.Customisations;
-using Zenject;
+﻿using Zenject;
 
 namespace BerserkV3.Generic.Customisation
 {
@@ -14,7 +13,7 @@ namespace BerserkV3.Generic.Customisation
 			Container
 				.BindInterfacesTo<CustomisationApplication>()
 				.AsSingle();
-			
+
 			Container
 				.BindInterfacesTo<CustomisationItemRepository>()
 				.AsSingle();

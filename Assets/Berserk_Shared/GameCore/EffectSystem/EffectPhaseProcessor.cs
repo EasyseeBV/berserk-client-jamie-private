@@ -84,7 +84,7 @@ namespace Berserk.Shared.GameCore.EffectSystem
 
 		private void SubscribeBuffEffectChanges(IRuntimeGameObject runtimeObject)
 		{
-			runtimeObject.OnRestore += stat =>
+			runtimeObject.OnRestore += (stat, value) =>
 			{
 				var objectRestoreEvent = new ObjectRestoreEvent
 				{
@@ -92,15 +92,13 @@ namespace Berserk.Shared.GameCore.EffectSystem
 					{
 						RuntimeId = runtimeObject.RuntimeData.Id,
 						StatName = stat.Name,
-						Default = stat.BaseStat,
-						From = stat.Previous,
-						To = stat.Current
+						Value = value
 					}
 				};
 				gameLogicContext.LogicQueueController.Add(objectRestoreEvent, runtimeObject.GetAccessibleReceiver());
 			};			
 			
-			runtimeObject.OnHit += stat =>
+			runtimeObject.OnHit += (stat, value) =>
 			{
 				var objectHitEvent = new ObjectHitEvent
 				{
@@ -108,9 +106,7 @@ namespace Berserk.Shared.GameCore.EffectSystem
 					{
 						RuntimeId = runtimeObject.RuntimeData.Id,
 						StatName = stat.Name,
-						Default = stat.BaseStat,
-						From = stat.Previous,
-						To = stat.Current
+						Value = value,
 					}
 				};
 				gameLogicContext.LogicQueueController.Add(objectHitEvent, runtimeObject.GetAccessibleReceiver());

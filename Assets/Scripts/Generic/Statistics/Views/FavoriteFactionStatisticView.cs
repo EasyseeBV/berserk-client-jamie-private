@@ -1,6 +1,5 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Game;
 using RR.Core.ResourceManagament;
 using RR.UI.FrameSystem;
 using UI;
@@ -55,9 +54,9 @@ namespace Statistics
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			if (!(View is BaseStatisticView statView))
+			if (View is not BaseStatisticView statView)
 				return;
-			statView.RawImage.texture.DestroyImmediateSafe();
+			statView.RawImage.ReleaseResource();
 		}
 	}
 }

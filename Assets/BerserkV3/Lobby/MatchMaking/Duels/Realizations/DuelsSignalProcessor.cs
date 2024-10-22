@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking.Duels;
 using Berserk.Shared.SignalR.Enums;
 using BerserkV3.Lobby.Network;
 using Newtonsoft.Json;
@@ -11,7 +11,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 	public class DuelsSignalProcessor : IDuelsSignalProcessor, IInitializable, IDisposable
 	{
 		private readonly ILobbyHub lobbyHub;
-		public event Action<LobbyDuelAction, LobbyDuelRoomModel> OnUpdateReceived; 
+		public event Action<LobbyDuelAction, DuelRoomModel> OnUpdateReceived; 
 		
 		public DuelsSignalProcessor(ILobbyHub lobbyHub)
 		{
@@ -35,7 +35,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				return;
 
 			var jsonData = args.FirstOrDefault()?.ToString() ?? string.Empty;
-			var duelRoomModel = JsonConvert.DeserializeObject<LobbyDuelRoomModel>(jsonData);
+			var duelRoomModel = JsonConvert.DeserializeObject<DuelRoomModel>(jsonData);
 			OnUpdateReceived?.Invoke(action, duelRoomModel);
 		}
 	}

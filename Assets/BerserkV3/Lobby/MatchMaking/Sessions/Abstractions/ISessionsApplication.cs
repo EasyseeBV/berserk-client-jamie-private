@@ -1,4 +1,4 @@
-﻿using Berserk.Shared.Data.Lobby;
+﻿using Berserk.Shared.Data.Lobby.Matchmaking;
 using Cysharp.Threading.Tasks;
 
 namespace BerserkV3.Lobby.MatchMaking.Sessions

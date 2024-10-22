@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Game;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Common.UIKit;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.UI;
 using Cysharp.Threading.Tasks;
 using RR.Core.ResourceManagament;

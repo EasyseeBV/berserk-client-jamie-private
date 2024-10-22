@@ -5,6 +5,7 @@ using Berserk.Shared.GameCore.Commands.Cmd;
 using Berserk.Shared.GameCore.LogicContext;
 using Berserk.Shared.GameCore.LogicEvents;
 using Berserk.Shared.GameCore.Models;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.Common.SceneService;
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Common.Utils;
@@ -19,6 +20,7 @@ namespace BerserkV3.GameCore.Settings
 	public class GameSettingsApplication : IInitializable, IDisposable
 	{
 		private readonly IReportService reportService;
+		private readonly IAudioApplication audioApplication;
 		private readonly IGameHub gameHub;
 		private readonly IGameContext gameContext;
 		private readonly IGameSettingButtonView settingButtonView;
@@ -30,9 +32,10 @@ namespace BerserkV3.GameCore.Settings
 		private bool initialized;
 
 		public GameSettingsApplication(
-			IReportService reportService,
 			IGameHub gameHub,
 			IGameContext gameContext,
+			IReportService reportService,
+			IAudioApplication audioApplication,
 			IGameSettingButtonView settingButtonView,
 			IBerserkTutorialApplication tutorialApplication,
 			IGameLogicEventsSource gameLogicEventsSource,
@@ -41,6 +44,7 @@ namespace BerserkV3.GameCore.Settings
 			IReportView reportView)
 		{
 			this.reportService = reportService;
+			this.audioApplication = audioApplication;
 			this.gameHub = gameHub;
 			this.gameContext = gameContext;
 			this.settingButtonView = settingButtonView;
@@ -58,6 +62,8 @@ namespace BerserkV3.GameCore.Settings
 			DefaultSharedLogger.Log($"[{GetType().Name.Orange().Bold()}] {nameof(Initialize)} method, {nameof(OnSurrender)} subscribed!");
 			settingsView.OnReport += reportView.Show;
 			settingsView.OnQuit += HandleGameLeft;
+			settingsView.OnSoundVolumeChanged += audioApplication.SetSoundVolume;
+			settingsView.OnMusicVolumeChanged += audioApplication.SetMusicVolume;
 			reportView.OnReport += Reporting;
 			settingButtonView.OnClick += Show;
 			gameLogicEventsSource.Subscribe<InitializeGame>(_ =>
@@ -74,6 +80,9 @@ namespace BerserkV3.GameCore.Settings
 				DefaultSharedLogger.Log($"[{GetType().Name.Orange().Bold()}] {nameof(Dispose)} method, {nameof(OnSurrender)} Unsubscribed!");
 				settingsView.OnSurrender -= OnSurrender;
 				settingsView.OnReport -= reportView.Show;
+				settingsView.OnQuit -= HandleGameLeft;
+				settingsView.OnSoundVolumeChanged -= audioApplication.SetSoundVolume;
+				settingsView.OnMusicVolumeChanged -= audioApplication.SetMusicVolume;
 			}
 
 			if (reportView != null)
@@ -85,6 +94,8 @@ namespace BerserkV3.GameCore.Settings
 
 		private void Show()
 		{
+			settingsView.SetSoundVolume(audioApplication.SoundVolume);
+			settingsView.SetMusicVolume(audioApplication.MusicVolume);
 			settingsView.ActiveBattle(true);
 			settingsView.ActiveReporting(reportService.IsAvailable);
 			settingsView.ActiveSurrender(initialized);

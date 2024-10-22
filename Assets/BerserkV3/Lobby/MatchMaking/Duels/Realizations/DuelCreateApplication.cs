@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking.Duels;
 using Berserk.Shared.SignalR.Enums;
 using BerserkV3.Common.Network;
 using BerserkV3.Common.Utils;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.Network;
 using BerserkV3.Lobby.UI.Duels;
 using BerserkV3.Startup.Authorization;
@@ -81,7 +81,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		public async UniTask CreateAsync(string name, string password, bool isPrivate)
 		{
 			signalTimeoutProcessor.Enabled = true;
-			var model = new LobbyCreateDuelRoomModel
+			var model = new DuelCreateRoomModel
 			{
 				Name = name.RemoveWhitespace(),
 				Password = password.RemoveWhitespace(),
@@ -119,7 +119,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				.Apply();
 		}
 		
-		private void OnMessageReceived(LobbyDuelAction action, LobbyDuelRoomModel duelModel)
+		private void OnMessageReceived(LobbyDuelAction action, DuelRoomModel duelModel)
 		{
 			switch (action)
 			{

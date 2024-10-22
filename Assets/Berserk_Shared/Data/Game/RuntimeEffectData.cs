@@ -21,5 +21,6 @@ namespace Berserk.Shared.Data.Game
 		public bool IsInnate { get; set; }
 		public TArg GetRuntimeArg<TArg>() => RuntimeArgs.OfType<TArg>().FirstOrDefault();
 		public IEnumerable<TArg> GetRuntimeArgs<TArg>() => RuntimeArgs.OfType<TArg>();
+		public EffectExecutionOrder ExecutionOrder { get; set; }
 	}
 }

@@ -1,7 +1,8 @@
 ﻿using BerserkV3.Common.TutorialSystem;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.MatchMaking.Practice;
 using BerserkV3.Lobby.MatchMaking.Sessions;
+using BerserkV3.Lobby.Vulcanite.Infrastructure;
 using BerserkV3.Startup.Applications;
 using BerserkV3.Startup.Authorization;
 using BerserkV3.Startup.Authorization.ExternalProviders;
@@ -13,7 +14,13 @@ namespace BerserkV3.Startup.Infrastructure
 	{
 		public override void InstallBindings()
 		{
+			Container
+				.BindInterfacesTo<SetupStartupUIGroup>()
+				.AsSingle()
+				.NonLazy();
+			
 			DeckInstaller.Install(Container);
+			VulcaniteInstaller.Install(Container);
 			SessionsStartupInstaller.Install(Container);
 			PracticeInstaller.Install(Container);
 			

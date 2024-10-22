@@ -1,4 +1,5 @@
-﻿using Berserk.Shared.Data.Identity.Social;
+﻿using Berserk.Shared.Data.Game.DraftMode.Configs;
+using Berserk.Shared.Data.Identity.Social;
 using Berserk.Shared.Data.Lobby;
 
 namespace Berserk.Shared.Data.Abstraction
@@ -29,6 +30,8 @@ namespace Berserk.Shared.Data.Abstraction
 		DeckRarityValueModel[] DeckRarityValueModels { get; }
 		DeckNftBonusModel[] DeckBonusValueModels { get; }
 		ExternalProvider[] AvailableSocials { get; }
+		string[] GameModes { get; }
+		DraftModeConfig DraftModeConfig { get;}
 
 		bool Initialized { get; }
 		void FillFromJson(string json);

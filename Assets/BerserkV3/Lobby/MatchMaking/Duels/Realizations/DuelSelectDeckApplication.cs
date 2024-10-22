@@ -6,21 +6,24 @@ using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.Utils;
 using BerserkV3.Generic.Customisation;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.MatchMaking.Leagues;
 using BerserkV3.Lobby.UI.Duels;
+using BerserkV3.Lobby.Vulcanite.Abstractions;
 using BerserkV3.Startup.Authorization;
+using BerserkV3.Startup.Authorization.Inventory.Models;
 using Cysharp.Threading.Tasks;
 using Lobby;
 using RR.Core.Extensions;
 using RR.UI.FrameSystem;
 using UI;
-using Vulcan.Data;
 
 namespace BerserkV3.Lobby.MatchMaking.Duels
 {
 	public class DuelSelectDeckApplication : IDuelSelectDeckApplication, IDisposable
 	{
+		private readonly IInventoryApplication userInventory;
+		private readonly IVulcaniteApplication vulcaniteApplication;
 		private readonly IGameDatabase gameDatabase;
 		private readonly ISharedConfig sharedConfig;
 		private readonly IDeckApplication deckApplication;
@@ -33,12 +36,16 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			IGameDatabase gameDatabase,
 			ISharedConfig sharedConfig,
 			IDeckApplication deckApplication,
-			ICustomisationItemRepository customisationItemRepository)
+			ICustomisationItemRepository customisationItemRepository, 
+			IInventoryApplication userInventory, 
+			IVulcaniteApplication vulcaniteApplication)
 		{
 			this.gameDatabase = gameDatabase;
 			this.sharedConfig = sharedConfig;
 			this.deckApplication = deckApplication;
 			this.customisationItemRepository = customisationItemRepository;
+			this.userInventory = userInventory;
+			this.vulcaniteApplication = vulcaniteApplication;
 		}
 
 		public async UniTask OpenAsync(Action onReturn = null) // TODO Subscribe to update when user's subscription has expired
@@ -99,14 +106,14 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				return false;
 			}
 			
-			var ownedHero = User.OwnedVulcanites.FirstOrDefault(x => x.Id == deckData.OwnedVulcaniteId);
+			var ownedHero = vulcaniteApplication.Get(deckData.OwnedVulcaniteId);
 			if (!ownedHero.IsValid())
 			{
 				NotifyClientException(gameDatabase.GetLocalization("ClientDuels_ValidateDeck_NotValidVulcanite"));
 				return false;
 			}
 
-			if (!deckData.IsValidCards())
+			if (!deckApplication.IsValidCards(deckData))
 			{
 				NotifyClientException(gameDatabase.GetLocalization("ClientDuels_ValidateDeck_NotValidCards"));
 				return false;
@@ -130,7 +137,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		{
 			var deckItemDatas = deckApplication.All.Select(deck =>
 			{
-				var ownedHero = User.OwnedVulcanites.FirstOrDefault(x => x.Id == deck.OwnedVulcaniteId);
+				var ownedHero = vulcaniteApplication.Get(deck.OwnedVulcaniteId);
 				var heroData = gameDatabase.GetHero(ownedHero?.VulcaniteId);
 
 				return new DuelDeckItemData
@@ -140,10 +147,10 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 					FactionUrl = $"{deck.Faction}_Flag",
 					CountText = $"{deck.OwnedCardIds.Count}/{sharedConfig.MaxCardsInDeck}",
 					LeagueFlagsUrls = LobbyBus.Leagues.Value
-						.Where(league => league.IsDeckValid(deck))
+						.Where(league => deckApplication.IsValidForLeague(league, deck))
 						.Select(model => model.GetArtURL())
 						.ToArray(),
-					IsValid = deck.IsValid(),
+					IsValid = deckApplication.IsValid(deck),
 					AvatarUrl = heroData?.ArtUrl,
 					QuadrantUrl = $"{heroData?.Quadrant ?? Quadrant.Neutral}_Flag"
 				};
@@ -171,7 +178,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				return UniTask.CompletedTask;
 			
 			var currDeck = deckApplication.All.First(x => x.Id == deckId);
-			var ownedHero = User.OwnedVulcanites.FirstOrDefault(x => x.Id == currDeck.OwnedVulcaniteId);
+			var ownedHero = vulcaniteApplication.Get(currDeck.OwnedVulcaniteId);
 			var heroData = gameDatabase.GetHero(ownedHero?.VulcaniteId);
 			var avatarUrl = heroData?.ArtUrl;
 			var frameUrl = customisationItemRepository.GetFirstEquipped(CustomisationType.AvatarFrame)?.PreviewURL;

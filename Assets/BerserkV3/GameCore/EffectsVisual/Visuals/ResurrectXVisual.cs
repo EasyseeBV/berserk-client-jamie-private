@@ -125,9 +125,9 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			
 			var headerText = Model.CurrentValue switch
 			{
-				< 0 => gameDatabase.GetLocalization("ResurrectCardsX"),
-				1 => gameDatabase.GetLocalization("ResurrectCardsOne"),
-				_ => string.Format(gameDatabase.GetLocalization("ResurrectCardsAny"), Model.CurrentValue)
+				< 0 => gameDatabase.GetLocalization("ClientVisual_ResurrectCardsX"),
+				1 => gameDatabase.GetLocalization("ClientVisual_ResurrectCardsOne"),
+				_ => string.Format(gameDatabase.GetLocalization("ClientVisual_ResurrectCardsAny"), Model.CurrentValue)
 			};
 			
 			resurrectHandView.SetHeaderText(headerText);
@@ -182,7 +182,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			
 			view.GlowView.Enable(canSelect && !view.MarkedAsSelected, GlowType.Turn);
 			if (view.Layout is IHandCardLayout handCardLayout)
-				handCardLayout.SetTitleText(view.MarkedAsSelected ? "Selected" : null);
+				handCardLayout.SetTitleText(view.MarkedAsSelected ? gameDatabase.GetLocalization("ClientVisual_ResurrectX_Selected") : null);
 			
 			view.Strategy.AllowSelection(canSelect);
 		}

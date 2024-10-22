@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
+	//TODO: Delete this
 	public partial class ProfileView : BaseView
 	{
 		private PageView[] pageMap;
@@ -18,13 +19,13 @@ namespace UI
 		protected override void OnAwake()
 		{
 			base.OnAwake();
-			var statisticRepository = new StatisticRepository();
-			var statisticViewFactory = new StatisticViewFactory();
-			var statisticEntityFactory = new StatisticViewModelFactory(statisticViewFactory, statisticRepository);
-			statisticApp = new StatisticApplication(statisticRepository);
-			ProfilePage.Construct(statisticEntityFactory);
-			StatisticsPage.Construct(statisticEntityFactory, statisticApp);
-			FavoriteDeckPage.Construct(statisticEntityFactory);
+			// var statisticRepository = new StatisticRepository();
+			// var statisticViewFactory = new StatisticViewFactory();
+			// var statisticEntityFactory = new StatisticViewModelFactory(statisticViewFactory, statisticRepository);
+			// statisticApp = new StatisticApplication(statisticRepository);
+			// ProfilePage.Construct(statisticEntityFactory);
+			// StatisticsPage.Construct(statisticEntityFactory, statisticApp);
+			// FavoriteDeckPage.Construct(statisticEntityFactory);
 			
 			pageMap = new PageView[]
 			{

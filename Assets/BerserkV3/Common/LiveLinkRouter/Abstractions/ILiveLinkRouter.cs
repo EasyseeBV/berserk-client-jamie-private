@@ -1,8 +1,11 @@
-﻿namespace BerserkV3.Common.LiveLinkRouter
+﻿using System;
+using Vuplex.WebView;
+
+namespace BerserkV3.Common.LiveLinkRouter
 {
 	public interface ILiveLinkRouter
 	{
-		void OpenLink(string url);
+		public void OpenLink(string url);
 		void OpenLinkByKey(string key);
 	}
 }

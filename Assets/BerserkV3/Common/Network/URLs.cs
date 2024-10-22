@@ -13,6 +13,7 @@ namespace BerserkV3.Common.Network // TODO: IMPORTANT do not change, used by ref
 		public static string HubUrl => $"{ServerUrl}/hubs";
 
 		public static string APIUrl => $"{ServerUrl}/{API_SUFFIX}";
+		public static string ShopUrl => $"https://berserk-shop-dev.azurewebsites.net/{API_SUFFIX}"; //TODO Update to dev stage etc
 
 		public static string ServerUrl => URLS_BY_REGION[EnvironmentSwitcher.CurrentRegion].GetServerURL();
 

@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Berserk.Shared.Data.Game;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.LiveLinkRouter;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Common.Utils;
-using BerserkV3.Lobby.Applications;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Startup.Authorization;
+using BerserkV3.Lobby.Decks;
 using Cysharp.Threading.Tasks;
 using Lobby;
 using RR.Core.Extensions;
@@ -21,6 +20,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
+	//TODO check and remove
 	[RequireComponent(typeof(CanvasGroup))]
 	public partial class DeckCardListView : BaseView
 	{
@@ -28,7 +28,7 @@ namespace UI
 		[SerializeField] private List<Toggle> sortButtons;
 		private readonly List<IDisposable> disposables = new();
 		private SortingType lastSelected;
-		private DeckData currentDeck;
+		private OwnedDeck currentDeck;
 		private CanvasGroup canvasGroup;
 		private bool hasChanges;
 		
@@ -64,19 +64,19 @@ namespace UI
 			LiveLinkRouterAdapter.Service.OpenLinkByKey(LinkKeyHelper.MARKET);
 		}
 
-		public void InitAndShow(DeckData deckModel)
+		public void InitAndShow(OwnedDeck ownedDeckModel)
 		{
 			SetActive(this, true);
 			canvasGroup.alpha = 0;
-			var isNewDeck = string.IsNullOrEmpty(deckModel.Id);
+			var isNewDeck = string.IsNullOrEmpty(ownedDeckModel.Id);
 			InitAsync().AddLoadingTask().Forget();
 
 			async UniTask InitAsync()
 			{
 				await UniTask.Yield();
-				currentDeck = deckModel;
+				currentDeck = ownedDeckModel;
 				DeckCardListPanel.DeckName = currentDeck?.Name;
-				DeckCardListPanel.OwnedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
+				//DeckCardListPanel.OwnedHero = User.OwnedVulcanites.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
 				hasChanges = false;
 				DisplayCards(isNewDeck);
 				await UniTask.Yield();
@@ -127,9 +127,9 @@ namespace UI
 
 		private bool ValidateCurrentDeck()
 		{
-			string message;
+			/*string message;
 			var ownedHeroId = DeckCardListPanel.OwnedHero?.Id;
-			var ownedVulcanite = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == ownedHeroId);
+			var ownedVulcanite = User.OwnedVulcanites.FirstOrDefault(x => x.Id == ownedHeroId);
 			if (ownedVulcanite == null)
 			{
 				message = GameDataBaseAdapter.Instance.GetLocalization("DeckChooseVulcanite");
@@ -157,13 +157,13 @@ namespace UI
 			else
 			{
 				return true;
-			}
+			}*/
 			
-			ConfirmationDialog.Instance.Init()
+			/*ConfirmationDialog.Instance.Init()
 				.SetMessage(message)
 				.SetTitle("Information")
 				.SetCancel()
-				.Apply();
+				.Apply();*/
 			return false;
 		}
 

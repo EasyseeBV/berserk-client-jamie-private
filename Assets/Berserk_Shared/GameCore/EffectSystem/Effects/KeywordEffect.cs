@@ -17,10 +17,10 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 		public IRuntimeGameObject Executor { get; private set; }
 		public EffectData EffectData { get; private set; }
 		public IRuntimeEffectData RuntimeData { get; private set; }
-		
+
 		protected IGameContext GameContext { get; private set; }
 		protected IGameLogicContext LogicContext { get; private set; }
-		
+
 		public KeywordEffect Init(
 			EffectData effectData,
 			IRuntimeEffectData runtimeData,
@@ -51,8 +51,10 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 		/// <summary>
 		///     Place all one-time logic here.
 		/// </summary>
-		public virtual void Create() {}
-		
+		public virtual void Create()
+		{
+		}
+
 		public void Expire()
 		{
 			var batchIdExpire = Math.Max(1, RuntimeData.Id) * 2;
@@ -78,12 +80,12 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 			OnExecute();
 			TryMarkEffectBatching(batchIdExecute, false);
 		}
-		
+
 		public virtual bool CanExecute()
 		{
 			return EffectData.MinTargetCount <= 0 || (Targets != null && Targets.Length >= EffectData.MinTargetCount);
 		}
-		
+
 		public void SetTargets(IRuntimeGameObject[] targets)
 		{
 			Targets = targets;
@@ -94,24 +96,36 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 		{
 			RuntimeData.DisabledLength = length;
 			OnDisabled();
-			
+
 			if (EffectData.Applied)
 				Executor.ChangedAppliedEffect(this);
 		}
 
-		public virtual void OnExpirePhase() {}
+		public virtual void OnExpirePhase()
+		{
+		}
 
-		public virtual void OnExecuted(){}
+		public virtual void OnExecuted()
+		{
+		}
 
-		public virtual void OnDeleted() {}
+		public virtual void OnDeleted()
+		{
+		}
 
-		public virtual void OnChanged() {}
+		public virtual void OnChanged()
+		{
+		}
 
-		public virtual void OnAdded() {}
+		public virtual void OnAdded()
+		{
+		}
 
-		protected virtual void OnDisabled() {}
+		protected virtual void OnDisabled()
+		{
+		}
 
-		public IRuntimeEffect Stack(IRuntimeEffect other)
+		public virtual IRuntimeEffect Stack(IRuntimeEffect other)
 		{
 			foreach (var effectStack in EffectData.EffectStacks)
 				InternalStack(effectStack, other);
@@ -173,9 +187,9 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 				case EffectStack.DoNotStack:
 				default: throw new ArgumentOutOfRangeException($"{value} - Cant use stack");
 			}
-			
+
 			return;
-			
+
 			int StackLengthAdditive(int otherValue)
 			{
 				if (otherValue < 0)
@@ -187,12 +201,12 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 				return RuntimeData.CurrentLength + otherValue;
 			}
 		}
-		
+
 		public virtual IRuntimeGameObject[] GetExecutionTargets()
 		{
 			return GetExecutionTargetsInternal(EffectData.ExecuteTargets);
 		}
-		
+
 		public virtual void Dispose()
 		{
 			//Manual cleanup works too early, breaks correct sync with client. TODO: find problem
@@ -203,15 +217,20 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 		/// <summary>
 		///     Called each time the effect recovery and init
 		/// </summary>
-		protected virtual void OnInit(){}
-
+		protected virtual void OnInit()
+		{
+		}
 
 		/// <summary>
 		///     Called each time the effect is triggered.
 		/// </summary>
-		protected virtual void OnExecute(){}
+		protected virtual void OnExecute()
+		{
+		}
 
-		protected virtual void OnExpire() {}
+		protected virtual void OnExpire()
+		{
+		}
 
 		protected virtual void OnStackCustom(IRuntimeEffect other)
 		{
@@ -228,12 +247,10 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 			return other;
 		}
 
-		protected int ValueModRounded(IntStat stat = null, EffectValue? effectValue = null)
+		protected virtual int ValueModRounded(IntStat stat = null, EffectValue? effectValue = null)
 		{
 			var rawValue = ValueMode(stat, effectValue);
-			return rawValue < 0
-				? (int) Math.Floor(rawValue)
-				: (int) Math.Round(rawValue);
+			return (int) Math.Round(rawValue);
 		}
 
 		protected float ValueMode(IntStat stat = null, EffectValue? effectValue = null)
@@ -247,9 +264,9 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 			{
 				EffectValue.Integer => RuntimeData.CurrentValue,
 
-				EffectValue.PercentFromCurrent => (stat ?? 1) * RuntimeData.CurrentValue / 100f,
+				EffectValue.PercentFromCurrent => CalculatePercentFromCurrent(stat),
 
-				EffectValue.PercentFromMaximum => (stat?.TotalMax ?? 1) * RuntimeData.CurrentValue / 100f,
+				EffectValue.PercentFromMaximum => CalculatePercentFromMaximum(stat),
 
 				EffectValue.AlliedCount => Math.Max(0, GameContext.GameRuntimePool
 					.GetCardsFilterBy(RuntimeState.InTable, ownerUserId, ObjectType.TableCardsMask)
@@ -273,7 +290,7 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 
 				EffectValue.TurnWithoutCards => RuntimeData.CurrentValue * (ownerContex.RuntimeData.TurnsWithoutCards ?? 1),
 
-				EffectValue.TargetCount => Targets is {Length: > 0} ? RuntimeData.CurrentValue * Targets.Length : 0,
+				EffectValue.TargetCount => Targets is { Length: > 0 } ? RuntimeData.CurrentValue * Targets.Length : 0,
 
 				EffectValue.SelfLava => ownerContex.RuntimeData.Mana * RuntimeData.CurrentValue,
 
@@ -316,7 +333,7 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 					.Reverse() // targets from base query have to be first in list
 					.ToArray(),
 
-				EffectExecuteTarget.Executor => new[] {Executor},
+				EffectExecuteTarget.Executor => new[] { Executor },
 				EffectExecuteTarget.Targets => Targets,
 				EffectExecuteTarget.Opposite => new IRuntimeGameObject[]
 				{
@@ -329,10 +346,28 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects
 				},
 				EffectExecuteTarget.TurnOwner => new IRuntimeGameObject[]
 				{
-					GameContext.GameRuntimePool.GetHeroes().First(x=> x.RuntimeData.OwnerUserId == GameContext.Timer.RuntimeData.OwnerId)
+					GameContext.GameRuntimePool.GetHeroes().First(x => x.RuntimeData.OwnerUserId == GameContext.Timer.RuntimeData.OwnerId)
 				},
 				_ => throw new NotImplementedException($"Unknown {nameof(EffectExecuteTarget)} : {flag}")
 			}).ToArray();
+		}
+
+		private float CalculatePercentFromCurrent(IntStat stat)
+		{
+			var statValue = stat ?? 1;
+			var currentValue = RuntimeData.CurrentValue;
+			var result = statValue * currentValue / 100f;
+			var roundedResult = (float)Math.Floor(result);
+			return roundedResult;
+		}
+
+		private float CalculatePercentFromMaximum(IntStat stat)
+		{
+			var statTotalMax = stat?.TotalMax ?? 1;
+			var currentValue = RuntimeData.CurrentValue;
+			var result = statTotalMax * currentValue / 100f;
+			var roundedResult = (float)Math.Floor(result);
+			return roundedResult;
 		}
 	}
 }

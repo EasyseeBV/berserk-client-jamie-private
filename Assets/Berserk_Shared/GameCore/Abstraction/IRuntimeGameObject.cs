@@ -18,12 +18,12 @@ namespace Berserk.Shared.GameCore.Abstraction
 		event Action<DamageValue> OnImmuneDamageAdded;
 		event Action<DamageValue> OnImmuneDamageDeleted;
 		event Action<string[]> OnImpossingEffectDeleted;
-		event Action<IStat<int>> OnRestore;
-		event Action<IStat<int>> OnHit;
+		event Action<IntStat, int> OnRestore;
+		event Action<IntStat, int> OnHit;
 		event Action OnSpawn;
 		event Action OnDie;
 		
-		IList<IRuntimeEffect> AppliedEffects { get; }
+		List<IRuntimeEffect> AppliedEffects { get; }
 		IRuntimeData RuntimeData { get; }
 		IObjectData Data { get; }
 

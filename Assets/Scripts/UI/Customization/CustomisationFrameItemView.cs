@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.DataBase;
-using BerserkV3.Lobby.Applications;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
+using BerserkV3.Startup.Authorization;
+using UnityEngine;
 
 namespace UI
 {
@@ -18,9 +19,11 @@ namespace UI
 
 		private string GetAdditionArtUrl()
 		{
-			var ownedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == DeckApplicationAdapter.Application.Current?.OwnedVulcaniteId)
-				?? VulcaniteHandler.Owned.FirstOrDefault(x=> x.IsValid());
-			return GameDataBaseAdapter.Instance.GetHero(ownedHero?.VulcaniteId)?.ArtUrl;
+			Debug.LogError("This old class replace with new one");
+			/*var ownedHero = User.OwnedVulcanites.FirstOrDefault(x => x.Id == DeckApplicationAdapter.Application.Current?.OwnedVulcaniteId)
+				?? User.OwnedVulcanites.FirstOrDefault(x=> x.IsValid());
+			return GameDataBaseAdapter.Instance.GetHero(ownedHero?.VulcaniteId)?.ArtUrl;*/
+			return "";
 		}
 	}
 }

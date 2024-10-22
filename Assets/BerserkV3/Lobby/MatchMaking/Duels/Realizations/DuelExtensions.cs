@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking.Duels;
 
 namespace BerserkV3.Lobby.MatchMaking.Duels
 {
@@ -12,7 +12,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			return string.IsNullOrWhiteSpace(value) ? null : value;
 		}
 		
-		public static List<DuelRoomItemData> MapDuelRooms(this IEnumerable<LobbyDuelRoomModel> rooms, int playerLimit)
+		public static List<DuelRoomItemData> MapDuelRooms(this IEnumerable<DuelRoomModel> rooms, int playerLimit)
 		{
 			if (rooms == null)
 				return new List<DuelRoomItemData>();
@@ -23,7 +23,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				.ToList();
 		}
 		
-		public static DuelRoomItemData MapDuelRoom(this LobbyDuelRoomModel roomModel, int playerLimit, int order)
+		public static DuelRoomItemData MapDuelRoom(this DuelRoomModel roomModel, int playerLimit, int order)
 		{
 			if (roomModel == null)
 				return default;

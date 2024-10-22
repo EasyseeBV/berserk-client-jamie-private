@@ -1,6 +1,8 @@
 using RR.Core.EventLayer;
 using System.Collections.Generic;
 using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking.AutoMatching;
+using Berserk.Shared.Data.Shop;
 using Berserk.Shared.SignalR.Enums;
 
 namespace Lobby
@@ -10,8 +12,6 @@ namespace Lobby
 		static LobbyBus()
 		{
 			InitFields<LobbyBus>();
-
-			CurrentOnlineCount.HideInLog = true;
 		}
 
 		public static RREvent LeaguesRefereshRequered;
@@ -34,6 +34,7 @@ namespace Lobby
 		public static RREvent OnRoomLeave;
 		
 		public static RREvent OnUserDataRefreshed;
-		public static State<int> CurrentOnlineCount;
+		
+		public static RREvent<List<ItemModel>> OnPurchasedRecieved;
 	}
 }

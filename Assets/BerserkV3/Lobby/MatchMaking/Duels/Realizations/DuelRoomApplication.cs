@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Audio;
 using Berserk.Shared.Data.Abstraction;
-using Berserk.Shared.Data.Lobby;
-using Berserk.Shared.GameCore.LogicContext;
+using Berserk.Shared.Data.Lobby.Matchmaking;
+using Berserk.Shared.Data.Lobby.Matchmaking.Duels;
 using Berserk.Shared.SignalR.Enums;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.Common.Network;
 using BerserkV3.Common.Utils;
 using BerserkV3.Lobby.MatchMaking.Sessions;
@@ -15,12 +16,12 @@ using Cysharp.Threading.Tasks;
 using Lobby;
 using RR.UI.FrameSystem;
 using UI;
-using Vulcan.Audio;
 
 namespace BerserkV3.Lobby.MatchMaking.Duels
 {
 	public class DuelRoomApplication : IDisposable, IDuelRoomApplication
 	{
+		private readonly IAudioApplication audioApplication;
 		private readonly ISessionsApplication sessionsApplication;
 		private readonly ISignalTimeoutProcessor signalTimeoutProcessor;
 		private readonly ISessionsSignalProcessor sessionsSignalProcessor;
@@ -33,6 +34,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		public event Action OnReturnRequested;
 		
 		public DuelRoomApplication(
+			IAudioApplication audioApplication,
 			ISessionsApplication sessionsApplication,
 			ISignalTimeoutProcessor signalTimeoutProcessor,
 			ISessionsSignalProcessor sessionsSignalProcessor,
@@ -40,6 +42,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			ISharedConfig sharedConfig,
 			IGameDatabase gameDatabase)
 		{
+			this.audioApplication = audioApplication;
 			this.sessionsApplication = sessionsApplication;
 			this.signalTimeoutProcessor = signalTimeoutProcessor;
 			this.sessionsSignalProcessor = sessionsSignalProcessor;
@@ -192,7 +195,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 
 		#region Network
 		
-		private void OnMessageReceived(LobbyDuelAction action, LobbyDuelRoomModel roomModel)
+		private void OnMessageReceived(LobbyDuelAction action, DuelRoomModel roomModel)
 		{
 			switch (action)
 			{
@@ -219,7 +222,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 					RefreshAsync(duelRoomData).Forget();
 					
 					if (duelRoomData.HostId == User.Id)
-						AudioController.Play(Clip.Lobby_OpponentEntered);
+						audioApplication.PlaySound(Clip.Lobby_OpponentEntered);
 					
 					return;
 				}

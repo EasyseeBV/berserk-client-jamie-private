@@ -1,42 +1,48 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.LogicContext;
 using BerserkV3.Common.AnalyticsSystem;
 using BerserkV3.Common.SerializedHelper;
 using BerserkV3.Common.StateMachine;
 using BerserkV3.Common.Utils;
 using BerserkV3.Generic.Customisation;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Startup.Abstractions;
+using BerserkV3.Startup.Authorization.Inventory.Models;
 using BerserkV3.Startup.Network;
 using BerserkV3.Startup.UI;
 using BerserkV3.Startup.Utils;
 using Cysharp.Threading.Tasks;
+using RR.UIService;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthProcessingState : AuthState<AuthProcessingArgs>
 	{
+		private readonly IUIService uiService;
 		private readonly ISerializeHelper serializeHelper;
 		private readonly IDeckApplication deckApplication;
 		private readonly IMessageApplication messageApplication;
 		private readonly IAnalyticsApplication analyticsApplication;
 		private readonly ICustomisationApplication customisationApplication;
-		private static AuthSaveView Window => AuthSaveView.Instance;
+		private readonly IInventoryApplication inventoryApplication;
 
 		public AuthProcessingState(
+			IUIService uiService,
 			ISerializeHelper serializeHelper,
 			IDeckApplication deckApplication,
 			IMessageApplication messageApplication,
 			IAnalyticsApplication analyticsApplication,
-			ICustomisationApplication customisationApplication)
+			ICustomisationApplication customisationApplication,
+			IInventoryApplication inventoryApplication)
 		{
+			this.uiService = uiService;
 			this.serializeHelper = serializeHelper;
 			this.deckApplication = deckApplication;
 			this.messageApplication = messageApplication;
 			this.analyticsApplication = analyticsApplication;
 			this.customisationApplication = customisationApplication;
+			this.inventoryApplication = inventoryApplication;
 		}
 
 		protected override void OnEnter(AuthProcessingArgs args)
@@ -46,7 +52,7 @@ namespace BerserkV3.Startup.Authorization
 
 		protected override void OnExit(AuthProcessingArgs args)
 		{
-			Window.Close();
+			uiService.Begin<AuthSaveWindow>().Hide();
 			base.OnExit(args);
 		}
 
@@ -71,7 +77,9 @@ namespace BerserkV3.Startup.Authorization
 				}
 				
 				await TaskUtil.RetryAsync(FetchUserDataAsync);
-				await TaskUtil.RetryAsync(FetchCustomisations).AddLoadingTask();
+				await TaskUtil.RetryAsync(FetchInventory);
+				await deckApplication.InitActiveDeckAsync(); 
+				await TaskUtil.RetryAsync(FetchCustomisations).AddLoadingTask();// TODO remove
 				await AuthSaveAsync();
 				StateMachineBus.Switch<AuthCompleteState>();
 			}
@@ -101,7 +109,6 @@ namespace BerserkV3.Startup.Authorization
 			User.Sync(response.Data);
 			analyticsApplication.SetUserId(User.Id);
 			AnalyticsBus.SendCustomEvent.Publish(new LoginModel(User.UserName));
-			await deckApplication.InitActiveDeckAsync();
 			return TryResult.Success;
 		}
 
@@ -110,6 +117,15 @@ namespace BerserkV3.Startup.Authorization
 			return await customisationApplication.InitAsync()
 				? TryResult.Success
 				: TryResult.Retry;
+		}
+		
+		private async Task<TryResult> FetchInventory()
+		{
+			var result = await inventoryApplication.InitAsync()
+				? TryResult.Success
+				: TryResult.Retry;
+			
+			return result;
 		}
 
 		private async UniTask AuthSaveAsync()
@@ -124,21 +140,26 @@ namespace BerserkV3.Startup.Authorization
 			}
 
 			var tcs = new UniTaskCompletionSource<bool>();
-			Window.Show();
-			Window.SetHeaderText("Authorization");
-			Window.SetMessageText(GameDatabase.GetLocalization("AuthRemember"));
-			Window.SetAcceptButtonText("Remember me");
-			Window.SetCancelButtonText("Skip");
-			Window.TimerWidget.SetTimer(30, () => tcs.TrySetResult(false));
-			Window.SetAcceptAction(() => tcs.TrySetResult(true));
-			Window.SetCancelAction(() => tcs.TrySetResult(false));
-
+			uiService.Begin<AuthSaveWindow>()
+				.WithInit(InitWindow)
+				.Show();
+			
 			if (await tcs.Task)
 				AuthSave();
-
-			var closeAsync = new UniTaskCompletionSource();
-			Window.Close(onAnimationDone: () => closeAsync.TrySetResult());
-			await closeAsync.Task;
+			
+			await uiService.Begin<AuthSaveWindow>().HideAsync();
+			
+			return;
+			void InitWindow(AuthSaveWindow window)
+			{
+				window.SetHeaderText("Authorization");
+				window.SetMessageText(GameDatabase.GetLocalization("AuthRemember"));
+				window.SetAcceptButtonText("Remember me");
+				window.SetCancelButtonText("Skip");
+				window.TimerWidget.SetTimer(30, () => tcs.TrySetResult(false));
+				window.SetAcceptAction(() => tcs.TrySetResult(true));
+				window.SetCancelAction(() => tcs.TrySetResult(false));
+			}
 		}
 
 		private void AuthSave()

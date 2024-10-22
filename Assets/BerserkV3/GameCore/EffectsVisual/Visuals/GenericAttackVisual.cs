@@ -1,21 +1,27 @@
 using System;
 using System.Linq;
-using Audio;
 using Berserk.Shared.Data.Enums;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.GameCore.Cards;
 using BerserkV3.GameCore.EffectsVisual.Attributes;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using RR.Core.DebugSystem;
 using UnityEngine;
-using Vulcan.Audio;
 
 namespace BerserkV3.GameCore.EffectsVisual.Visuals
 {
 	[EffectVisual(EffectVisualKeyword.GenericAttack)]
 	public class GenericAttackVisual : EffectVisual
 	{
+		private readonly IAudioApplication audioApplication;
 		private const float ANIMATED_ATTACK_SIZE = 1.5f;
+		public GenericAttackVisual(IAudioApplication audioApplication)
+		{
+			this.audioApplication = audioApplication;
+		}
+
 		public override async UniTask StartEffectAsync()
 		{
 			foreach (var target in Targets.Where(t => !t.RuntimeGameObject.IsDead))
@@ -63,7 +69,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 						.DOMove(target.position, 0.1f)
 						.SetDelay(0.05f)
 						.SetEase(Ease.InCirc)
-						.OnComplete(() => AudioController.Play(Clip.TableCard_Attack)))
+						.OnComplete(() => audioApplication.PlaySound(Clip.TableCard_Attack)))
 					.Append(executorTransform.DOMove(fromPosition, 0.3f).SetEase(Ease.OutCubic))
 					.Append(executorTransform.DOScale(scaleFrom, 0.3f).SetEase(Ease.InOutCubic))
 					.OnComplete(() => executorTransform.SetSiblingIndex(sibling))

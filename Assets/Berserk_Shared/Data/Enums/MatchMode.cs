@@ -11,6 +11,7 @@ namespace Berserk.Shared.Data.Enums
 		Ranked,
 		Practice,
 		Tutorial,
-		AutoTest
+		AutoTest,
+		DraftMode
 	}
 }

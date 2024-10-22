@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
@@ -66,7 +65,7 @@ namespace Berserk.Shared.Data.Game
 			Mana = new IntStat(data.Mana);
 			Attack = new IntStat(data.Attack);
 			Armor = new IntStat(data.Armor); // empty stat
-			MoveCount = new IntStat(0, 1); // max 1 move per turn
+			MoveCount = new IntStat(1); // max 1 move per turn
 			ImposingEffects = data.EffectsIds?.ToList();
 			Type = data.Type;
 
@@ -74,7 +73,7 @@ namespace Berserk.Shared.Data.Game
 			Mana.SetName(nameof(Mana));
 			Attack.SetName(nameof(Attack));
 			Armor.SetName(nameof(Armor));
-			MoveCount.SetName(nameof(MoveCount));
+			MoveCount.Set(0).SetName(nameof(MoveCount));
 		}
 
 		public bool Equals(IRuntimeData other)

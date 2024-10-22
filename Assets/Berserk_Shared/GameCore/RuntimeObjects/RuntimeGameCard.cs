@@ -20,7 +20,7 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 		public override void Spawn(bool notify = true)
 		{
 			base.Spawn(notify);
-			RuntimeData.MoveCount.ResetToMax();
+			RuntimeData.MoveCount.Add(RuntimeData.MoveCount.BaseStat);
 		}
 
 		public void ReturnToDeck(bool notify = true)

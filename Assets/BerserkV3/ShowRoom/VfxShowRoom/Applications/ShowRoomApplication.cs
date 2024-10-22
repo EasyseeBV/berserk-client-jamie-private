@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Berserk.Shared.Data.Enums;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.GameCore.Controllers;
 using BerserkV3.GameCore.EffectsVisual.Abstractions;
 using UnityEngine;
 using UnityEngine.UI;
-using Vulcan.Audio;
 using Zenject;
 using Object = UnityEngine.Object;
 
@@ -19,17 +19,20 @@ namespace BerserkV3.ShowRoom.VfxShowRoom
 		private readonly IInstantiator instantiator;
 		private readonly IGameContainers gameContainers;
 		private readonly IVfxApplication vfxApplication;
+		private readonly IAudioApplication audioApplication;
 		private readonly List<Transform> showRoomCards;
 		private VfxKeywordList listView;
 		
 		public ShowRoomApplication(
 			IInstantiator instantiator, 
 			IGameContainers gameContainers,
-			IVfxApplication vfxApplication)
+			IVfxApplication vfxApplication,
+			IAudioApplication audioApplication)
 		{
 			this.instantiator = instantiator;
 			this.gameContainers = gameContainers;
 			this.vfxApplication = vfxApplication;
+			this.audioApplication = audioApplication;
 			showRoomCards = new List<Transform>();
 		}
 		
@@ -37,7 +40,7 @@ namespace BerserkV3.ShowRoom.VfxShowRoom
 		{
 			BuildShowRoomCards();
 			BuildShowRoomVfx();
-			AudioController.SetVolume(0.1f);
+			audioApplication.SetSoundVolume(0.1f);
 		}
 
 		private void BuildShowRoomVfx()

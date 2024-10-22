@@ -18,57 +18,67 @@ namespace Berserk.Shared.GameCore
 		Default = 64,
 		Name = 128,
 	}
-
+	
+	[Serializable]
 	public class IntStat : Stat<int>, IStatModifiable<int>
 	{
 		#region Constructors
 
 		[JsonConstructor]
 		public IntStat(
-			List<IStatModifier<int>> modifiers, 
-			string name, 
-			int previous, 
-			int current, 
-			int baseStat, 
-			int max, 
+			List<IStatModifier<int>> modifiers,
+			string name,
+			int previous,
+			int current,
+			int baseStat,
+			int max,
 			StatChanges changes) : base(name, previous, current, baseStat, max, changes)
 		{
 			Modifiers = modifiers;
-			CalculateMidifiers();
+			CalculateModifiers(false);
 		}
 
 		public IntStat() : base(0)
 		{
-			CalculateMidifiers();
+			CalculateModifiers(false);
 		}
 
 		public IntStat(int max) : base(max)
 		{
-			CalculateMidifiers();
+			CalculateModifiers(false);
 		}
 
 		public IntStat(int current, int max) : base(current, max)
 		{
-			CalculateMidifiers();
+			CalculateModifiers(false);
 		}
 
-		public IntStat(IntStat copy) : base(copy)
-		{
-			CalculateMidifiers();
-		}
+		#endregion
+
+		#region Operators
+
+		public static implicit operator int(IntStat stat) => stat.TotalCurrent;
 
 		#endregion
 
 		#region Override
 
-		[JsonIgnore] public override bool IsMax => Current >= TotalMax;
+		[JsonIgnore] public override bool IsMax => TotalCurrent >= TotalMax;
 
 		protected override int ApplyCurrent(int value)
 		{
-			value = value > TotalMax ? TotalMax : value;
-			return value != Current
-				? base.ApplyCurrent(value)
-				: value;
+			var newTotal = value + ModCurrent;
+			if (newTotal <= TotalMax)
+				return base.ApplyCurrent(value);
+
+			var totalMaxAbs = Math.Abs(TotalMax);
+			var newTotalSign = Math.Sign(newTotal);
+			var newTotalAbs = Math.Abs(newTotal);
+			var overLimit = newTotalAbs - totalMaxAbs;
+			newTotalAbs -= overLimit;
+			newTotalAbs *= newTotalSign;
+			
+			return base.ApplyCurrent(newTotalAbs);
 		}
 
 		public override IStat<int> Replace(IStat<int> other, bool notify = false)
@@ -102,7 +112,7 @@ namespace Berserk.Shared.GameCore
 
 		public override void NotifyChanges(bool force = false)
 		{
-			CalculateMidifiers(false);
+			CalculateModifiers(false);
 			base.NotifyChanges(force);
 		}
 
@@ -112,7 +122,9 @@ namespace Berserk.Shared.GameCore
 
 		[JsonProperty] protected List<IStatModifier<int>> Modifiers = new();
 		[JsonIgnore] public int TotalMax => Max + ModMax;
+		[JsonIgnore] public int TotalCurrent => Current + ModCurrent;
 		[JsonIgnore] public int ModMax { get; protected set; }
+		[JsonIgnore] public int ModCurrent { get; protected set; }
 
 		// Encapsulation is for modifiers only, other changes will be incorrect.
 
@@ -128,6 +140,16 @@ namespace Berserk.Shared.GameCore
 			ModMax = value;
 		}
 
+		public void AddModCurrent(int value)
+		{
+			ModCurrent += value;
+		}
+
+		public void SetModCurrent(int value)
+		{
+			ModCurrent = value;
+		}
+
 		#endregion
 
 		public IEnumerable<IStatModifier<int>> GetModifiers()
@@ -140,23 +162,25 @@ namespace Berserk.Shared.GameCore
 			return Modifiers.Where(x => x.Id == id).ToArray();
 		}
 
-		public void CalculateMidifiers(bool notify = true)
+		[JsonIgnore] private readonly object calculateLock = new();
+		public void CalculateModifiers(bool notify = true)
 		{
-			var modMaxPrevious = ModMax;
-			ModMax = 0;
-			var orderedModifiers = Modifiers.OrderByDescending(x => x.Priority).ToArray();
-			// first calc all maximum
-			foreach (var modifier in orderedModifiers)
-				modifier.ApplyMaximum(this);
-			// then calc all current, because current are depends to maximum
-			foreach (var modifier in orderedModifiers)
-				modifier.ApplyCurrent(this);
+			lock (calculateLock)
+			{
+				var modMaxPrevious = ModMax;
+				var modCurrPrevious = ModCurrent;
+				ModCurrent = ModMax = 0;
 
+				foreach (var modifier in Modifiers)
+					modifier.Apply(this);
+
+				SetChanges(modMaxPrevious != ModMax || modCurrPrevious != ModCurrent, StatChanges.Modifiers);
+			}
+			
 			ApplyCurrent(Current);
-			SetChanges(modMaxPrevious != ModMax, StatChanges.Modifiers);
 			
 			if (notify)
-				NotifyChanges();
+				base.NotifyChanges();
 		}
 
 		public void AddModifier(IStatModifier<int> value, bool notify = true)
@@ -174,6 +198,7 @@ namespace Berserk.Shared.GameCore
 			}
 
 			Modifiers.Add(value);
+			SortModifiers();
 			SetChanges(true, StatChanges.Modifiers);
 
 			if (notify)
@@ -183,23 +208,27 @@ namespace Berserk.Shared.GameCore
 		public void RemoveModifier(IStatModifier<int> value, bool notify = true)
 		{
 			value?.Expire(this);
-			SetChanges(Modifiers.Remove(value), StatChanges.Modifiers);
-			
-			if (Modifiers.Count == 0)
-				ModMax = 0;
-			
-			if (!notify)
+			if (Modifiers.Remove(value))
 			{
-				ApplyCurrent(Current);
-				return;
+				SortModifiers();
+				SetChanges(true, StatChanges.Modifiers);
 			}
+
+			if (Modifiers.Count == 0)
+			{
+				ModMax = 0;
+				ModCurrent = 0;
+			}
+
+			ApplyCurrent(Current);
 			
-			NotifyChanges();
+			if (notify)
+				NotifyChanges();
 		}
 
 		public void RemoveModifiers(string id, bool notify = true)
 		{
-			foreach (var modifier in Modifiers.OrderByDescending(x=> x.Priority).ToArray())
+			foreach (var modifier in Modifiers.ToArray().Reverse())
 			{
 				if (modifier?.Id == id)
 					RemoveModifier(modifier, false);
@@ -213,6 +242,7 @@ namespace Berserk.Shared.GameCore
 		{
 			SetChanges(Modifiers.Count > 0, StatChanges.Modifiers);
 			ModMax = 0;
+			ModCurrent = 0;
 			Modifiers.Clear();
 
 			if (notify)
@@ -252,13 +282,23 @@ namespace Berserk.Shared.GameCore
 			Set(value, notify);
 		}
 
-		public string ToString(string v) => Current.ToString(v);
+		public string ToString(string v) => TotalCurrent.ToString(v);
 
 		public override void Dispose()
 		{
 			base.Dispose();
 			Modifiers.Clear();
 			ModMax = default;
+			ModCurrent = default;
+		}
+
+		protected virtual bool SortModifiers()
+		{
+			if (Modifiers.Count <= 1)
+				return false;
+			
+			Modifiers.Sort((x, y) => (x.Priority).CompareTo(y.Priority));
+			return true;
 		}
 	}
 }

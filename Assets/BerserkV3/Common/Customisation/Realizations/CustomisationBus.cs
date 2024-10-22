@@ -1,4 +1,3 @@
-using Audio;
 using RR.Core.EventLayer;
 
 namespace BerserkV3.Generic.Customisation
@@ -10,6 +9,6 @@ namespace BerserkV3.Generic.Customisation
 			InitFields<CustomisationBus>();
 		}
 		
-		public static State<Clip> OnMusicUpdated;
+		public static State<string> OnMusicPlayTest;
 	}
 }

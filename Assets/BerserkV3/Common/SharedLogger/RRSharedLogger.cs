@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Berserk.Shared.GameCore.LogicContext;
 using RR.Core.DebugSystem;
 
@@ -23,6 +23,11 @@ namespace BerserkV3.Generic.SharedLogger
 		public void Error(Exception exception)
 		{
 			RRLogger.Error(exception);
+		}
+		
+		public void Error(Exception exception, string message)
+		{
+			RRLogger.Error($"{exception} message:{message}");
 		}
 	}
 }

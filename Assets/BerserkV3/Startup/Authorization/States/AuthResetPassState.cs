@@ -7,51 +7,65 @@ using BerserkV3.Startup.Network;
 using BerserkV3.Startup.UI;
 using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
+using RR.UIService;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthResetPassState : AuthState<AuthResetPassArgs>
 	{
-		private static AuthResetPassView Window => AuthResetPassView.Instance;
+		private readonly IUIService uiService;
+		public AuthResetPassState(IUIService uiService)
+		{
+			this.uiService = uiService;
+		}
 
 		protected override void OnEnter(AuthResetPassArgs args)
 		{
-			Window.SetCodeInputValueChangeAction(OnInputsChanged);
-			Window.SetPassInputValueChangeAction(OnInputsChanged);
-			Window.SetReturnAction(StateMachineBus.Switch<AuthForgotPassState>);
-			Window.SetFooterAction(StateMachineBus.Switch<AuthSignInState>);
-			Window.SetResetAction(() => ReqestResetPassAsync().Forget(e => RRLogger.Error(e)));
-			Window.SetHeaderText("<b>Reset</b> Password");
-			Window.SetMessageText($"We have sent you an email with reset code.");
-			Window.SetFooterText($"Remember your Password? <color=#F55D0D>Log in");
-			Window.SetResetText("Reset Password");
-			Window.SetResetInteractable(false);
-			Window.SetCodeInputText(string.Empty);
-			Window.SetPassInputText(string.Empty);
-			OnInputsChanged(string.Empty);
-			Window.Show();
+			uiService.Begin<AuthResetPassWindow>()
+				.WithInit(InitWindow)
+				.Show();
+			
+			return;
+			void InitWindow(AuthResetPassWindow window)
+			{
+				window.SetCodeInputValueChangeAction(InputsChanged);
+				window.SetPassInputValueChangeAction(InputsChanged);
+				window.SetReturnAction(StateMachineBus.Switch<AuthForgotPassState>);
+				window.SetFooterAction(StateMachineBus.Switch<AuthSignInState>);
+				window.SetResetAction(() => ReqestResetPassAsync().Forget(e => RRLogger.Error(e)));
+				window.SetHeaderText("<b>Reset</b> Password");
+				window.SetMessageText($"We have sent you an email with reset code.");
+				window.SetFooterText($"Remember your Password? <color=#F55D0D>Log in");
+				window.SetResetText("Reset Password");
+				window.SetResetInteractable(false);
+				window.SetCodeInputText(string.Empty);
+				window.SetPassInputText(string.Empty);
+				InputsChanged(string.Empty);
+				
+				return;
+				void InputsChanged(string value)
+				{
+					var isActive = !string.IsNullOrEmpty(window.GetCodeInputText())
+					               && !string.IsNullOrEmpty(window.GetPassInputText());
+					window.SetResetInteractable(isActive);
+				}
+			}
 		}
 
 		protected override void OnExit(AuthResetPassArgs args)
 		{
-			Window.Close();
-		}
-
-		private void OnInputsChanged(string value)
-		{
-			var isActive = !string.IsNullOrEmpty(Window.GetCodeInputText())
-			               && !string.IsNullOrEmpty(Window.GetPassInputText());
-			Window.SetResetInteractable(isActive);
+			uiService.Begin<AuthResetPassWindow>().Hide();
 		}
 
 		private async UniTask ReqestResetPassAsync()
 		{
+			var window = uiService.Get<AuthResetPassWindow>();
 			var email = GetArgs().Email;
 			var model = new ResetPasswordModel
 			{
 				Email = email, 
-				Password = Window.GetPassInputText(), 
-				EmailCode = Window.GetCodeInputText()
+				Password = window.GetPassInputText(), 
+				EmailCode = window.GetCodeInputText()
 			};
 			
 			var response = await IdentityAPI.PostResetPassword(model).AddLoadingTask();
@@ -63,7 +77,7 @@ namespace BerserkV3.Startup.Authorization
 
 			var message = "Password reset successful! Continue to login.";
 			var messageArgs = AuthMessageArgs.Accepted(nameof(AuthSignInState), message);
-			var signInArgs = new AuthSignInArgs {Email = email, Password = Window.GetPassInputText()};
+			var signInArgs = new AuthSignInArgs {Email = email, Password = window.GetPassInputText()};
 			StateMachineBus.Switch<AuthMessageState>(messageArgs, signInArgs);
 		}
 

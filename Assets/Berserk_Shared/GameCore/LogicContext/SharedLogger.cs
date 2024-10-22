@@ -7,6 +7,7 @@ namespace Berserk.Shared.GameCore.LogicContext
 		void Log(string message);
 		void Error(string message);
 		void Error(Exception exception);
+		void Error(Exception exception, string message);
 	}
 	
 	public static class DefaultSharedLogger
@@ -26,6 +27,11 @@ namespace Berserk.Shared.GameCore.LogicContext
 		public static void Error(string message)
 		{
 			logger.Error(message);
+		}
+
+		public static void Error(Exception exception, string message)
+		{
+			logger.Error(exception, message);
 		}
 
 		public static void Error(Exception exception)

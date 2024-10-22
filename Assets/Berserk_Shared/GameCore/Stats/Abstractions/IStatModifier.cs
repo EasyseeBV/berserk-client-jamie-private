@@ -5,13 +5,12 @@
 		string Id { get; }
 		int Priority { get; }
 
-		T ModifierCurrrent { get; }
+		T ModifierCurrent { get; }
 		T ModifierMaximum { get; }
 		T MaximumApplied { get; }
 		T CurrentApplied { get; }
-		
-		void ApplyMaximum(IStatModifiable<T> stat);
-		void ApplyCurrent(IStatModifiable<T> stat);
+
+		void Apply(IStatModifiable<T> stat);
 		void Expire(IStatModifiable<T> stat);
 		
 		IStatModifier<T> SetModifierId(string id);

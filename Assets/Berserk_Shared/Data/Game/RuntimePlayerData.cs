@@ -15,8 +15,8 @@ namespace Berserk.Shared.Data.Game
 		public bool IsFinishedMulligan { get; set; }
 		public int? TurnsWithoutCards { get; set; }
 		public int LastRoundWithActive { get; set; }
-		public IntStat Mana { get; set; } = new() {Name = nameof(Mana)};
-		public IntStat HandCount { get; set; } = new() {Name = nameof(HandCount)};
+		public IntStat Mana { get; set; }
+		public IntStat HandCount { get; set; }
 		public List<RuntimePlayedCardData> PlayedCards { get; set; } = new();
 	}
 }

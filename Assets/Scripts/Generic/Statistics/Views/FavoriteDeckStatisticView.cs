@@ -2,7 +2,6 @@ using System;
 using BerserkV3.Common.DataBase;
 using RR.UI.FrameSystem;
 using UnityEngine;
-using Vulcan.Data;
 using UI;
 
 namespace Statistics

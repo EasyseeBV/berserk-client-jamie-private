@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Audio;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.Commands.Cmd;
 using Berserk.Shared.GameCore.LogicContext;
 using Berserk.Shared.GameCore.LogicEvents;
 using Berserk.Shared.GameCore.Models;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.GameCore.Cards;
 using BerserkV3.GameCore.Controllers;
 using BerserkV3.GameCore.EffectsVisual.Attributes;
@@ -20,7 +21,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using RR.Core.Extensions;
 using UnityEngine;
-using Vulcan.Audio;
 
 namespace BerserkV3.GameCore.EffectsVisual.Visuals
 {
@@ -35,6 +35,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 		private readonly IGameRepository gameRepository;
 		private readonly IGameContainers gameContainers;
 		private readonly IMulliganView mulliganView;
+		private readonly IAudioApplication audioApplication;
 
 		public MulliganVisual(
 			IGameHub gameHub,
@@ -42,6 +43,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			IGameRepository gameRepository,
 			IGameContainers gameContainers,
 			IMulliganView mulliganView,
+			IAudioApplication audioApplication,
 			IGameLogicEventsSource gameLogicEventsSource)
 		{
 			this.gameHub = gameHub;
@@ -49,6 +51,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			this.gameRepository = gameRepository;
 			this.gameContainers = gameContainers;
 			this.mulliganView = mulliganView;
+			this.audioApplication = audioApplication;
 			subscription = new CancellationTokenSource();
 			gameLogicEventsSource.Subscribe<ChangedTimer>(TryDisplayWaitOpponent, subscription.Token);
 		}
@@ -228,7 +231,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			var delayBetwenCardMove = 0.35f;
 			for (var i = 0; i < cardCount; i++)
 			{
-				AudioController.Play(Clip.Card_Spawn); // its rearrange clip, naming wrong!
+				audioApplication.PlaySound(Clip.Card_Spawn); // its rearrange clip, naming wrong!
 				await UniTask.Delay(TimeSpan.FromSeconds(delayBetwenCardMove));
 			}
 		}

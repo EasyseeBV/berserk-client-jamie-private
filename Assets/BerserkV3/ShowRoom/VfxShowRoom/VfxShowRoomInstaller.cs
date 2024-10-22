@@ -17,7 +17,6 @@ namespace BerserkV3.ShowRoom.VfxShowRoom
 			Container
 				.BindInterfacesTo<EffectsFactory>()
 				.AsSingle()
-				.WithArguments(true)
 				.NonLazy();
 			
 			Container

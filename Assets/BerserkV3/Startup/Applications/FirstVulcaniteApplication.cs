@@ -7,9 +7,11 @@ using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.GameCore.LogicContext;
 using BerserkV3.Common.UIKit;
 using BerserkV3.Generic.Customisation;
-using BerserkV3.Lobby.Applications;
 using BerserkV3.Lobby.UI;
+using BerserkV3.Lobby.Vulcanite.Abstractions;
 using BerserkV3.Startup.Abstractions;
+using BerserkV3.Startup.Authorization;
+using BerserkV3.Startup.Authorization.Inventory.Models;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;
 using RR.UI.FrameSystem;
@@ -19,20 +21,25 @@ namespace BerserkV3.Startup.Applications
 {
 	public class FirstVulcaniteApplication : IFirstVulcaniteApplication
 	{
+		private readonly IInventoryApplication userInventory;
 		private readonly IGameDatabase gameDatabase;
 		private readonly ICustomisationItemRepository customisationRepository;
+		private readonly IVulcaniteApplication vulcaniteApplication;
 		private UniTaskCompletionSource<bool> completion;
 		private CancellationTokenSource lifeTime;
 		
 		private static SelectFirstVulcaniteView Window => SelectFirstVulcaniteView.Instance;
-		
 
 		public FirstVulcaniteApplication(
 			IGameDatabase gameDatabase,
-			ICustomisationItemRepository customisationRepository)
+			ICustomisationItemRepository customisationRepository,
+			IVulcaniteApplication vulcaniteApplication, 
+			IInventoryApplication userInventory)
 		{
 			this.gameDatabase = gameDatabase;
 			this.customisationRepository = customisationRepository;
+			this.vulcaniteApplication = vulcaniteApplication;
+			this.userInventory = userInventory;
 		}
 		
 		public void Dispose()
@@ -48,7 +55,7 @@ namespace BerserkV3.Startup.Applications
 		{
 			try
 			{
-				if (VulcaniteHandler.Owned.Any(x => gameDatabase.GetHero(x.VulcaniteId).LevelAtRegistration == 1))
+				if (vulcaniteApplication.Owned.Any(x => gameDatabase.GetHero(x.VulcaniteId).LevelAtRegistration == 1))
 					return false;
 
 				lifeTime?.Cancel();
@@ -133,7 +140,7 @@ namespace BerserkV3.Startup.Applications
 		{
 			try
 			{
-				await VulcaniteHandler.GiveVulcanite(selectedId);
+				await vulcaniteApplication.GiveVulcanite(selectedId);
 				completion?.TrySetResult(true);
 				completion = null;
 			}

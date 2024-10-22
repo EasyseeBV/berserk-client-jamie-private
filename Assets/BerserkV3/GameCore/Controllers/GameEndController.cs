@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using Audio;
 using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.LogicEvents;
 using Berserk.Shared.GameCore.Models.API;
 using Berserk.Shared.GameCore.Utils;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.SceneService;
 using BerserkV3.Common.Utils;
@@ -15,20 +16,19 @@ using BerserkV3.GameCore.Network;
 using BerserkV3.GameCore.Repository;
 using BerserkV3.GameCore.UI;
 using BerserkV3.Generic.Customisation;
-using BerserkV3.Lobby.MatchMaking.Leagues;
-using BerserkV3.Lobby.MatchMaking.Leagues.Data;
+using BerserkV3.Lobby.Home.Args;
 using BerserkV3.Startup.Authorization;
 using Cysharp.Threading.Tasks;
-using Events;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;
-using Vulcan.Audio;
+using UI;
 using Zenject;
 
 namespace BerserkV3.GameCore.Controllers
 {
 	public class GameEndController : DisposableWithCts, IInitializable
 	{
+		private readonly IAudioApplication audioApplication;
 		private readonly IGameCustomisationApplication customisationApplication;
 		private readonly IGameLogicEventsSource gameLogicEventsSource;
 		private readonly IGameRepository gameRepository;
@@ -39,6 +39,7 @@ namespace BerserkV3.GameCore.Controllers
 		private string victoryId;
 		
 		public GameEndController(
+			IAudioApplication audioApplication,
 			IGameCustomisationApplication customisationApplication,
 			IGameLogicEventsSource gameLogicEventsSource,
 			IGameRepository gameRepository,
@@ -46,6 +47,7 @@ namespace BerserkV3.GameCore.Controllers
 			IGameEndView gameEndView,
 			ISceneService sceneService)
 		{
+			this.audioApplication = audioApplication;
 			this.customisationApplication = customisationApplication;
 			this.gameLogicEventsSource = gameLogicEventsSource;
 			this.gameRepository = gameRepository;
@@ -96,14 +98,21 @@ namespace BerserkV3.GameCore.Controllers
 			
 			if (string.IsNullOrEmpty(gameEndModel.WinnerId))
 			{
-				// used OnError directly because handling signal from server
-				ErrorDispatcher.OnError.Publish(500, gameContext.GameDatabase.GetLocalization("ErrorNoWinner"));
+				ConfirmationDialog.Instance.Init()
+					.SetTitle("Information")
+					.SetMessage($"Code : 500, {gameContext.GameDatabase.GetLocalization("ErrorNoWinner")}")
+					.SetCancel()
+					.Apply();
 				return;
 			}
 			
 			if (string.IsNullOrEmpty(gameEndModel.LooserId))
-			{ // used OnError directly because handling signal from server
-				ErrorDispatcher.OnError.Publish(500,gameContext.GameDatabase.GetLocalization("ErrorNoLoose"));
+			{
+				ConfirmationDialog.Instance.Init()
+					.SetTitle("Information")
+					.SetMessage($"Code : 500, {gameContext.GameDatabase.GetLocalization("ErrorNoLoose")}")
+					.SetCancel()
+					.Apply();
 				return;
 			}
 
@@ -129,7 +138,7 @@ namespace BerserkV3.GameCore.Controllers
 			gameEndView.SetAllowPlayAgain(!string.IsNullOrWhiteSpace(gameContext.RuntimeData.LeagueId));
 			gameEndView.SetReason(GetReasonText(gameEndModel.Reason, defeat.UserName));
 			gameEndView.Show();
-			AudioController.Play(victory.UserId == User.Id ? Clip.VictoryPopup : Clip.LostPopup);
+			audioApplication.PlaySound(victory.UserId == User.Id ? Clip.VictoryPopup : Clip.LostPopup);
 		}
 
 		private string GetPlayerStatistic(string userId)

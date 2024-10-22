@@ -12,34 +12,47 @@ using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;
 using RR.Network.Rest;
+using RR.UIService;
 using UnityEngine.Device;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthThermsState : AuthState<AuthThermsArgs>
 	{
-		private static AuthThermsView Window => AuthThermsView.Instance;
+		private readonly IUIService uiService;
+		public AuthThermsState(IUIService uiService)
+		{
+			this.uiService = uiService;
+		}
 
 		protected override async void OnEnter(AuthThermsArgs args)
 		{
 			var policyText = await GetThermsAsync().AddLoadingTask();
-			if (!string.IsNullOrEmpty(policyText))
-				Window.SetMessageText(policyText);
+			uiService.Begin<AuthThermsWindow>()
+				.WithInit(InitWindow)
+				.Show();
 			
-			Window.SetHeaderText("Please Read the Terms and Privacy Policy");
-			Window.SetButtonText(args.Accept.Text);
-			Window.SetToggleChangeAction(Window.SetButtonInteractable);
-			Window.SetSubmitAction(() => AcceptThermsAsync().Forget(e => RRLogger.Error(e)));
-			Window.SetFooterAction(() => HandleButton(args.Footer));
-			Window.SetFooterText(args.Footer.Text);
-			Window.SetButtonInteractable(false);
-			Window.SetToggle(false);
-			Window.Show();
+			return;
+
+			void InitWindow(AuthThermsWindow window)
+			{
+				if (!string.IsNullOrEmpty(policyText))
+					window.SetMessageText(policyText);
+			
+				window.SetHeaderText("Please Read the Terms and Privacy Policy");
+				window.SetButtonText(args.Accept.Text);
+				window.SetToggleChangeAction(window.SetButtonInteractable);
+				window.SetSubmitAction(() => AcceptThermsAsync().Forget(e => RRLogger.Error(e)));
+				window.SetFooterAction(() => HandleButton(args.Footer));
+				window.SetFooterText(args.Footer.Text);
+				window.SetButtonInteractable(false);
+				window.SetToggle(false);
+			}
 		}
 
 		protected override void OnExit(AuthThermsArgs args)
 		{
-			Window.Close();
+			uiService.Begin<AuthThermsWindow>().Hide();
 		}
 		
 		private async UniTask AcceptThermsAsync()

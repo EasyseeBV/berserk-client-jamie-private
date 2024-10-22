@@ -56,6 +56,7 @@ namespace BerserkV3.Common.StateMachine
 	            throw new ArgumentException($"State already exist  {state.Id}");
 
             stateStorage.Add(state.Id, state);
+            state.Order = stateStorage.Count-2;
         }
 
         public void Remove(string stateId)
@@ -75,8 +76,13 @@ namespace BerserkV3.Common.StateMachine
             if (Current != null && Current.Id == stateId)
 	            Switch(EmptyState.Id);
 
-            if (stateStorage.ContainsKey(stateId))
-	            stateStorage.Remove(stateId);
+            if (!stateStorage.TryGetValue(stateId, out var state))
+	            return;
+
+            if (state != null)
+				state.Order = 0;
+            
+	        stateStorage.Remove(stateId);
         }
 
         public void Switch(string stateId, params object[] args)
@@ -96,9 +102,24 @@ namespace BerserkV3.Common.StateMachine
             OnSwitchState?.Invoke(stateId);
         }
 
-        public IEnumerable<IState> Get()
+        public IEnumerable<IState> GetStates(bool includeDefault = false)
         {
-            return stateStorage.Values.ToArray();
+	        return includeDefault 
+		        ? stateStorage.Values.OrderBy(x => x.Order).ToArray() 
+		        : stateStorage.Values.Where(x=> x.Id != EmptyState.Id).OrderBy(x => x.Order).ToArray();
+        }
+
+        public IState GetState(string stateId)
+        {
+	        if (string.IsNullOrEmpty(stateId))
+		        return default;
+	        
+	        return stateStorage.TryGetValue(stateId, out var state) ? state : default;
+        }
+
+        public IState GetState(int index)
+        {
+	        return stateStorage.Values.FirstOrDefault(x => x.Order == index);
         }
 
         public bool Any()

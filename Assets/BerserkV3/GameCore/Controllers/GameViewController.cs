@@ -1,13 +1,13 @@
-﻿using Audio;
-using Berserk.Shared.GameCore.Abstraction;
+﻿using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.LogicEvents;
 using Berserk.Shared.GameCore.Models.API;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.Common.Utils;
 using BerserkV3.GameCore.LogicEventsProcessor;
 using BerserkV3.GameCore.Network;
 using BerserkV3.GameCore.Repository;
 using BerserkV3.GameCore.UI;
-using Vulcan.Audio;
 using Zenject;
 
 namespace BerserkV3.GameCore.Controllers
@@ -15,18 +15,18 @@ namespace BerserkV3.GameCore.Controllers
 	public class GameViewController : DisposableWithCts, IInitializable
 	{
 		private readonly IGameView gameView;
-		private readonly IGameContext gameContext;
+		private readonly IAudioApplication audioApplication;
 		private readonly IGameLogicEventsSource gameLogicEventsSource;
 		private readonly IGameRepository gameRepository;
 
 		public GameViewController(
 			IGameView gameView,
-			IGameContext gameContext,
+			IAudioApplication audioApplication,
 			IGameLogicEventsSource gameLogicEventsSource,
 			IGameRepository gameRepository)
 		{
 			this.gameView = gameView;
-			this.gameContext = gameContext;
+			this.audioApplication = audioApplication;
 			this.gameLogicEventsSource = gameLogicEventsSource;
 			this.gameRepository = gameRepository;
 		}
@@ -47,7 +47,7 @@ namespace BerserkV3.GameCore.Controllers
 			
 			gameView.SetActiveteYourTurn(true);
 			gameView.AnimateTurn();
-			AudioController.Play(Clip.YourTurn);
+			audioApplication.PlaySound(Clip.YourTurn);
 		}
 
 		private async void ShowOpponentCommend()

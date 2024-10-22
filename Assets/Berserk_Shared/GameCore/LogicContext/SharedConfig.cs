@@ -1,8 +1,10 @@
 ﻿using System;
 using Berserk.Shared.Data.Abstraction;
+using Berserk.Shared.Data.Game.DraftMode.Configs;
 using Berserk.Shared.Data.Identity.Social;
 using Berserk.Shared.Data.Lobby;
 using Berserk.Shared.GameCore.Utils;
+using Berserk.Shared.Data;
 using Newtonsoft.Json;
 
 namespace Berserk.Shared.GameCore.LogicContext
@@ -36,6 +38,8 @@ namespace Berserk.Shared.GameCore.LogicContext
 		public DeckRarityValueModel[] DeckRarityValueModels { get; set; }
 		public DeckNftBonusModel[] DeckBonusValueModels { get; set; }
 		public ExternalProvider[] AvailableSocials { get; set; }
+		public string[] GameModes { get; set; }
+		public DraftModeConfig DraftModeConfig { get; set; }
 		[JsonIgnore] public bool Initialized { get; private set; }
 
 		public void FillFromJson(string json)

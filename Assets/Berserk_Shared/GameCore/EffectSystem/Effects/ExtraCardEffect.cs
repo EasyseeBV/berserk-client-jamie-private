@@ -1,5 +1,6 @@
 ﻿using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Commands.Cmd;
+using Berserk.Shared.GameCore.Commands.Cmd.DebugCmd;
 using Berserk.Shared.GameCore.Models;
 
 namespace Berserk.Shared.GameCore.EffectSystem.Effects

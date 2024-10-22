@@ -17,25 +17,28 @@ using BerserkV3.Startup.Network;
 using BerserkV3.Startup.UI;
 using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
+using RR.UIService;
 using UnityEngine;
 
 namespace BerserkV3.Startup.Authorization.ExternalProviders
 {
 	public class ExtenralProviderApple : ExternalProviderBase, IExternalProvider
 	{
-		private readonly ISerializeHelper serializeHelper;
-		private readonly IGameDatabase gameDatabase;
+		private readonly IUIService uiService;
 		private readonly ExternalProvider provider;
-		private static AuthSocialResponseView Window => AuthSocialResponseView.Instance;
+		private readonly IGameDatabase gameDatabase;
+		private readonly ISerializeHelper serializeHelper;
 
 		public ExtenralProviderApple(
-			ExternalProvider provider, 
-			ISerializeHelper serializeHelper,
-			IGameDatabase gameDatabase)
+			IUIService uiService,
+			ExternalProvider provider,
+			IGameDatabase gameDatabase,
+			ISerializeHelper serializeHelper)
 		{
+			this.uiService = uiService;
 			this.provider = provider;
-			this.serializeHelper = serializeHelper;
 			this.gameDatabase = gameDatabase;
+			this.serializeHelper = serializeHelper;
 		}
 
 		public async UniTask<ExternalProviderResponse> LoginAsync()
@@ -47,11 +50,15 @@ namespace BerserkV3.Startup.Authorization.ExternalProviders
 				if (!AppleAuthManager.IsCurrentPlatformSupported)
 					throw new Exception("Current platform is unsupported");
 
-				Window.ClearCancelActions();
-				Window.Show();
-				Window.SetHeaderText("Authorization");
-				Window.SetMessageText("We are waiting for the provider's response.");
-				Window.SetCancelAction(() => internalTaskSource?.Cancel());
+				uiService.Begin<AuthSocialResponseWindow>()
+					.WithInit(window =>
+					{
+						window.ClearCancelActions();
+						window.SetHeaderText("Authorization");
+						window.SetMessageText("We are waiting for the provider's response.");
+						window.SetCancelAction(() => internalTaskSource?.Cancel());
+					})
+					.Show();
 
 				var deserializer = new PayloadDeserializer();
 				var appleAuthManager = new AppleAuthManager(deserializer);
@@ -81,7 +88,7 @@ namespace BerserkV3.Startup.Authorization.ExternalProviders
 			}
 			finally
 			{
-				Window.Close();
+				uiService.Begin<AuthSocialResponseWindow>().Hide();
 				internalTaskSource.Cancel();
 				internalTaskSource.Dispose();
 				internalTaskSource = null;

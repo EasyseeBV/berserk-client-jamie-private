@@ -1,18 +1,14 @@
 using System.Linq;
 using RR.Core.Extensions;
-using Vulcan.Data;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Threading;
-using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.Common.UIKit;
-using BerserkV3.Generic.Customisation;
-using BerserkV3.Lobby.Applications;
 using Cysharp.Threading.Tasks;
 using Global;
 using Lobby;
@@ -23,6 +19,7 @@ using Object = UnityEngine.Object;
 
 namespace UI
 {
+	// todo check and remove
 	public partial class DeckSelectVulcaniteDialog : View
 	{
 		[SerializeField] private HorizontalHexagoneLayout hexagoneLayout;
@@ -78,7 +75,7 @@ namespace UI
 
 		private async UniTask RenderAsync()
 		{
-			render?.Cancel();
+			/*render?.Cancel();
 			render?.Dispose();
 			render = new CancellationTokenSource();
 			var updateToken = render.Token;
@@ -92,13 +89,13 @@ namespace UI
 			var customItem = CustomisationServiceAdapter.Repository.GetFirstEquipped(CustomisationType.AvatarFrame);
 			var loadTasks = query.Select(async (vulcaniteData, index) =>
 			{
-				var ownedHero = VulcaniteHandler.Owned.FirstOrDefault(v => v.VulcaniteId == vulcaniteData.Id);
+				var ownedHero = User.OwnedVulcanites.FirstOrDefault(v => v.VulcaniteId == vulcaniteData.Id);
 
 				if (index >= itemViews.Count)
 					itemViews.Add(Instantiate(HexagoneItemView, hexagoneLayout.transform));
 				
 				var itemView = itemViews[index];
-				var itemAvailable = VulcaniteHandler.IsValidVulcanite(vulcaniteData.Id);
+				var itemAvailable = VulcaniteServiceAdapter.Service.IsValidVulcanite(vulcaniteData.Id);
 				var isRent = ownedHero?.IsRent ?? false;
 				itemView.SetDynamicallyCreated(false); // used in pool items
 
@@ -133,13 +130,13 @@ namespace UI
 				itemView.Show(noAnimation:true);
 			}
 			
-			hexagoneLayout.RefreshLayout();
+			hexagoneLayout.RefreshLayout();*/
 		}
 
 		private void OnVulcaniteSelected(string vulcaniteId)
 		{
-			var gameDataBase = GameDataBaseAdapter.Instance;
-			var ownedVulcanite = VulcaniteHandler.Owned.FirstOrDefault(v => v.VulcaniteId == vulcaniteId) ?? VulcaniteHandler.Owned.First();
+			/*var gameDataBase = GameDataBaseAdapter.Instance;
+			var ownedVulcanite = User.OwnedVulcanites.FirstOrDefault(v => v.VulcaniteId == vulcaniteId) ?? User.OwnedVulcanites.First();
 			var vulcaniteData = gameDataBase.GetHero(ownedVulcanite.VulcaniteId);
 			loadingResources?.Cancel();
 			loadingResources?.Dispose();
@@ -160,7 +157,7 @@ namespace UI
 				.JoinToString("\n");
 			
 			Set(EffectTxt, effectsDescription);
-			currentVulcanite = ownedVulcanite;
+			currentVulcanite = ownedVulcanite;*/
 		}
 
 		private void Select()

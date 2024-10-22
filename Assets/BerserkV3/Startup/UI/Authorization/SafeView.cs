@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
-using Berserk.Shared.GameCore.LogicContext;
 using Cysharp.Threading.Tasks;
 using RR.UI.FrameSystem;
 
 namespace BerserkV3.Startup.UI
 {
+	[Obsolete("Instead of this use UISafeWindowBase")]
 	public abstract class SafeView : BaseView
 	{
 		protected virtual int InteractableDelayMs => 500;

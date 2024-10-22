@@ -20,12 +20,12 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 		public event Action<DamageValue> OnImmuneDamageAdded;
 		public event Action<DamageValue> OnImmuneDamageDeleted;
 		public event Action<string[]> OnImpossingEffectDeleted;
-		public event Action<IStat<int>> OnRestore;
-		public event Action<IStat<int>> OnHit;
+		public event Action<IntStat, int> OnRestore;
+		public event Action<IntStat, int> OnHit;
 		public event Action OnSpawn;
 		public event Action OnDie;
 
-		public IList<IRuntimeEffect> AppliedEffects { get;  private set; }
+		public List<IRuntimeEffect> AppliedEffects { get;  private set; }
 		public IRuntimeData RuntimeData { get; private set;  }
 		public IObjectData Data { get; private set; }
 
@@ -131,7 +131,7 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 			
 			var stat = GetRestoreStat(value, initiator);
 			stat.Add(value);
-			OnRestore?.Invoke(stat);
+			OnRestore?.Invoke(stat, value);
 			
 			if (!exclude.Contains(EffectPhase.AfterHeal))
 				ChangeEffectPhase(EffectPhase.AfterHeal);
@@ -295,9 +295,13 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 				}
 			}
 
+			
 			stackEffect = executeEffect = newEffect;
 			AppliedEffects.Add(newEffect);
+			AppliedEffects.Sort((x, y) => ((int)x.EffectData.ExecutionOrder).CompareTo((int)y.EffectData.ExecutionOrder)); //sorting effects and runtime effects by ExecutionOrder, so effects with latest type will be calculated in the very end
+
 			RuntimeData.AppliedEffects.Add(newEffect.RuntimeData);
+			RuntimeData.AppliedEffects.Sort((x, y) => ((int)x.ExecutionOrder).CompareTo((int)y.ExecutionOrder));
 			OnBuffEffectAdded?.Invoke(newEffect);
 			newEffect.OnAdded();
 		}
@@ -387,7 +391,7 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 
 		public void ResetEffects(params IRuntimeEffect[] except)
 		{
-			foreach (var effect in AppliedEffects.Except(except).ToArray())
+			foreach (var effect in AppliedEffects.Except(except).Reverse().ToArray()) // reversed to remove effects with Latest ExecutionOrder in the beginning of removal
 			{
 				RemoveAppliedEffect(effect);
 			}
@@ -417,23 +421,23 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 		{
 			if (damage <= 0)
 				return;
-			
-			if (RuntimeData.Armor.Current > 0)
+
+			if (RuntimeData.Armor > 0)
 			{
 				if (damageType == DamageType.Pure)
 				{
 					RuntimeData.Hp.Substract(damage);
-					OnHit?.Invoke(RuntimeData.Hp);
+					OnHit?.Invoke(RuntimeData.Hp, damage);
 				}
 				
 
 				RuntimeData.Armor.Substract(damage);
-				OnHit?.Invoke(RuntimeData.Armor);
+				OnHit?.Invoke(RuntimeData.Armor, damage);
 				return;
 			}
 			
 			RuntimeData.Hp.Substract(damage);
-			OnHit?.Invoke(RuntimeData.Hp);
+			OnHit?.Invoke(RuntimeData.Hp, damage);
 		}
 
 		protected virtual IntStat GetRestoreStat(int value, IRuntimeGameObject initiator)
@@ -444,7 +448,7 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 		protected void ResetStat(IntStat stat, int defaultStat, bool? resetToMax = null)
 		{
 			stat.ClearModifiers(false);
-			resetToMax ??= stat.Current > defaultStat;
+			resetToMax ??= stat > defaultStat;
 			stat.SetMax(defaultStat);
 			
 			if (resetToMax.Value)

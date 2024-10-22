@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking;
 using BerserkV3.GameCore.UI;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;

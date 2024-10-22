@@ -2,7 +2,7 @@ using RR.UI.FrameSystem;
 using System;
 using System.Linq;
 using System.Threading;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.Common.Utils;
 using Cysharp.Threading.Tasks;

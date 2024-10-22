@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using Berserk.Shared.Lobby.Abstractions;
 
 namespace Berserk.Shared.Lobby.Deck

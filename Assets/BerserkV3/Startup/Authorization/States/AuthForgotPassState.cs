@@ -7,35 +7,48 @@ using BerserkV3.Startup.Network;
 using BerserkV3.Startup.UI;
 using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
+using RR.UIService;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthForgotPassState : State
 	{
-		private static AuthForgotPassView Window => AuthForgotPassView.Instance;
+		private readonly IUIService uiService;
+		public AuthForgotPassState(IUIService uiService)
+		{
+			this.uiService = uiService;
+		}
+
 		public override void OnEnter(params object[] args)
 		{
-			Window.SetInputValueChangeAction(v => Window.SetResetInteractable(!string.IsNullOrEmpty(v)));
-			Window.SetReturnAction(StateMachineBus.Switch<AuthSignInState>);
-			Window.SetFooterAction(StateMachineBus.Switch<AuthSignInState>);
-			Window.SetResetAction(() => ReqestResetPassAsync().Forget(e => RRLogger.Error(e)));
-			Window.SetHeaderText("<b>Forgot</b> Password");
-			Window.SetFieldText("Email Address");
-			Window.SetFooterText($"Remember your Password? <color=#F55D0D>Log in");
-			Window.SetResetText("Reset Password");
-			Window.SetResetInteractable(false);
-			Window.SetInputText(string.Empty);
-			Window.Show();
+			uiService.Begin<AuthForgotPassWindow>()
+				.WithInit(InitWindowAsync)
+				.Show();
+			
+			return;
+			void InitWindowAsync(AuthForgotPassWindow window)
+			{
+				window.SetInputValueChangeAction(v => window.SetResetInteractable(!string.IsNullOrEmpty(v)));
+				window.SetReturnAction(StateMachineBus.Switch<AuthSignInState>);
+				window.SetFooterAction(StateMachineBus.Switch<AuthSignInState>);
+				window.SetResetAction(() => ReqestResetPassAsync().Forget(e => RRLogger.Error(e)));
+				window.SetHeaderText("<b>Forgot</b> Password");
+				window.SetFieldText("Email Address");
+				window.SetFooterText($"Remember your Password? <color=#F55D0D>Log in");
+				window.SetResetText("Reset Password");
+				window.SetResetInteractable(false);
+				window.SetInputText(string.Empty);
+			}
 		}
 
 		public override void OnExit()
 		{
-			Window.Close();
+			uiService.Begin<AuthForgotPassWindow>().Hide();
 		}
 
 		private async UniTask ReqestResetPassAsync()
 		{
-			var email = Window.GetInputText();
+			var email = uiService.Get<AuthForgotPassWindow>().GetInputText();
 			var model = new ForgotPasswordModel { Email = email }; 
 			var response = await IdentityAPI.PostForgotPassword(model).AddLoadingTask();
 			if (response.Code != HttpStatusCode.OK)

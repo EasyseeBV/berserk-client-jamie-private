@@ -2,39 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Enums;
-using Berserk.Shared.Data.Game;
+using Berserk.Shared.Data.UserInventory;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.TutorialSystem;
-using BerserkV3.Lobby.Applications;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Common.Utils;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.MatchMaking.Leagues;
 using BerserkV3.Lobby.UI;
-using Events;
-using Game;
+using BerserkV3.Startup.Authorization.Inventory.Models;
 using Lobby;
 using Lobby.Items;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;
+using RR.Core.ResourceManagament;
 using RR.Game.TutorialSystemV2.Realizations;
 using RR.UI.FrameSystem;
 using UnityEngine;
-using Vulcan.Data;
+using Zenject;
 
 namespace UI
 {
+	[Obsolete]
+	//TODO check and remove // will be removed during deck rework
 	public partial class PlayerDecksView : BaseView
 	{
 		[SerializeField] private PlayerView playerView = default;
 		
 		private readonly List<IDisposable> disposables = new();
 		private Dictionary<string, DeckButtonView> deckItems;
-		private List<DeckData> deckModels;
+		private List<OwnedDeck> deckModels;
 		private string selectedDeck;
 		
+
 		protected override void OnAwake()
 		{
 			deckItems = new Dictionary<string, DeckButtonView>();
-			deckModels = new List<DeckData>();
+			deckModels = new List<OwnedDeck>();
 			DeleteButton.Subscribe(ConfirmDeleteDeck);
 			BackButton.Subscribe(Close);
 			EditButton.Subscribe(() =>
@@ -63,10 +66,11 @@ namespace UI
 		
 		private void Init()
 		{
-			deckItems.Clear();
+			Debug.LogError("Class sholud be replaced");
+			/*deckItems.Clear();
 			deckModels.Clear();
 			DecksPanel.DestroyChildrenExcept(DeckButton.transform);
-			deckModels.AddRange(DeckApplicationAdapter.Application.All);
+			deckModels.AddRange(DeckApplicationAdapter.Application.AllDecks);
 			SetSelectedDeckFirst();
 			foreach (var deck in deckModels)
 			{
@@ -75,7 +79,7 @@ namespace UI
 					.Select(x => x.GetArtURL())
 					.ToArray();
 				
-				var ownedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == deck.OwnedVulcaniteId);
+				var ownedHero = userInventory.OwnedVulcanites.FirstOrDefault(x => x.Id == deck.OwnedVulcaniteId);
 				var heroData = GameDataBaseAdapter.Instance.GetHero(ownedHero?.VulcaniteId);
 				var deckItem = Instantiate(DeckButton, DecksPanel);
 				deckItem.Id = deck.Id;
@@ -91,7 +95,7 @@ namespace UI
 			}
 			
 			SelectDeck(DeckApplicationAdapter.Application.Current.Id);
-			OnRentRefreshed();
+			OnRentRefreshed();*/
 		}
 		
 		private void SetSelectedDeckFirst()
@@ -103,29 +107,32 @@ namespace UI
 		
 		private void OnRentRefreshed()
 		{
-			if (deckItems == null || deckItems.Count == 0 || deckModels == null || deckModels.Count == 0)
+			/*if (deckItems == null || deckItems.Count == 0 || deckModels == null || deckModels.Count == 0)
 				return;
 			
 			foreach (var (deckId, deckItem) in deckItems)
 			{
 				var deckModel = deckModels.FirstOrDefault(x => x.Id == deckId);
 				deckItem.SetWarning(!deckModel.IsValid());
-			}
+			}*/
 		}
 		
 		private void CreateNewDeck()
 		{
 			if (deckModels.Count >= SharedConfigAdapter.Config.MaxDeckCount)
 			{
-				ErrorDispatcher.OnInternalWarning.Publish(
-					$"Can't create a new deck! Max allowed number of decks is {SharedConfigAdapter.Config.MaxDeckCount}");
+				ConfirmationDialog.Instance.Init()
+					.SetMessage($"Can't create a new deck! Max allowed number of decks is {SharedConfigAdapter.Config.MaxDeckCount}")
+					.SetTitle("Information")
+					.SetCancel()
+					.Apply();
 				return;
 			}
 			
-			var newDeckModel = new DeckData
+			var newDeckModel = new OwnedDeck
 			{
 				Name = "New Deck",
-				OwnedVulcaniteId = VulcaniteHandler.Owned.FirstOrDefault()?.Id,
+				//OwnedVulcaniteId = userInventory.OwnedVulcanites.FirstOrDefault()?.Id,
 				OwnedCardIds = new List<string>()
 			};
 			
@@ -145,7 +152,12 @@ namespace UI
 		{
 			if (deckModels.Count == 1)
 			{
-				ErrorDispatcher.OnInternalWarning.Publish(GameDataBaseAdapter.Instance.GetLocalization("ErrorDeleteDeck"));
+				ConfirmationDialog.Instance.Init()
+					.SetMessage(GameDataBaseAdapter.Instance.GetLocalization("ErrorDeleteDeck"))
+					.SetTitle("Information")
+					.SetCancel()
+					.Apply();
+				
 				return;
 			}
 			
@@ -156,7 +168,7 @@ namespace UI
 			Init();
 		}
 		
-		private DeckData GetCurrentDeckModel()
+		private OwnedDeck GetCurrentDeckModel()
 		{
 			return deckModels.FirstOrDefault(x => x.Id == selectedDeck);
 		}
@@ -173,7 +185,7 @@ namespace UI
 		
 		private void SetDeckInfo()
 		{
-			if (string.IsNullOrEmpty(selectedDeck) || !deckModels.Exists(deck => deck.Id == selectedDeck))
+			/*if (string.IsNullOrEmpty(selectedDeck) || !deckModels.Exists(deck => deck.Id == selectedDeck))
 			{
 				RRLogger.Warning($"[{nameof(PlayerDecksView)}] - selected deck does not represented in collection");
 				selectedDeck = DeckApplicationAdapter.Application.Current.Id;
@@ -183,7 +195,7 @@ namespace UI
 			DeckTitleText.SetText(currentDeck.Name);
 
 			var gameDataBase = GameDataBaseAdapter.Instance;
-			var ownedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
+			var ownedHero = userInventory.OwnedVulcanites.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
 			var heroData = gameDataBase.GetHero(ownedHero?.VulcaniteId);
 			playerView.SetArt(heroData.ArtUrl);
 			playerView.SetName(heroData.Name);
@@ -195,7 +207,7 @@ namespace UI
 				.Select(effectData => gameDataBase.GetKeyword(effectData.KeywordId).GetEffectDescription(effectData))
 				.JoinToString("\n");
 			
-			EffectTxt.text = effectsDescription;
+			EffectTxt.text = effectsDescription;*/
 		}
 		
 		protected override void OnClosed()
@@ -213,7 +225,7 @@ namespace UI
 		private void OnDestroy()
 		{
 			if (PlayerImage)
-				PlayerImage.texture.DestroyImmediateSafe();
+				PlayerImage.ReleaseResource();
 			
 			LobbyBus.OnUserDataRefreshed.Unsubscribe(OnRentRefreshed);
 		}

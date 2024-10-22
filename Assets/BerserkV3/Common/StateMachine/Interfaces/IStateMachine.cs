@@ -24,7 +24,9 @@ namespace BerserkV3.Common.StateMachine
         
         void Switch(string stateId, params object[] args);
 
-        IEnumerable<IState> Get();
+        IEnumerable<IState> GetStates(bool includeDefault = false);
+        IState GetState(string stateId);
+        IState GetState(int index);
 
         bool Any();
         

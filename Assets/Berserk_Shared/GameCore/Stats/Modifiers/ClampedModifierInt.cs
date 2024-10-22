@@ -38,17 +38,11 @@ namespace Berserk.Shared.GameCore
 		}
 
 		#endregion
-		
-		public override void ApplyMaximum(IStatModifiable<int> stat)
+
+		public override void Apply(IStatModifiable<int> stat)
 		{
 			MaximumApplied = Apply(stat.AddModMax, Clamp(ModifierMaximum, MinMax, MaxMax, stat.TotalMax));
-		}
-
-		public override void ApplyCurrent(IStatModifiable<int> stat)
-		{
-			var currToApply = ModifierCurrrent - CurrentApplied;
-			if (currToApply != 0)
-				CurrentApplied += Apply(value => stat.Add(value, false), Clamp(currToApply, MinCur, MaxCur, stat.Current));
+			CurrentApplied = Apply(stat.AddModCurrent, Clamp(ModifierCurrent, MinCur, MaxCur, stat.TotalCurrent));
 		}
 
 		public override void Expire(IStatModifiable<int> stat)
@@ -61,20 +55,31 @@ namespace Berserk.Shared.GameCore
 
 			if (CurrentApplied != 0 && RemoveCurrWhenExpire)
 			{
-				Apply(value => stat.Add(value, false), Clamp(Sign(CurrentApplied, true), MinCur, MaxCur, stat.Current));
+				var revertValueRaw = Sign(CurrentApplied, true);  // invert an applied value to reverse direction
+				var possibleRevertValue = Clamp(revertValueRaw, MinCur, MaxCur, stat.TotalCurrent); // get a value which can be reverted
+				if (possibleRevertValue != revertValueRaw) // when it has a difference then apply possible to modifier and other to current
+				{
+					var deltaRevertValue = revertValueRaw - possibleRevertValue;
+					Apply(stat.AddModCurrent, possibleRevertValue); // revert possible modifier
+					Apply(value => stat.Add(value, false), Sign(deltaRevertValue, true)); 
+					CurrentApplied = 0;
+					return;
+				}
+				
+				Apply(stat.AddModCurrent, possibleRevertValue);
 				CurrentApplied = 0;
 			}
 		}
-
-		private static int Clamp(int modifierValue, int? min, int? max, int statValue)
+		
+		public static int Clamp(int modifierValue, int? min, int? max, int statValue)
 		{
 			TryRestrict(statValue, modifierValue, min, total => total>=min, out var result);
 			TryRestrict(statValue, result ?? modifierValue, max, total => total<=max, out result);
 
 			return result ?? modifierValue;
 		}
-
-		private static void TryRestrict(int statValue, int modifierValue, int? limit, Func<int, bool> compareFunc, out int? result)
+		
+		public static void TryRestrict(int statValue, int modifierValue, int? limit, Func<int, bool> compareFunc, out int? result)
 		{
 			if (compareFunc == null)
 			{
@@ -84,9 +89,9 @@ namespace Berserk.Shared.GameCore
 			}
 			
 			var total = statValue + modifierValue;
-			if (!limit.HasValue || modifierValue == 0 || compareFunc.Invoke(total))
+			if (!limit.HasValue || modifierValue == 0 || compareFunc.Invoke(total)) 
 			{
-				result = modifierValue;
+				result = modifierValue; 
 				return;
 			}
 			

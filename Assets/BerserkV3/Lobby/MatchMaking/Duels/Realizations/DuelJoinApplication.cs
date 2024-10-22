@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking.Duels;
 using Berserk.Shared.GameCore.LogicContext;
 using Berserk.Shared.SignalR.Enums;
 using BerserkV3.Common.Network;
 using BerserkV3.Common.Utils;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.Network;
 using BerserkV3.Lobby.UI.Duels;
 using BerserkV3.Startup.Authorization;
@@ -79,7 +79,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				signalTimeoutProcessor.Enabled = true;
 				duelsSignalProcessor.OnUpdateReceived -= OnMessageReceived;
 				duelsSignalProcessor.OnUpdateReceived += OnMessageReceived;
-				var model = new LobbyDuelJoinRoomModel
+				var model = new DuelJoinRoomModel
 				{
 					RoomId = roomId.RemoveWhitespace(),
 					RoomCode = roomCode.RemoveWhitespace(),
@@ -121,7 +121,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 				.Apply();
 		}
 
-		private void OnMessageReceived(LobbyDuelAction action, LobbyDuelRoomModel roomModel)
+		private void OnMessageReceived(LobbyDuelAction action, DuelRoomModel roomModel)
 		{
 			if (action != LobbyDuelAction.PlayerJoined 
 				|| roomModel.Players.All(x => x.UserId != User.Id))

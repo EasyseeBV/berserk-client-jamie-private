@@ -207,7 +207,8 @@ namespace Berserk.Shared.GameCore.LogicContext
 				CurrentValue = effectConfig.Value,
 				TargetIds = targets.Select(x => x.RuntimeData.Id).ToList(),
 				RuntimeArgs = args?.ToList() ?? new List<IEffectRuntimeArg>(),
-				AccessLevel = executor.GetAccessLevel()
+				AccessLevel = executor.GetAccessLevel(),
+				ExecutionOrder = effectConfig.ExecutionOrder
 			};
 			
 			var keywordEffect = EffectsFactory

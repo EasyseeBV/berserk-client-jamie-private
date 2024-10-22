@@ -4,7 +4,7 @@ using System.Linq;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Game;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using BerserkV3.Common.DataBase;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;

@@ -2,27 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking.AutoMatching;
 using Berserk.Shared.Data.Lobby.Statistics;
 using BerserkV3.Common.Utils;
 using BerserkV3.Lobby.Network;
 using Lobby;
-using ServerCore.Infrastructure.Models;
 using Sirenix.Utilities;
 using UnityEngine;
+using Zenject;
 
 namespace Statistics
 {
 	public class StatisticApplication : IStatisticApplication
 	{
+		private readonly IInstantiator instantiator;
 		private readonly IStatisticsRepository repository;
-		private static readonly float updateInterval = 500;
-		private static readonly string defaultElo = "1200";
+		private const float UPDATE_INTERVAL = 500;
+		private const string DEFAULT_ELO = "1200"; // TODO GameConfig.BaseMMR move to SharedConfig and use here
 		private float lastUpdateTime;
 		private bool RequiredRefresh => lastUpdateTime < Time.time;
 
-		public StatisticApplication(IStatisticsRepository repository)
+		public StatisticApplication(IStatisticsRepository repository, ISharedConfig sharedConfig)
 		{
 			this.repository = repository;
 		}
@@ -52,7 +54,7 @@ namespace Statistics
 				return false;
 
 			repository.Clear();
-			lastUpdateTime = Time.time + updateInterval;
+			lastUpdateTime = Time.time + UPDATE_INTERVAL;
 			var statisticsModel = statisticsResponse.Data ?? new UserStatisticsData
 			{
 				FavDeck = new UserStatisticDeckData { CardIds = new List<string>() },
@@ -92,7 +94,7 @@ namespace Statistics
 							.LeagueStats
 							.FirstOrDefault(x => x.LeagueId == model.Id)?
 							.ELO
-							.ToString() ?? defaultElo)))
+							.ToString() ?? DEFAULT_ELO)))
 						.ToList()
 				}
 			};
@@ -163,6 +165,11 @@ namespace Statistics
 		private int GetPercent(int total, float current)
 		{
 			return (int)(current / total * 100);
+		}
+		
+		private T Instantiate<T>(params object[] args)
+		{
+			return instantiator.Instantiate<T>(args);
 		}
 	}
 }

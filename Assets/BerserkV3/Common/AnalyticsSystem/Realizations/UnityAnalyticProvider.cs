@@ -15,7 +15,6 @@ namespace BerserkV3.Common.AnalyticsSystem
 		{
 			try
 			{
-				await UnityServices.InitializeAsync();
 				AnalyticsService.Instance.StartDataCollection();
 			}
 			catch (Exception ex)

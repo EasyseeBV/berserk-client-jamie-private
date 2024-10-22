@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking;
 using Berserk.Shared.SignalR.Enums;
 using BerserkV3.Lobby.Network;
 using Newtonsoft.Json;

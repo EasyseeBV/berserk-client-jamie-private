@@ -12,13 +12,8 @@ namespace RR.Game.TutorialSystemV2.Realizations
 {
 	public class DefaultTutorialProgressRepository : ITutorialProgressRepository
 	{
-		protected IDictionary<string, bool> Progress;
+		protected IDictionary<string, bool> Progress = new Dictionary<string, bool>();
 		protected virtual string DefaultFileName => "TutorialData.json";
-
-		public DefaultTutorialProgressRepository()
-		{
-			Progress = new Dictionary<string, bool>();
-		}
 
 		public virtual async Task InitAsync(IEnumerable<string> ids)
 		{
@@ -78,9 +73,9 @@ namespace RR.Game.TutorialSystemV2.Realizations
 
 		public virtual bool IsCompleted(string id)
 		{
-			return !string.IsNullOrEmpty(id)
-			       && Progress.TryGetValue(id, out var isCompleted)
-			       && isCompleted;
+			return string.IsNullOrEmpty(id)
+			       || !Progress.TryGetValue(id, out var isCompleted) 
+			       || isCompleted;
 		}
 
 		public virtual bool IsCompleted()

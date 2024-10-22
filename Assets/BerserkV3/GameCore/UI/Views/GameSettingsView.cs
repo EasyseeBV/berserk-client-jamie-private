@@ -2,7 +2,6 @@ using System;
 using Berserk.Shared.GameCore.LogicContext;
 using BerserkV3.GameCore.Settings;
 using BerserkV3.Startup.UI;
-using Events;
 using RR.Core.Extensions;
 
 namespace BerserkV3.GameCore.UI
@@ -13,11 +12,14 @@ namespace BerserkV3.GameCore.UI
 		public event Action OnSurrender;
 		public event Action OnReport;
 
+		public event Action<float> OnSoundVolumeChanged;
+		public event Action<float> OnMusicVolumeChanged;
+
 		protected override void OnAwake()
 		{
 			base.OnAwake();
-			MusicSlider.onValueChanged.AddListener(OnMusicVolumeUpdate);
-			AudioSlider.onValueChanged.AddListener(OnAudioVolumeUpdate);
+			MusicSlider.onValueChanged.AddListener(value => OnMusicVolumeChanged?.Invoke(value));
+			AudioSlider.onValueChanged.AddListener(value => OnSoundVolumeChanged?.Invoke(value));
 			
 			CloseBtn.onClick.AddListener(Close);
 			SurrenderBtn.onClick.AddListener(() => OnSurrender?.Invoke());
@@ -41,23 +43,15 @@ namespace BerserkV3.GameCore.UI
 		{
 			SetActive(BattleButtonsPanel, value);
 		}
-		
-		protected override void OnShown()
+
+		public void SetSoundVolume(float value01)
 		{
-			AudioSlider.value = DataBus.AppData.Value.AudioVolume;
-			MusicSlider.value = DataBus.AppData.Value.MusicVolume;
+			AudioSlider.value = value01;
 		}
 
-		private void OnMusicVolumeUpdate(float volume)
+		public void SetMusicVolume(float value01)
 		{
-			DataBus.AppData.Value.MusicVolume = volume;
-			DataBus.AppData.Repeat();
-		}
-
-		private void OnAudioVolumeUpdate(float volume)
-		{
-			DataBus.AppData.Value.AudioVolume = volume;
-			DataBus.AppData.Repeat();
+			MusicSlider.value = value01;
 		}
 
 		private void OnDestroy()
@@ -72,6 +66,8 @@ namespace BerserkV3.GameCore.UI
 			OnQuit = null;
 			OnSurrender = null;
 			OnReport = null;
+			OnSoundVolumeChanged = null;
+			OnMusicVolumeChanged = null;
 		}
 	}
 }

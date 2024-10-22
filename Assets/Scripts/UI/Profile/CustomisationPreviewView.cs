@@ -9,7 +9,6 @@ using RR.UI.FrameSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Vulcan.Audio;
 
 namespace UI
 {
@@ -37,7 +36,7 @@ namespace UI
 			PreviewImage.ReleaseResource();
 		}
 		
-		public async UniTask SetupPreviewAsync(PreviewInfo info, CancellationToken token = default)
+		public async UniTask SetupAsync(PreviewInfo info, CancellationToken token = default)
 		{
 			token.ThrowIfCancellationRequested();
 			ResetPreview();
@@ -50,12 +49,8 @@ namespace UI
 				LoadArt(AdditionImage, info.AdditionUrl, token));
 			
 			token.ThrowIfCancellationRequested();
-			if (isMusicContent 
-			    && MusicController.TryGetClip(info.PreviewUrl, out var clip)
-			    && CustomisationBus.OnMusicUpdated.Value != clip)
-			{
-				CustomisationBus.OnMusicUpdated += clip;
-			}
+			if (isMusicContent && CustomisationBus.OnMusicPlayTest.Value != info.PreviewUrl)
+				CustomisationBus.OnMusicPlayTest += info.PreviewUrl;
 
 			PreviewAspect.aspectRatio = info.PreviewAspect;
 			Set(TitleText, info.TitleText);

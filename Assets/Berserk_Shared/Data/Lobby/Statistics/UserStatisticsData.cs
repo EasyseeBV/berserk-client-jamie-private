@@ -17,5 +17,6 @@ namespace Berserk.Shared.Data.Lobby.Statistics
 
 		public List<UserStatisticsLeagueData> LeagueStats { get; set; }
 		public List<UserStatisticsHeroData> VulcaniteStats { get; set; }
+		public List<UserCardStatisticsData> PlayerStatisticsCard { get; set; }
 	}
 }

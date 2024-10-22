@@ -91,17 +91,17 @@ namespace Berserk.Shared.GameCore.EffectSystem.TargetSystem
 		
 		public static bool IsEqual(this IntStat stat, int value)
 		{
-			return stat.Current == value;
+			return stat == value;
 		}
 
 		public static bool IsLess(this IntStat stat, int value)
 		{
-			return stat.Current < value;
+			return stat < value;
 		}
 		
 		public static bool IsMore(this IntStat stat, int value)
 		{
-			return stat.Current > value;
+			return stat > value;
 		}
 
 		public static IEnumerable<IRuntimeGameObject> GetFiltredUnitsByMana(this IEnumerable<IRuntimeGameObject> units, bool isLowest)

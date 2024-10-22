@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Berserk.Shared.Data.Game;
 using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 
 namespace Berserk.Shared.Data.Identity
 {
@@ -17,8 +18,6 @@ namespace Berserk.Shared.Data.Identity
 		public bool IsAnonymous { get; set; }
 		
 		public DateTime? LastLogin { get; set; }
-        public List<OwnedCard> OwnedCards { get; set; } = new();
-		public List<DeckData> Decks { get; set; } = new();
-		public List<OwnedVulcanite> OwnedVulcanites { get; set; } = new();
+        
 	}
 }

@@ -2,10 +2,11 @@
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking;
 using BerserkV3.Common.ProgressDrawer;
 using BerserkV3.Common.SceneService;
 using BerserkV3.Common.Utils;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.Network;
 using Cysharp.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace BerserkV3.Lobby.MatchMaking.Practice
 
 		public async UniTask<bool> StartPracticeMatchAsync()
 		{
-			var model = new LobbyPracticeStartSessionModel
+			var model = new LobbyJoinPracticeModel
 			{
 				Difficulty = PracticeMode.Normal,
 				MatchMode = MatchMode.Practice,
@@ -43,7 +44,7 @@ namespace BerserkV3.Lobby.MatchMaking.Practice
 		
 		public async UniTask<bool> StartTutorialMatchAsync()
 		{
-			var model = new LobbyPracticeStartSessionModel
+			var model = new LobbyJoinPracticeModel
 			{
 				Difficulty = PracticeMode.Tutorial,
 				MatchMode = MatchMode.Tutorial,

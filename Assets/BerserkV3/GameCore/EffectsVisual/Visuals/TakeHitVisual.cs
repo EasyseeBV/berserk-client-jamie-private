@@ -1,29 +1,35 @@
-﻿using Audio;
-using Berserk.Shared.Data.Enums;
+﻿using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.EffectSystem.Effects.RuntimeArgs;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.GameCore.EffectsVisual.Attributes;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using Vulcan.Audio;
 
 namespace BerserkV3.GameCore.EffectsVisual.Visuals
 {
 	[EffectVisual(EffectVisualKeyword.TakeHit)]
 	public class TakeHitVisual : EffectVisual
 	{
+		private readonly IAudioApplication audioApplication;
 		private readonly Vector3 hitIndicationScaleTo = new(1.2f, 1.2f);
 		private readonly Vector3 hitIndicationScaleEnd = Vector3.zero;
 		private const float HIT_INDICATION_OFFSET_DURATION = 1f;
 		private const float HIT_INDICATION_SCALE_DURATION = 0.5f;
 		private const float HIT_DURATION = 0.75f;
 		private const float HIT_SHAKE_STRENGTH = 12f;
+		
+		public TakeHitVisual(IAudioApplication audioApplication)
+		{
+			this.audioApplication = audioApplication;
+		}
 
 		public override UniTask PlaySingleEffectAsync()
 		{
 			return UniTask.WhenAll(Targets.Select(t =>
 			{
-				AudioController.Play(Clip.TableCard_Damage);
+				audioApplication.PlaySound(Clip.TableCard_Damage);
 				t.SelfContainer.DOKill();
 				var sourcePosition = t.SelfContainer.localPosition;
 				t.SelfContainer
@@ -39,7 +45,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 		{
 			var target = Executor.SelfContainer;
 			var arg = Model.GetRuntimeArg<ObjectStatEffectArg>();
-			var damageText = $"{arg.To - arg.From}";
+			var damageText = $"{-arg.Value}";
 			var indicator = (VFXText) VfxApplication.SpawnVfxToParent(EffectVisualKeyword.TakeHit);
 			indicator.SetPosition(target.position);
 			indicator.SetText(damageText);

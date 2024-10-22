@@ -23,6 +23,7 @@ namespace Berserk.Shared.SignalR.Enums
 		Matched,
 		VulcaniteRentExpired,
 		SubscriptionExpired,
-		RankedDecay
+		RankedDecay,
+		Store
 	}
 }

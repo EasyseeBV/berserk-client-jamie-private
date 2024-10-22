@@ -4,15 +4,18 @@ using System.Linq;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
-using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Lobby.Matchmaking;
+using Berserk.Shared.Data.Lobby.Matchmaking.Duels;
 using Berserk.Shared.SignalR.Enums;
 using BerserkV3.Common.Network;
 using BerserkV3.Common.Utils;
 using BerserkV3.Generic.Customisation;
-using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.Decks;
 using BerserkV3.Lobby.Network;
 using BerserkV3.Lobby.UI.Duels;
+using BerserkV3.Lobby.Vulcanite.Abstractions;
 using BerserkV3.Startup.Authorization;
+using BerserkV3.Startup.Authorization.Inventory.Models;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;
 using RR.UI.FrameSystem;
@@ -32,6 +35,8 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		private readonly ICustomisationItemRepository customisationsRepository;
 		private readonly ISignalTimeoutProcessor signalTimeoutProcessor;
 		private readonly IDuelsSignalProcessor duelsSignalProcessor;
+		private readonly IInventoryApplication userInventory;
+		private readonly IVulcaniteApplication vulcaniteApplication;
 		
 		private static LobbyDuelView LobbyDuelView => LobbyDuelView.Instance;
 		private readonly List<DuelRoomItemData> roomItemDatas = new();
@@ -46,7 +51,8 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			IDuelSelectDeckApplication duelSelectDeckApplication,
 			ICustomisationItemRepository customisationsRepository,
 			ISignalTimeoutProcessor signalTimeoutProcessor,
-			IDuelsSignalProcessor duelsSignalProcessor)
+			IDuelsSignalProcessor duelsSignalProcessor, 
+			IVulcaniteApplication vulcaniteApplication)
 		{
 			this.sharedConfig = sharedConfig;
 			this.gameDatabase = gameDatabase;
@@ -57,6 +63,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			this.customisationsRepository = customisationsRepository;
 			this.signalTimeoutProcessor = signalTimeoutProcessor;
 			this.duelsSignalProcessor = duelsSignalProcessor;
+			this.vulcaniteApplication = vulcaniteApplication;
 			this.deckApplication = deckApplication;
 		}
 		
@@ -111,7 +118,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		
 		private async UniTask StartPracticeAsync()
 		{
-			var model = new LobbyPracticeStartSessionModel
+			var model = new LobbyJoinPracticeModel
 			{
 				MatchMode = MatchMode.Practice,
 				Difficulty = PracticeMode.Normal,
@@ -133,7 +140,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		
 		private UniTask RefreshUserInfoAsync()
 		{
-			var ownedVulcanite = User.OwnedVulcanites.FirstOrDefault(x=> x.Id == deckApplication.Current.OwnedVulcaniteId);
+			var ownedVulcanite = vulcaniteApplication.Get(deckApplication.Current.OwnedVulcaniteId);
 			var heroData = gameDatabase.GetHero(ownedVulcanite?.VulcaniteId);
 			var frameUrl = customisationsRepository.GetFirstEquipped(CustomisationType.AvatarFrame)?.PreviewURL;
 			var avatarUrl = heroData?.ArtUrl;
@@ -217,7 +224,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			return true;
 		}
 		
-		private async void OnMessageReceived(LobbyDuelAction action, LobbyDuelRoomModel duelRoomModel)
+		private async void OnMessageReceived(LobbyDuelAction action, DuelRoomModel duelRoomModel)
 		{
 			switch (action)
 			{

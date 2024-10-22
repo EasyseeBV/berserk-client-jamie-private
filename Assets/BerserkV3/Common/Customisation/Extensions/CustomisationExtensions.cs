@@ -3,7 +3,6 @@ using Berserk.Shared.Data.Customisation;
 using BerserkV3.Common.DataBase;
 using Newtonsoft.Json;
 using RR.Core.DebugSystem;
-using Vulcan.Data;
 
 namespace BerserkV3.Generic.Customisation
 {

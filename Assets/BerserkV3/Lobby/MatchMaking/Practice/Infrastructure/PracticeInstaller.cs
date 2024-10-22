@@ -10,11 +10,6 @@ namespace BerserkV3.Lobby.MatchMaking.Practice
 				.BindInterfacesTo<PracticeApplication>()
 				.AsSingle()
 				.NonLazy();
-			
-			Container
-				.Bind<PracticeApplicationAdapter>()
-				.AsSingle()
-				.NonLazy();
 		}
 	}
 }

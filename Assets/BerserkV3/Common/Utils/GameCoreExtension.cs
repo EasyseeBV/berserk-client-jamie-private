@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
+using Berserk.Shared.Data.Game;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.Startup.Events;
 using Cysharp.Threading.Tasks;
@@ -164,6 +165,14 @@ namespace BerserkV3.Common.Utils
 
 			progress.Report(1f);
 			onDone?.Invoke();
+		}
+
+		public static string GetEffectDescription(this KeywordData data, EffectData effectData)
+		{
+			if (string.IsNullOrEmpty(data?.Description) || effectData == null)
+				return string.Empty;
+			
+			return $"{data.Description.Replace("{value}", $"{effectData.Value}")}";
 		}
 	}
 }

@@ -7,10 +7,8 @@ using Cysharp.Threading.Tasks;
 using RR.Core.ResourceManagament;
 using RR.Core.Extensions;
 using RR.UI.FrameSystem;
-using ServerCore.Infrastructure.Models;
 using UI;
 using UnityEngine;
-using Vulcan.Data;
 
 namespace Statistics
 {

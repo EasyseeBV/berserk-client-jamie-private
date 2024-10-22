@@ -57,8 +57,11 @@ namespace BerserkV3.Common.TutorialSystem
 			if (!searchPossibleKeywords)
 				return ProgressRepository.IsCompleted(id.ToString());
 
-			return TryFindPossibleHints(id, out var hints) 
-			       && hints.Any(entity => ProgressRepository.IsCompleted(entity.Id));
+			if (!TryFindPossibleHints(id, out var hints))
+				return true;
+			
+			var isCompleted = hints.Any(entity => ProgressRepository.IsCompleted(entity.Id));
+			return isCompleted;
 		}
 
 		public override async Task SkipAsync()

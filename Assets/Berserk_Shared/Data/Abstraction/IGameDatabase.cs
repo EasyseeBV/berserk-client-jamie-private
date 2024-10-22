@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Berserk.Shared.Data.Consumables;
 using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Game;
@@ -30,7 +31,7 @@ namespace Berserk.Shared.Data.Abstraction
 
 		#region Cards
 
-		IEnumerable<CardData> AllCards();
+		IEnumerable<CardData> AllCards(params string[] except);
 
 		CardData GetCard(string id);
 
@@ -45,6 +46,16 @@ namespace Berserk.Shared.Data.Abstraction
 		IEnumerable<HeroData> GetHeroes(IEnumerable<string> ids);
 
 		HeroData GetHero(string id);
+
+		#endregion
+		
+		#region Consumables
+
+		IEnumerable<ConsumableData> AllConsumables();
+
+		IEnumerable<ConsumableData> GetConsumables(IEnumerable<string> ids);
+
+		ConsumableData GetConsumable(string id);
 
 		#endregion
 

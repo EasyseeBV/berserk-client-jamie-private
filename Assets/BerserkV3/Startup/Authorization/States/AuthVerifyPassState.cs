@@ -1,26 +1,41 @@
 ﻿using BerserkV3.Common.StateMachine;
 using BerserkV3.Startup.UI;
+using RR.UIService;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthVerifyPassState : State
 	{
-		private static AuthVerifyPassView Window => AuthVerifyPassView.Instance;
+		private readonly IUIService uiService;
+
+		public AuthVerifyPassState(IUIService uiService)
+		{
+			this.uiService = uiService;
+		}
+
 		public override void OnEnter(params object[] args)
 		{
-			Window.SetHeaderText("<b>Reset</b> Password");
-			Window.SetMessageText("We have sent you an email with reset password link,<br>" +
-			                      "please click on that link to proceed further.");
-			Window.SetFooterText($"Remember your Password? <color=#F55D0D>Log in");
-			Window.SetFooterAction(StateMachineBus.Switch<AuthSignInState>);
-			Window.SetReturnAction(StateMachineBus.Switch<AuthForgotPassState>);
-			Window.SetFooterInteractable(true);
-			Window.Show();
+			uiService.Begin<AuthVerifyPassWindow>()
+				.WithInit(InitWindow)
+				.Show();
+
+			return;
+
+			void InitWindow(AuthVerifyPassWindow window)
+			{
+				window.SetHeaderText("<b>Reset</b> Password");
+				window.SetMessageText("We have sent you an email with reset password link,<br>" +
+				                      "please click on that link to proceed further.");
+				window.SetFooterText($"Remember your Password? <color=#F55D0D>Log in");
+				window.SetFooterAction(StateMachineBus.Switch<AuthSignInState>);
+				window.SetReturnAction(StateMachineBus.Switch<AuthForgotPassState>);
+				window.SetFooterInteractable(true);
+			}
 		}
 
 		public override void OnExit()
 		{
-			Window.Close();
+			uiService.Begin<AuthVerifyPassWindow>().Hide();
 		}
 	}
 }

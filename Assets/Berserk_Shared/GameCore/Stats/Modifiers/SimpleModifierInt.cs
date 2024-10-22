@@ -7,13 +7,13 @@ namespace Berserk.Shared.GameCore
 	{
 		[JsonProperty] public string Id { get; protected set; }
 		[JsonProperty] public int Priority { get; protected set; }
-		[JsonProperty] public int ModifierCurrrent { get; protected set; }
+		[JsonProperty] public int ModifierCurrent { get; protected set; }
 		[JsonProperty] public int ModifierMaximum { get; protected set; }
 		[JsonProperty] public int MaximumApplied { get; protected set; }
 		[JsonProperty] public int CurrentApplied { get; protected set; }
 		[JsonProperty] protected bool RemoveMaxWhenExpire;
 		[JsonProperty] protected bool RemoveCurrWhenExpire;
-
+		
 		#region Setters
 
 		public IStatModifier<int> SetModifierId(string id)
@@ -38,7 +38,7 @@ namespace Berserk.Shared.GameCore
 
 		public IStatModifier<int> SetCurrModifier(int value, int applied = 0, bool revertWhenExpire = false)
 		{
-			ModifierCurrrent = value;
+			ModifierCurrent = value;
 			RemoveCurrWhenExpire = revertWhenExpire;
 			CurrentApplied = applied;
 			return this;
@@ -46,7 +46,7 @@ namespace Berserk.Shared.GameCore
 
 		public ModifierStack<int> GetDataStack(ModifierStack<int> other = default)
 		{
-			other.ModifierCurrentTotal += ModifierCurrrent;
+			other.ModifierCurrentTotal += ModifierCurrent;
 			other.ModifierMaximumTotal += ModifierMaximum;
 			other.CurrentAppliedTotal += CurrentApplied;
 			other.MaximumAppliedTotal += MaximumApplied;
@@ -55,16 +55,10 @@ namespace Berserk.Shared.GameCore
 
 		#endregion
 
-		public virtual void ApplyMaximum(IStatModifiable<int> stat)
+		public virtual void Apply(IStatModifiable<int> stat)
 		{
-			MaximumApplied = Apply(stat.AddModMax, Sign(ModifierMaximum));
-		}
-
-		public virtual void ApplyCurrent(IStatModifiable<int> stat)
-		{
-			var currToApply = ModifierCurrrent - CurrentApplied;
-			if (currToApply != 0)
-				CurrentApplied += Apply(value => stat.Add(value, false), currToApply);
+			MaximumApplied = Apply(stat.AddModMax, ModifierMaximum);
+			CurrentApplied = Apply(stat.AddModCurrent, ModifierCurrent);
 		}
 
 		public virtual void Expire(IStatModifiable<int> stat)
@@ -77,7 +71,7 @@ namespace Berserk.Shared.GameCore
 
 			if (CurrentApplied != 0 && RemoveCurrWhenExpire)
 			{
-				Apply(value => stat.Add(value, false), Sign(CurrentApplied, true));
+				Apply(stat.AddModCurrent, Sign(CurrentApplied, true));
 				CurrentApplied = 0;
 			}
 		}

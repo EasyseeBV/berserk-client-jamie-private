@@ -20,5 +20,6 @@ namespace Berserk.Shared.Data.Abstraction
 		TArg GetRuntimeArg<TArg>();
 		IEnumerable<TArg> GetRuntimeArgs<TArg>();
 		bool Disabled => DisabledLength is -1 or > 0;
+		EffectExecutionOrder ExecutionOrder { get; set; }
 	}
 }

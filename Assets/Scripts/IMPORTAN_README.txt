@@ -1,1 +1,1 @@
-There is a lot of legacy in the scripts directory, instead explore the BeserkV3 directory where the latest production code is located.
+There is a lot of legacy in the scripts directory, instead explore the BeserkV3 directory where the latest development code is located.

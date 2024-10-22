@@ -1,8 +1,9 @@
-using Audio;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.Utils;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.Common.InputSystem.DragDropSystem;
 using BerserkV3.Common.InputSystem.HoveringSystem;
 using BerserkV3.Common.InputSystem.SelectionSystem;
@@ -11,7 +12,6 @@ using BerserkV3.GameCore.EffectsVisual.Abstractions;
 using BerserkV3.GameCore.TargetSystem.Abstraction;
 using DG.Tweening;
 using UnityEngine;
-using Vulcan.Audio;
 using IDropHandler = BerserkV3.Common.InputSystem.DragDropSystem.IDropHandler;
 
 namespace BerserkV3.GameCore.Cards
@@ -21,6 +21,7 @@ namespace BerserkV3.GameCore.Cards
 	public class CardHandStrategy : BaseStrategy, ICardHandStrategy, IDraggable, IHoverable, IPreviewable, ISelectable
 	{
 		private readonly IAnimatorApplication animatorApplication;
+		private readonly IAudioApplication audioApplication;
 		private readonly IGameContext gameContext;
 		private readonly IHoveringSystem hoveringSystem;
 		private readonly IDragDropSystem dragDropSystem;
@@ -45,6 +46,7 @@ namespace BerserkV3.GameCore.Cards
 		public CardHandStrategy(
 			ICardView cardView,
 			IAnimatorApplication animatorApplication,
+			IAudioApplication audioApplication,
 			IGameContext gameContext,
 			IHoveringSystem hoveringSystem,
 			IDragDropSystem dragDropSystem,
@@ -54,6 +56,7 @@ namespace BerserkV3.GameCore.Cards
 		{
 			View = cardView;
 			this.animatorApplication = animatorApplication;
+			this.audioApplication = audioApplication;
 			this.gameContext = gameContext;
 			this.hoveringSystem = hoveringSystem;
 			this.dragDropSystem = dragDropSystem;
@@ -227,7 +230,7 @@ namespace BerserkV3.GameCore.Cards
 			var cardTransform = View.SelfContainer;
 			cardTransform.DOKill();
 			cardTransform.localRotation = Quaternion.identity;
-			AudioController.Play(Clip.Card_StartDrag);
+			audioApplication.PlaySound(Clip.Card_StartDrag);
 		}
 
 		private void OnDragCanceled(IDraggable draggable, IDropHandler dropHandler)
@@ -236,7 +239,7 @@ namespace BerserkV3.GameCore.Cards
 				return;
 
 			animatorApplication.EnqueueRestorePosition(View.TargetTransform, View.SelfContainer);
-			AudioController.Play(View.RuntimeGameObject.Data.Type == ObjectType.Spell
+			audioApplication.PlaySound(View.RuntimeGameObject.Data.Type == ObjectType.Spell
 				? Clip.Spell_Release
 				: Clip.Card_Release);
 		}

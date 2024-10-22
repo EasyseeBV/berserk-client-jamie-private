@@ -256,7 +256,7 @@ namespace UI
 		{
 			token.ThrowIfCancellationRequested();
 			if (view is ICustomisationPreviewableView previewableView)
-				return previewView.SetupPreviewAsync(previewableView.GetPreviewInfo(), token);
+				return previewView.SetupAsync(previewableView.GetPreviewInfo(), token);
 
 			previewView.ResetPreview();
 			return UniTask.CompletedTask;

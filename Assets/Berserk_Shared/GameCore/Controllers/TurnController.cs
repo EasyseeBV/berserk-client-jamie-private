@@ -52,12 +52,12 @@ namespace Berserk.Shared.GameCore.Controllers
 				var ownerId = timerData.OwnerId;
 				var prevOwnerId = gameContext.PlayerRepository.GetOpposite(ownerId).UserId;
 
+				SetNullMovesOnTable(prevOwnerId);
+				
 				if (timerData.Turn > 1)
 					ExecuteAfterTurnEndedPhase(prevOwnerId, ownerId);
-
-				SetNullMovesOnTable(prevOwnerId);
+				
 				ReplenishMana(ownerId, timerData.Turn, timerData.Round);
-				RestoreMovesOnTable(ownerId);
 
 				if (timerData.Round == 1)
 					ExecuteFirstRoundPhase(ownerId);
@@ -74,6 +74,7 @@ namespace Berserk.Shared.GameCore.Controllers
 				gameLogicContext.LogicQueueController.Add(new TurnGame(timerData));
 				ExecuteGiveCards(ownerId, timerData.Turn);
 				ExecuteRoundStartedPhase(ownerId);
+				RestoreMovesOnTable(ownerId);
 			}
 			catch (Exception exception)
 			{
@@ -163,7 +164,7 @@ namespace Berserk.Shared.GameCore.Controllers
 		private void RestoreMovesOnTable(string userId)
 		{
 			foreach (var card in gameContext.GameRuntimePool.GetAllTableObjects(userId))
-				card.RuntimeData.MoveCount.ResetToMax();
+				card.RuntimeData.MoveCount.Add(card.RuntimeData.MoveCount.BaseStat);
 		}
 
 		private void SetNullMovesOnTable(string userId)

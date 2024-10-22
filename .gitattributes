@@ -14,9 +14,10 @@ cmd = '<path to UnityYAMLMerge>' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 *.asset merge=unityyamlmerge
 *.meta merge=unityyamlmerge
 *.controller merge=unityyamlmerge
-/Assets/Firebase/Plugins/x86_64/FirebaseCppApp-11_6_0.bundle filter=lfs diff=lfs merge=lfs -text
-/Library/ArtifactDB filter=lfs diff=lfs merge=lfs -text
-/Library/PackageCache/com.unity.burst@1.8.10/.Runtime/libburst-llvm-15.dylib filter=lfs diff=lfs merge=lfs -text
-/Library/PackageCache/com.unity.toolchain.win-x86_64-linux-x86_64@2.0.6/data~/payload.tar.7z filter=lfs diff=lfs merge=lfs -text
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-11_6_0.bundle filter=lfs diff=lfs merge=lfs -text
+Assets/Third[[:space:]]Party/WebView/Standalone/Mac/Plugins/VuplexWebViewMac.bundle/Contents/Frameworks/Vuplex[[:space:]]WebView.app/Contents/Frameworks/Chromium[[:space:]]Embedded[[:space:]]Framework.framework/Chromium[[:space:]]Embedded[[:space:]]Framework filter=lfs diff=lfs merge=lfs -text
+Assets/Third[[:space:]]Party/WebView/Standalone/Mac/Plugins/VuplexWebViewMac_with_codecs.bundle/Contents/Frameworks/Vuplex[[:space:]]WebView.app/Contents/Frameworks/Chromium[[:space:]]Embedded[[:space:]]Framework.framework/Chromium[[:space:]]Embedded[[:space:]]Framework filter=lfs diff=lfs merge=lfs -text
+Assets/Third[[:space:]]Party/WebView/Standalone/Windows/Plugins/libcef_with_codecs.dll filter=lfs diff=lfs merge=lfs -text
+Assets/Third[[:space:]]Party/WebView/Standalone/Windows/Plugins/VuplexWebViewChromium/libcef.dll filter=lfs diff=lfs merge=lfs -text
 Assets/Firebase/Plugins/x86_64/FirebaseCppApp-13_6_0.bundle filter=lfs diff=lfs merge=lfs -text
 Assets/Assets/Cards/Backs/Card_Back_Notus.png filter=lfs diff=lfs merge=lfs -text

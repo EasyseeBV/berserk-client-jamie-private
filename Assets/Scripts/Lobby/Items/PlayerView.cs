@@ -1,6 +1,7 @@
+using System;
 using System.Linq;
 using BerserkV3.Common.DataBase;
-using BerserkV3.Lobby.Applications;
+using BerserkV3.Startup.Authorization;
 using Cysharp.Threading.Tasks;
 using RR.Core.ResourceManagament;
 using TMPro;
@@ -9,6 +10,8 @@ using UnityEngine.UI;
 
 namespace Lobby.Items
 {
+	[Obsolete]
+	//TODO check and remove
 	public class PlayerView : MonoBehaviour
 	{
 		[SerializeField] private RawImage avatarImage;
@@ -18,8 +21,8 @@ namespace Lobby.Items
 		
 		public void SetArtFromOwnedVulcaniteId(string id)
 		{
-			var ownedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == id);
-			SetArtFromVulcaniteId(ownedHero?.VulcaniteId);
+			//var ownedHero = User.OwnedVulcanites.FirstOrDefault(x => x.Id == id);
+			//SetArtFromVulcaniteId(ownedHero?.VulcaniteId);
 		}
 		
 		public void SetArtFromVulcaniteId(string id)

@@ -87,8 +87,6 @@ namespace BerserkV3.GameCore.Network
 
 			var cmdName = typeof(T).Name;
 			GameCoreBus.OnCommandExecute.Publish(cmdName);
-			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] " +
-			                        $"Try send {cmdName.Orange()} {JsonConvert.SerializeObject(model)}");
 			model ??= new CmdParamsModel(sessionProcessor.Context.Timer.RuntimeData.TimeHash);
 			logicEventsProcessor.ProcessUnQueueAsync(new CommandWait(model.CommandId)).Forget();
 			
@@ -96,15 +94,11 @@ namespace BerserkV3.GameCore.Network
 				predictProcessor.PerformCmd<T>(model);
 			
 			await SendAsync("PerformCommand", cmdName, JsonConvert.SerializeObject(model, SharedSerializationHelper.SerializeSettings));
-
-			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] Sent successful {cmdName.Green()}");
 		}
 
 		public async UniTask ReadyToInitializeAsync()
 		{
-			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] Try send ReadyToInitialize");
 			await SendAsync("ReadyToInitialize").AsUniTask();
-			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] Sent successful ReadyToInitialize");
 		}
 		
 		private bool HandleInternalSignalTypes(Message message)

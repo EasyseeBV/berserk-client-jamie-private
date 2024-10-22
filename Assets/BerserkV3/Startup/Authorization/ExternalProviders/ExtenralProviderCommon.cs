@@ -12,21 +12,24 @@ using BerserkV3.Startup.Network;
 using BerserkV3.Startup.UI;
 using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
+using RR.UIService;
 using UnityEngine;
 
 namespace BerserkV3.Startup.Authorization.ExternalProviders
 {
 	public class ExtenralProviderCommon : ExternalProviderBase, IExternalProvider
 	{
+		private readonly IUIService uiService;
 		private readonly ExternalProvider provider;
 
 		private UniTaskCompletionSource<ExternalProviderResponse> login;
 		private CancellationTokenSource logining;
 
-		private static AuthSocialResponseView Window => AuthSocialResponseView.Instance;
-
-		public ExtenralProviderCommon(ExternalProvider provider)
+		public ExtenralProviderCommon(
+			IUIService uiService,
+			ExternalProvider provider)
 		{
+			this.uiService = uiService;
 			this.provider = provider;
 		}
 
@@ -47,9 +50,14 @@ namespace BerserkV3.Startup.Authorization.ExternalProviders
 
 				LiveLinkRouterAdapter.Service.OpenLink(redirectResponse.Data.RedirectUrl);
 
-				Window.Show();
-				Window.SetHeaderText("Authorization");
-				Window.SetMessageText("We are waiting for the provider's response.");
+				uiService.Begin<AuthSocialResponseWindow>()
+					.WithInit(window =>
+					{
+						window.SetHeaderText("Authorization");
+						window.SetMessageText("We are waiting for the provider's response.");
+					})
+					.Show();
+				
 				OnApplicationFocusChanged(true);
 				return await login.Task;
 			}
@@ -65,7 +73,7 @@ namespace BerserkV3.Startup.Authorization.ExternalProviders
 			finally
 			{
 				Application.focusChanged -= OnApplicationFocusChanged;
-				Window.Close();
+				uiService.Begin<AuthSocialResponseWindow>().Hide();
 				logining?.Cancel();
 				logining?.Dispose();
 				logining = null;
@@ -74,18 +82,19 @@ namespace BerserkV3.Startup.Authorization.ExternalProviders
 
 		private void OnApplicationFocusChanged(bool focused)
 		{
+			var window = uiService.Get<AuthSocialResponseWindow>();
 			if (!focused)
 			{
 				logining?.Cancel();
 				logining?.Dispose();
 				logining = null;
-				Window.ClearCancelActions();
+				window.ClearCancelActions();
 				return;
 			}
 
 			logining = new CancellationTokenSource();
 			SocialLoginAsync(logining.Token).Forget();
-			Window.SetCancelAction(() => login?.TrySetResult(new ExternalProviderResponse(string.Format(AUTH_CANCELLED, provider), false)));
+			window.SetCancelAction(() => login?.TrySetResult(new ExternalProviderResponse(string.Format(AUTH_CANCELLED, provider), false)));
 		}
 
 		private async UniTask SocialLoginAsync(CancellationToken token)

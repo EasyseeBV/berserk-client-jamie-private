@@ -10,6 +10,7 @@ namespace Berserk.Shared.Data.Game
 		public bool Applied { get; set; }
 		public bool FirstTickApply { get; set; }
 		public bool FirstTickExecute { get; set; }
+		public EffectExecutionOrder ExecutionOrder { get; set; }
 		public EffectKeyword Keyword { get; set; }
 		public EffectVisualKeyword VisualKeyword { get; set; }
 		public EffectPhase[] Phases { get; set; }

@@ -3,27 +3,39 @@ using BerserkV3.Common.Network;
 using BerserkV3.Common.StateMachine;
 using BerserkV3.Startup.UI;
 using Cysharp.Threading.Tasks;
+using RR.UIService;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthChooseState : State
 	{
-		private static AuthChooseView Window => AuthChooseView.Instance;
-		
+		private readonly IUIService uiService;
+		public AuthChooseState(IUIService uiService)
+		{
+			this.uiService = uiService;
+		}
+
 		public override void OnEnter(params object[] args)
 		{
-			Window.Show();
-			Window.SetSignInButtonText("LOGIN");
-			Window.SetGuestButtonText("CONTINUE AS GUEST");
-			Window.SetSignUpButtonText("SIGN-UP FOR FREE");
-			Window.SetGuestAction(() => AuthSignInState.LoginGuest(response => NotifyAndRetry(response.GetMessage())).Forget(DefaultSharedLogger.Error));
-			Window.SetSignInAction(StateMachineBus.Switch<AuthByTokenState>);
-			Window.SetSignUpAction(StateMachineBus.Switch<AuthSignUpState>);
+			uiService.Begin<AuthChooseWindow>()
+				.WithInit(InitWindow)
+				.Show();
+			
+			return;
+			void InitWindow(AuthChooseWindow window)
+			{
+				window.SetSignInButtonText("LOGIN");
+				window.SetGuestButtonText("CONTINUE AS GUEST");
+				window.SetSignUpButtonText("SIGN-UP FOR FREE");
+				window.SetGuestAction(() => AuthSignInState.LoginGuest(response => NotifyAndRetry(response.GetMessage())).Forget(DefaultSharedLogger.Error));
+				window.SetSignInAction(StateMachineBus.Switch<AuthByTokenState>);
+				window.SetSignUpAction(StateMachineBus.Switch<AuthSignUpState>);
+			}
 		}
 
 		public override void OnExit()
 		{
-			Window.Close();
+			uiService.Begin<AuthChooseWindow>().Hide();
 			base.OnExit();
 		}
 		

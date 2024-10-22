@@ -17,23 +17,25 @@ using BerserkV3.Startup.Utils;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;
 using RR.Network.Rest;
+using RR.UIService;
 using Environment = BerserkV3.Startup.Network.Enums.Environment;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthSignInState : AuthState<AuthSignInArgs>
 	{
+		private readonly IUIService uiService;
 		private readonly ILiveLinkRouter linkRouter;
 		private readonly ISerializeHelper serializeHelper;
 		private readonly ISharedConfig sharedConfig;
-		
-		private static AuthSignInView Window => AuthSignInView.Instance;
 
 		public AuthSignInState(
+			IUIService uiService,
 			ILiveLinkRouter linkRouter,
 			ISerializeHelper serializeHelper,
 			ISharedConfig sharedConfig)
 		{
+			this.uiService = uiService;
 			this.linkRouter = linkRouter;
 			this.serializeHelper = serializeHelper;
 			this.sharedConfig = sharedConfig;
@@ -41,35 +43,9 @@ namespace BerserkV3.Startup.Authorization
 
 		protected override void OnEnter(AuthSignInArgs args)
 		{
-			Window.SetHeaderText("Login");
-			Window.SetEmailText(args.Email);
-			Window.SetPasswordText(args.Password);
-			Window.SetTestPasswordText(string.Empty);
-			Window.SetGuestButtonText("Continue as a guest");
-			Window.SetSignInButtonText("Login");
-			Window.SetSignUpButtonText($"Don’t have an account? {"Register".CustomColor("#F55D0D")}");
-			Window.SetDeleteAccountButtonText("Delete account?");
-			Window.SetForgotPassButtonText("Forgot Password?");
-
-			if (string.IsNullOrEmpty(args.Email) && serializeHelper.HasKey(SerializeKeyHelper.EMAIL))
-				Window.SetEmailText(serializeHelper.Get(SerializeKeyHelper.EMAIL));
-			
-			var socials = sharedConfig.AvailableSocials.Where(x => x.IsPlatformAvailable()).ToArray();
-			var isSocialAvailable = socials.IsSocialsAvailable();
-			if (isSocialAvailable)
-				foreach (var provider in socials)
-					SetSocialProvider(provider);
-			
-			Window.SocialWidget.SetActive(isSocialAvailable);
-			Window.SetActiveSeparator(isSocialAvailable);
-
-			Window.SetSignUpAction(StateMachineBus.Switch<AuthSignUpState>);
-			Window.SetDeleteAccountAction(RedirectToDeleteAccount);
-			Window.SetForgotPassAction(StateMachineBus.Switch<AuthForgotPassState>);
-			Window.SetSignInAction(() => SignIn().Forget(DefaultSharedLogger.Error));
-			Window.SetGuestAction(() => LoginGuest(respose => NotifyAndRetry(respose.GetMessage())).Forget(DefaultSharedLogger.Error));
-			Window.SetActiveTestPassword(IsTestingAvailable());
-			Window.Show();
+			uiService.Begin<AuthSignInWindow>()
+				.WithInit(InitWindow)
+				.Show();
 			
 			if (args.AutoSignIn && !IsTestingAvailable())
 				SignIn().Forget(DefaultSharedLogger.Error);
@@ -77,22 +53,57 @@ namespace BerserkV3.Startup.Authorization
 
 		protected override void OnExit(AuthSignInArgs args)
 		{
+			uiService.Begin<AuthSignInWindow>().Hide();
 			base.OnExit(args);
-			Window.Close();
 		}
-
-		private void SetSocialProvider(ExternalProvider provider)
+		
+		private void InitWindow(AuthSignInWindow window)
 		{
-			var button = Window.SocialWidget.CreateButton(provider);
-			var args = new AuthSocialSignInArgs {Provider = provider, ReturnState = Id};
-			button.Subscribe(() => StateMachineBus.Switch<AuthSocialSignInState>(args));
+			var args = GetArgs();
+			window.SetHeaderText("Login");
+			window.SetEmailText(args.Email);
+			window.SetPasswordText(args.Password);
+			window.SetTestPasswordText(string.Empty);
+			window.SetGuestButtonText("Continue as a guest");
+			window.SetSignInButtonText("Login");
+			window.SetSignUpButtonText($"Don’t have an account? {"Register".CustomColor("#F55D0D")}");
+			window.SetDeleteAccountButtonText("Delete account?");
+			window.SetForgotPassButtonText("Forgot Password?");
+
+			if (string.IsNullOrEmpty(args.Email) && serializeHelper.HasKey(SerializeKeyHelper.EMAIL))
+				window.SetEmailText(serializeHelper.Get(SerializeKeyHelper.EMAIL));
+			
+			var socials = sharedConfig.AvailableSocials.Where(x => x.IsPlatformAvailable()).ToArray();
+			var isSocialAvailable = socials.IsSocialsAvailable();
+			if (isSocialAvailable)
+				foreach (var provider in socials)
+					SetSocialProvider(provider);
+			
+			window.SocialWidget.SetActive(isSocialAvailable);
+			window.SetActiveSeparator(isSocialAvailable);
+
+			window.SetSignUpAction(StateMachineBus.Switch<AuthSignUpState>);
+			window.SetDeleteAccountAction(RedirectToDeleteAccount);
+			window.SetForgotPassAction(StateMachineBus.Switch<AuthForgotPassState>);
+			window.SetSignInAction(() => SignIn().Forget(DefaultSharedLogger.Error));
+			window.SetGuestAction(() => LoginGuest(respose => NotifyAndRetry(respose.GetMessage())).Forget(DefaultSharedLogger.Error));
+			window.SetActiveTestPassword(IsTestingAvailable());
+				
+			return;
+			void SetSocialProvider(ExternalProvider provider)
+			{
+				var button = window.SocialWidget.CreateButton(provider);
+				var socialSignInArgs = new AuthSocialSignInArgs {Provider = provider, ReturnState = Id};
+				button.Subscribe(() => StateMachineBus.Switch<AuthSocialSignInState>(socialSignInArgs));
+			}
 		}
 
 		private async UniTask SignIn()
 		{
+			var window = uiService.Get<AuthSignInWindow>();
 			if (IsTestingAvailable())
 			{
-				var testerResponse = await IdentityAPI.PostLoginInTester(Window.GetTestPassword()).AddLoadingTask();
+				var testerResponse = await IdentityAPI.PostLoginInTester(window.GetTestPassword()).AddLoadingTask();
 				if (testerResponse.Code != HttpStatusCode.OK)
 				{
 					NotifyAndRetry($"{testerResponse.GetMessage()}");
@@ -100,7 +111,7 @@ namespace BerserkV3.Startup.Authorization
 				}
 			}
 
-			var authResponse = await IdentityAPI.PostLogIn(Window.GetEmail(), Window.GetPassword()).AddLoadingTask();
+			var authResponse = await IdentityAPI.PostLogIn(window.GetEmail(), window.GetPassword()).AddLoadingTask();
 			if (authResponse.Code != HttpStatusCode.OK)
 			{
 				NotifyAndRetry($"{authResponse.GetMessage()}");
@@ -111,8 +122,8 @@ namespace BerserkV3.Startup.Authorization
 			{
 				var verificationArgs = new AuthVerificationArgs
 				{
-					Email = Window.GetEmail(), 
-					Password = Window.GetPassword(), 
+					Email = window.GetEmail(), 
+					Password = window.GetPassword(), 
 					UserName = ""
 				};
 				StateMachineBus.Switch<AuthVerificationState>(verificationArgs);
@@ -138,7 +149,8 @@ namespace BerserkV3.Startup.Authorization
 
 		private void NotifyAndRetry(string message)
 		{
-			var args = new AuthSignInArgs {Email = Window.GetEmail(), Password = Window.GetPassword()};
+			var window = uiService.Get<AuthSignInWindow>();
+			var args = new AuthSignInArgs {Email = window.GetEmail(), Password = window.GetPassword()};
 			StateMachineBus.Switch<AuthMessageState>(AuthMessageArgs.Retry(Id, message), args);
 		}
 

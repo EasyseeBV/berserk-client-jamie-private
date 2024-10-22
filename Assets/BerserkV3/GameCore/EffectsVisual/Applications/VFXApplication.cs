@@ -1,21 +1,26 @@
 using System;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.GameCore.Controllers;
 using BerserkV3.GameCore.EffectsVisual.Abstractions;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;
 using UnityEngine;
-using Vulcan.Audio;
 
 namespace BerserkV3.GameCore.EffectsVisual.Applications
 {
 	public class VFXApplication : IVfxApplication
 	{
 		private readonly IVfxFactory vfxFactory;
+		private readonly IAudioApplication audioApplication;
 		private static IGameContainers gameContainers;
 
-		public VFXApplication(IVfxFactory vfxFactory, IGameContainers gameContainers)
+		public VFXApplication(
+			IVfxFactory vfxFactory, 
+			IGameContainers gameContainers,
+			IAudioApplication audioApplication)
 		{
 			this.vfxFactory = vfxFactory;
+			this.audioApplication = audioApplication;
 			VFXApplication.gameContainers = gameContainers;
 		}
 
@@ -41,7 +46,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Applications
 		{
 			var vfx = vfxFactory.Create(id.ToString());
 			vfx.SetArguments(args);
-			AudioController.Play(vfx.AudioKeyword);
+			audioApplication.PlaySound(vfx.AudioKeyword);
 			return vfx;
 		}
 
@@ -49,7 +54,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Applications
 		{
 			var vfx = vfxFactory.Create(id.ToString());
 			vfx.SetPosition(position);
-			AudioController.Play(vfx.AudioKeyword);
+			audioApplication.PlaySound(vfx.AudioKeyword);
 			return vfx;
 		}
 		
@@ -57,7 +62,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Applications
 		{
 			var vfx = vfxFactory.Create(id.ToString());
 			SetVfxParent(vfx, parent);
-			AudioController.Play(vfx.AudioKeyword);
+			audioApplication.PlaySound(vfx.AudioKeyword);
 			return vfx;
 		}
 		
@@ -66,7 +71,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Applications
 			parent = TryFixParent(parent);
 			var vfx = vfxFactory.Create(id.ToString(), parent);
 			vfx.SetPosition(GetPosition(parent));
-			AudioController.Play(vfx.AudioKeyword);
+			audioApplication.PlaySound(vfx.AudioKeyword);
 			return vfx;
 		}
 

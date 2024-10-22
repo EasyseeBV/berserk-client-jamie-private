@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.UserInventory;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.Attributes;
 using Berserk.Shared.GameCore.Commands;

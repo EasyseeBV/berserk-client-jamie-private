@@ -72,8 +72,8 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			selectionSystem.OnSelected += OnSelected;
 			var handCards = GetSelfHandCardViews();
 			SetupInitial(handCards);
-			RefreshDiscardView();
 			RefreshAllCards();
+			RefreshDiscardView();
 			discardHandView.ShowAsync().Forget();
 			RearrangeHandAsync(0f, handCards).Forget();
 			return UniTask.CompletedTask;
@@ -84,8 +84,8 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			if (localExpired)
 				return UniTask.CompletedTask;
 			
-			RefreshDiscardView();
 			RefreshAllCards();
+			RefreshDiscardView();
 			return base.ChangeEffectAsync();
 		}
 		
@@ -138,13 +138,20 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			
 			var headerText = Model.CurrentValue switch
 			{
-				< 0 => gameContext.GameDatabase.GetLocalization("DiscardCardsX"),
-				1 => gameContext.GameDatabase.GetLocalization("DiscardCardsOne"),
-				_ => string.Format(gameContext.GameDatabase.GetLocalization("DiscardCardsAny"), Model.CurrentValue)
+				< 0 => gameContext.GameDatabase.GetLocalization("ClientVisual_DiscardCardsX"),
+				1 => gameContext.GameDatabase.GetLocalization("ClientVisual_DiscardCardsOne"),
+				_ => string.Format(gameContext.GameDatabase.GetLocalization("ClientVisual_DiscardCardsAny"), Model.CurrentValue)
 			};
 			discardHandView.SetHeaderText(headerText);
 			discardHandView.SetButtonCallback(() => PerformUserActionAsync().Forget());
-			discardHandView.SetInteractable(!localMessageSent);
+			RefreshAcceptButton();
+		}
+
+		private void RefreshAcceptButton()
+		{
+			var selectedCount = GetSelfSelectedCardViews().Length;
+			var isLimitReachedOrDefault = selectedCount == 0 || selectedCount == Model.CurrentValue;
+			discardHandView.SetInteractable(!localMessageSent && isLimitReachedOrDefault);
 			discardHandView.SetButtonVisibility(!localMessageSent);
 		}
 		
@@ -166,6 +173,8 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			SetupCardContainer(cardView);
 			if (select) // only when selected
 				Refresh(cardView, true);
+			
+			RefreshAcceptButton();
 		}
 		
 		private void RefreshAllCards()
@@ -198,7 +207,7 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			
 			view.GlowView.Enable(canSelect && !view.MarkedAsSelected, GlowType.Turn);
 			if (view.Layout is IHandCardLayout handCardLayout)
-				handCardLayout.SetTitleText(view.MarkedAsSelected ? "Selected" : null);
+				handCardLayout.SetTitleText(view.MarkedAsSelected ? gameContext.GameDatabase.GetLocalization("ClientVisual_DiscardX_Selected") : null);
 			
 			strategy.AllowSelection(canSelect);
 		}

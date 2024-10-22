@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using BerserkV3.Common.Network;
-using BerserkV3.Lobby;
 using BerserkV3.Startup.Authorization;
+using BerserkV3.Startup.Authorization.Inventory.Models;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using RR.Core.DebugSystem;
@@ -17,6 +17,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Zenject;
 
 /// <summary>
 ///     Represents a behavior for working with the user reporting client.
@@ -27,6 +28,18 @@ using UnityEngine.UI;
 /// </remarks>
 public class UserReportingScript : MonoBehaviour
 {
+	#region DI
+
+	private IInventoryApplication userInventory; 
+	
+	[Inject]
+	public void Construct(IInventoryApplication userInventory)
+	{
+		this.userInventory = userInventory;
+	}
+
+	#endregion
+	
 	#region Constructors
 
 	/// <summary>
@@ -302,10 +315,10 @@ public class UserReportingScript : MonoBehaviour
 	{
 		if (!User.IsAuthorized)
 			return;
-
+		
 		var fileName = $"UserAccountReport.json";
 		userReport.Attachments.Add(new UserReportAttachment(fileName, fileName, "application/json",
-			Encoding.UTF8.GetBytes(User.ValidateUserData(false))));
+			Encoding.UTF8.GetBytes(userInventory.ValidateUserData(false))));
 	}
 
 	private UserReportingClientConfiguration GetConfiguration()

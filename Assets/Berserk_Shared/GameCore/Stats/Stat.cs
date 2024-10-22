@@ -17,7 +17,7 @@ namespace Berserk.Shared.GameCore
 		[JsonProperty] public virtual T Max { get; protected set; }
 		[JsonProperty] public StatChanges Changes { get; protected set; }
 		[JsonIgnore] public virtual bool IsMax => Current.Equals(Max);
-		[JsonIgnore] public virtual bool HasChanged { get; private set; }
+		[JsonIgnore] public virtual bool HasChanges { get; private set; }
 
 		#region Constuctors
 
@@ -53,12 +53,6 @@ namespace Berserk.Shared.GameCore
 
 		#endregion
 
-		#region Operators
-
-		public static implicit operator T(Stat<T> stat) => stat.Current;
-
-		#endregion
-
 		protected virtual T ApplyCurrent(T value)
 		{
 			SetChanges(!Current.Equals(value), StatChanges.Current);
@@ -69,7 +63,7 @@ namespace Berserk.Shared.GameCore
 
 		protected void SetChanges(bool changes, StatChanges value)
 		{
-			HasChanged = HasChanged || changes;
+			HasChanges |= changes;
 			if (!changes || value == StatChanges.None) 
 				return;
 			
@@ -108,7 +102,7 @@ namespace Berserk.Shared.GameCore
 		{
 			if (other == null)
 			{
-				DefaultSharedLogger.Error("Other stat does not exist");
+				DefaultSharedLogger.Error("Other stat doesn't exist");
 				return this;
 			}
 			
@@ -154,13 +148,15 @@ namespace Berserk.Shared.GameCore
 
 		public virtual void NotifyChanges(bool force = false)
 		{
-			if (!HasChanged && !force) 
+			if (!HasChanges && !force) 
 				return;
-			
-			HasChanged = false;
+
+			HasChanges = false;
 			OnChanged?.Invoke(Current);
 			OnChangedFrom?.Invoke(Previous, Current);
-			Changes = StatChanges.None;
+			
+			if (!HasChanges)
+				Changes = StatChanges.None;
 		}
 
 		public virtual IStat<T> ResetToMax(bool notify = true)
@@ -181,7 +177,7 @@ namespace Berserk.Shared.GameCore
 		{
 			OnChanged = null;
 			OnChangedFrom = null;
-			HasChanged = false;
+			HasChanges = false;
 			
 			Max = default;
 			Name = default;
@@ -189,7 +185,7 @@ namespace Berserk.Shared.GameCore
 			Current  = default;
 			BaseStat  = default;
 			Changes  = default;
-			HasChanged  = default;
+			HasChanges  = default;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using Berserk.Shared.Data.Abstraction;
@@ -8,20 +8,20 @@ using BerserkV3.Common.AnalyticsSystem;
 using BerserkV3.Common.AppTime;
 using BerserkV3.Common.Network;
 using BerserkV3.Common.ProgressDrawer;
+using BerserkV3.Common.PurchasingSystem.Abstractions;
+using BerserkV3.Common.UIService;
 using BerserkV3.Common.Utils;
 using BerserkV3.GameCore.Network;
-using BerserkV3.Generic.Customisation;
 using BerserkV3.Startup.Abstractions;
 using BerserkV3.Startup.Network;
-using BerserkV3.Startup.UI;
 using BerserkV3.Startup.Utils;
 using BestHTTP;
 using Cysharp.Threading.Tasks;
-using Events;
 using RR.Core.Extensions;
 using RR.Core.ResourceManagament;
 using RR.Core.Utilities.DiscSpaceUtils;
-using UnityEngine;
+using RR.UIService;
+using Unity.Services.Core;
 using Zenject;
 using Environment = BerserkV3.Startup.Network.Enums.Environment;
 
@@ -35,8 +35,10 @@ namespace BerserkV3.Init.Applications
 		private readonly IResourceService resourceService;
 		private readonly IMessageApplication messageApplication;
 		private readonly IAppTimeSynchronizer appTimeSynchronizer;
+		private readonly IServerChoiseApplication serverChoiseApplication;
 		private readonly IRedirectionApplication redirectionApplication;
 		private readonly IAnalyticsApplication analyticsApplication;
+		private readonly IPurchasingApplication purchasingApplication;
 
 		protected InitApplication(
 			IGameDatabase gameDatabase,
@@ -45,8 +47,10 @@ namespace BerserkV3.Init.Applications
 			IResourceService resourceService,
 			IMessageApplication messageApplication,
 			IAppTimeSynchronizer appTimeSynchronizer,
+			IServerChoiseApplication serverChoiseApplication,
 			IRedirectionApplication redirectionApplication,
-			IAnalyticsApplication analyticsApplication)
+			IAnalyticsApplication analyticsApplication, 
+			IPurchasingApplication purchasingApplication)
 		{
 			this.gameDatabase = gameDatabase;
 			this.sharedConfig = sharedConfig;
@@ -55,21 +59,24 @@ namespace BerserkV3.Init.Applications
 			this.messageApplication = messageApplication;
 			this.redirectionApplication = redirectionApplication;
 			this.appTimeSynchronizer = appTimeSynchronizer;
+			this.serverChoiseApplication = serverChoiseApplication;
 			this.analyticsApplication = analyticsApplication;
+			this.purchasingApplication = purchasingApplication;
 		}
 
 		public async void Initialize()
 		{
 			try
 			{
+				await serverChoiseApplication.InitAsync();
+				
 				HTTPManager.Setup();
-				if (EnvironmentSwitcher.CurrentEnvironment <= Environment.Staging)
-					await ServerChoiceView.Instance.Init();
-
 				if (EnvironmentSwitcher.CurrentEnvironment > Environment.LocalHost)
 					HTTPManager.RequestTimeout = TimeSpan.FromSeconds(60);
 
+				await TaskUtil.RetryAsync(InitializeUnityServices, retry: 2).AddLoadingTask();
 				await analyticsApplication.InitAsync(Token).AddLoadingTask();
+				await purchasingApplication.InitAsync(Token).AddLoadingTask();
 				await TaskUtil.RetryLoopAsync(() => ServerRouter.SelectLowestLatencyServer(messageApplication));
 				await TaskUtil.RetryLoopAsync(CheckVersion);
 				await TaskUtil.RetryLoopAsync(appTimeSynchronizer.SynchronizeTimeAsync).AddLoadingTask();
@@ -136,6 +143,18 @@ namespace BerserkV3.Init.Applications
 			return TryResult.Success;
 		}
 
+		private async Task<TryResult> InitializeUnityServices()
+		{
+			try
+			{
+				await UnityServices.InitializeAsync();
+				return TryResult.Success;
+			}
+			catch (Exception ex) 
+			{
+				return TryResult.Retry;
+			}
+		}
 		private async Task<TryResult> CheckVersion()
 		{
 			
@@ -184,7 +203,6 @@ namespace BerserkV3.Init.Applications
 			{
 				var progress = SetupProgressScreen();
 				await resourceService.InitializeAsync(progress);
-				CustomisationBus.OnMusicUpdated += DataBus.AppData.Value.LobbyMusic;
 			}
 			catch (NotEnoughMemoryException e)
 			{

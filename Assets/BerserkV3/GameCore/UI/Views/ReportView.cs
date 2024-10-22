@@ -2,7 +2,6 @@ using System;
 using Berserk.Shared.Data.Enums;
 using BerserkV3.GameCore.Settings;
 using RR.UI.FrameSystem;
-using ServerCore.Infrastructure.Models;
 using Sirenix.Utilities;
 using static TMPro.TMP_Dropdown;
 

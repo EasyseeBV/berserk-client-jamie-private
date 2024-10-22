@@ -1,9 +1,10 @@
-using Audio;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.Commands.Cmd;
 using Berserk.Shared.GameCore.LogicContext;
 using Berserk.Shared.GameCore.LogicEvents;
+using BerserkV3.Common.AudioSystem;
+using BerserkV3.Common.AudioSystem.Abstractions;
 using BerserkV3.Common.Utils;
 using BerserkV3.GameCore.LogicEventsProcessor;
 using BerserkV3.GameCore.Network.Abstraction;
@@ -11,7 +12,6 @@ using BerserkV3.GameCore.Repository;
 using BerserkV3.GameCore.UI;
 using Cysharp.Threading.Tasks;
 using GameCore;
-using Vulcan.Audio;
 using Zenject;
 
 namespace BerserkV3.GameCore.Controllers
@@ -19,6 +19,7 @@ namespace BerserkV3.GameCore.Controllers
 	public class TimerController : DisposableWithCts, IInitializable, ITickable
 	{
 		private readonly ITimerView timerView;
+		private readonly IAudioApplication audioApplication;
 		private readonly IGameLogicEventsSource gameLogicEventsSource;
 		private readonly IGameRepository gameRepository;
 		private readonly IGameContext gameContext;
@@ -28,12 +29,14 @@ namespace BerserkV3.GameCore.Controllers
 
 		public TimerController(
 			ITimerView timerView,
+			IAudioApplication audioApplication,
 			IGameLogicEventsSource gameLogicEventsSource,
 			IGameRepository gameRepository,
 			IGameContext gameContext,
 			IGameHub gameHub)
 		{
 			this.timerView = timerView;
+			this.audioApplication = audioApplication;
 			this.gameLogicEventsSource = gameLogicEventsSource;
 			this.gameRepository = gameRepository;
 			this.gameContext = gameContext;
@@ -60,7 +63,7 @@ namespace BerserkV3.GameCore.Controllers
 			if (canHandleThenSeconds && timeLeft == 10)
 			{
 				canHandleThenSeconds = false;
-				AudioController.Play(Clip.Timer_RunningOut);
+				audioApplication.PlaySound(Clip.Timer_RunningOut);
 				timerView.HandleTenSecondsLeft();
 				return;
 			}

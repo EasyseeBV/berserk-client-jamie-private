@@ -117,6 +117,7 @@ namespace Berserk.Shared.GameCore.EffectSystem.Effects.Buffs
 				.SetMinCurrent(GetRestrictionMinCurrent(stat))
 				.SetMaxCurrent(GetRestrictionMaxCurrent(stat))
 				.SetModifierId(RuntimeArg.ModifierId)
+				.SetPriority((int)EffectData.ExecutionOrder)
 				.SetCurrModifier(currValue, 0, RevertCurrentWhenExpire)
 				.SetMaxModifier(maxValue, 0, RevertMaximumWhenExpire);
 		}

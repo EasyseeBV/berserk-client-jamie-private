@@ -8,11 +8,6 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		public override void InstallBindings()
 		{
 			Container
-				.Bind<DuelsApplicationAdapter>()
-				.AsSingle()
-				.NonLazy();
-			
-			Container
 				.BindInterfacesTo<DuelsApplication>()
 				.AsSingle()
 				.NonLazy();

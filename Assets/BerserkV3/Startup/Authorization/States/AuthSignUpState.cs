@@ -11,16 +11,20 @@ using BerserkV3.Startup.UI;
 using BerserkV3.Startup.Utils;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;
+using RR.UIService;
 
 namespace BerserkV3.Startup.Authorization
 {
 	public class AuthSignUpState : AuthState<AuthSignUpArgs>
 	{
+		private readonly IUIService uiService;
 		private readonly ISharedConfig sharedConfig;
-		private static AuthSignUpView Window => AuthSignUpView.Instance;
 
-		public AuthSignUpState(ISharedConfig sharedConfig)
+		public AuthSignUpState(
+			IUIService uiService, 
+			ISharedConfig sharedConfig)
 		{
+			this.uiService = uiService;
 			this.sharedConfig = sharedConfig;
 		}
 
@@ -38,47 +42,58 @@ namespace BerserkV3.Startup.Authorization
 				return;
 			}
 			
-			Window.SetEmailInputText(args.Email);
-			Window.SetUserNameInputText(args.UserName);
-			Window.SetPasswordInputText(args.Password);
-			Window.SetHeaderText("Sign Up");
-			Window.SetAuthText("Create you game account!");
-			Window.SetGuestButtonText("Continue as a guest");
-			Window.SetLoginButtonText($"Already have an account? {"Log in".CustomColor("#F55D0D")}");
-			Window.SetContinueButtonText("Continue");
-			Window.SetContinueAction(() => RegisterAsync(new AuthRegisterModel
-			{
-				Email = Window.GetEmail(),
-				UserName = Window.GetUserName(),
-				Password = Window.GetPassword(),
-				Version = IdentityAPI.GetVersion()
-			}).Forget());
-			Window.SetGuestAction(() => AuthSignInState.LoginGuest(response => NotifyAndRetry(response.GetMessage())).Forget());
-			Window.SetLoginAction(StateMachineBus.Switch<AuthSignInState>);
+			uiService.Begin<AuthSignUpWindow>()
+				.WithInit(InitWindow)
+				.Show();
 
-			var socials = sharedConfig.AvailableSocials.Where(x => x.IsPlatformAvailable()).ToArray();
-			var isSocialAvailable = socials.IsSocialsAvailable();
-			if (isSocialAvailable)
-				foreach (var provider in socials)
-					SetSocialProvider(provider);
 			
-			Window.SocialWidget.SetActive(isSocialAvailable);
-			Window.SetActiveSeparator(isSocialAvailable);
-			Window.Show();
+			return;
+
+			void InitWindow(AuthSignUpWindow window)
+			{
+							
+				window.SetEmailInputText(args.Email);
+				window.SetUserNameInputText(args.UserName);
+				window.SetPasswordInputText(args.Password);
+				window.SetHeaderText("Sign Up");
+				window.SetAuthText("Create you game account!");
+				window.SetGuestButtonText("Continue as a guest");
+				window.SetLoginButtonText($"Already have an account? {"Log in".CustomColor("#F55D0D")}");
+				window.SetContinueButtonText("Continue");
+				window.SetContinueAction(() => RegisterAsync(new AuthRegisterModel
+				{
+					Email = window.GetEmail(),
+					UserName = window.GetUserName(),
+					Password = window.GetPassword(),
+					Version = IdentityAPI.GetVersion()
+				}).Forget());
+				window.SetGuestAction(() => AuthSignInState.LoginGuest(response => NotifyAndRetry(response.GetMessage())).Forget());
+				window.SetLoginAction(StateMachineBus.Switch<AuthSignInState>);
+
+				var socials = sharedConfig.AvailableSocials.Where(x => x.IsPlatformAvailable()).ToArray();
+				var isSocialAvailable = socials.IsSocialsAvailable();
+				if (isSocialAvailable)
+					foreach (var provider in socials)
+						SetSocialProvider(provider);
+			
+				window.SocialWidget.SetActive(isSocialAvailable);
+				window.SetActiveSeparator(isSocialAvailable);
+				
+				return;
+				void SetSocialProvider(ExternalProvider provider)
+				{
+					var button = window.SocialWidget.CreateButton(provider);
+					var socialSignInArgs = new AuthSocialSignInArgs {Provider = provider, ReturnState = Id};
+					button.Subscribe(() => StateMachineBus.Switch<AuthSocialSignInState>(socialSignInArgs));
+				}
+			}
 		}
 		
 		protected override void OnExit(AuthSignUpArgs args)
 		{
-			Window.Close();
+			uiService.Begin<AuthSignUpWindow>().Hide();
 		}
 		
-		private void SetSocialProvider(ExternalProvider provider)
-		{
-			var button = Window.SocialWidget.CreateButton(provider);
-			var args = new AuthSocialSignInArgs {Provider = provider, ReturnState = Id};
-			button.Subscribe(() => StateMachineBus.Switch<AuthSocialSignInState>(args));
-		}
-
 		private async UniTask RegisterAsync(AuthRegisterModel model)
 		{
 			var response = await IdentityAPI.PostRegister(model).AddLoadingTask();
@@ -95,7 +110,8 @@ namespace BerserkV3.Startup.Authorization
 
 		private void NotifyAndRetry(string message)
 		{
-			var args = new AuthSignUpArgs{Email = Window.GetEmail(), Password = Window.GetPassword(), UserName = Window.GetUserName()};
+			var window = uiService.Get<AuthSignUpWindow>();
+			var args = new AuthSignUpArgs{Email = window.GetEmail(), Password = window.GetPassword(), UserName = window.GetUserName()};
 			StateMachineBus.Switch<AuthMessageState>(AuthMessageArgs.Retry(Id, message), args);
 		}
 	}
