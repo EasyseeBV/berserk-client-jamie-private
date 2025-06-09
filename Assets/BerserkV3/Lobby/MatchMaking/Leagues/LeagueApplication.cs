@@ -153,7 +153,8 @@ namespace BerserkV3.Lobby.MatchMaking.Leagues
 		
 		private void OnAcceptTimeOut()
 		{
-			matchSearchApplication.LoadingDeclinedAndEndQueue();
+			AcceptedMatch(true);
+			//matchSearchApplication.LoadingDeclinedAndEndQueue();
 		}
 
 		private void MatchStarting()
