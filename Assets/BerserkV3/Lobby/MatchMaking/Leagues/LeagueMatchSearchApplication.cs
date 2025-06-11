@@ -286,9 +286,9 @@ namespace BerserkV3.Lobby.MatchMaking.Leagues
 				
 				case MatchSearchState.Found:
 					titleText = gameDatabase.GetLocalization("MatchAcceptingTitle");
-					model.TimeText = gameDatabase.GetLocalization("MatchFoundDescription");
-					view.SetAcceptButtonVisible(true);
-					view.SetDeclineButtonVisible(true);
+					model.TimeText = gameDatabase.GetLocalization("MatchFoundDescriptionAutoStart");
+					//view.SetAcceptButtonVisible(true);
+					//view.SetDeclineButtonVisible(true);
 					break;
 				
 				case MatchSearchState.Accepted:
