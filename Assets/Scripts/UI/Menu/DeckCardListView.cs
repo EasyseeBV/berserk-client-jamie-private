@@ -11,8 +11,10 @@ using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Common.Utils;
 using BerserkV3.Lobby.Applications;
 using BerserkV3.Lobby.Deck;
+using BerserkV3.Startup.Authorization;
 using Cysharp.Threading.Tasks;
 using Lobby;
+using RR.Core.DebugSystem;
 using RR.Core.Extensions;
 using RR.Game.TutorialSystemV2.Realizations;
 using RR.UI.FrameSystem;
@@ -114,6 +116,15 @@ namespace UI
 				.ToOrdered()
 				.SelectMany(stack => stack.GetAll().Select(x=> x.Id))
 				.ToList();
+			
+			var notOwnedCards = User.OwnedCards
+				.Where(x => !x.IsOwned)
+				.ToList();
+			
+			var notOwnedInDeck = notOwnedCards
+				.Where(c => currentDeck.OwnedCardIds.Contains(c.Id))
+				.ToList();
+			RRLogger.Error($"Not Owned Cards in current deck: {string.Join(", ", notOwnedInDeck.Select(c => c.CardId))}");
 
 			if (!await DeckApplicationAdapter.Application.SaveAsync(currentDeck)) 
 				return;

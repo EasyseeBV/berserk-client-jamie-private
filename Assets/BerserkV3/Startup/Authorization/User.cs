@@ -84,6 +84,12 @@ namespace BerserkV3.Startup.Authorization
 				builder.AppendLine($"Total subscription cards : {MarkValid(OwnedCards.Count(x => x.IsSubscription))}");
 				builder.AppendLine($"Total valid cards : {MarkValid(OwnedCards.Count(x => x.IsValid()))}");
 				builder.AppendLine($"Total inValid cards : {MarkInValid(OwnedCards.Count(x => !x.IsValid()))}");
+				var notOwnedCards = OwnedCards.Where(x => !x.IsOwned).ToList();
+				builder.AppendLine($"Total not owned cards: {MarkInValid(notOwnedCards.Count)}");
+				foreach (var card in notOwnedCards)
+				{
+					builder.AppendLine($"  not owned: CardId={card.CardId ?? "<unknownId>"}");
+				}
 			}
 			catch (Exception e)
 			{
