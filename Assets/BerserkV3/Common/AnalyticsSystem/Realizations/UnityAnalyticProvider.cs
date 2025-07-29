@@ -35,9 +35,26 @@ namespace BerserkV3.Common.AnalyticsSystem
 			 * Default limit of 500 characters for the dictionary content
 			 * Default limit of 100 custom events per hour, per user
 			 */
-			
+			//TODO: needs to be tested
 			base.OnSendThroughSdk(eventName, customData);
-			AnalyticsService.Instance.CustomData(eventName, customData);
+			var evt = new CustomEvent(eventName);
+
+			if (customData != null)
+			{
+				foreach (var kvp in customData)
+				{
+					try
+					{
+						evt.Add(kvp.Key, kvp.Value);
+					}
+					catch (ArgumentException ex)
+					{
+						UnityEngine.Debug.LogWarning($"Analytics parameter skipped: {kvp.Key} — unsupported type {kvp.Value?.GetType()?.Name}");
+					}
+				}
+			}
+
+			AnalyticsService.Instance.RecordEvent(evt);
 		}
 
 		protected override void OnDisposed()

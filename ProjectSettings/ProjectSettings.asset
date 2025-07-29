@@ -17,7 +17,7 @@ PlayerSettings:
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
-  m_ShowUnitySplashScreen: 1
+  m_ShowUnitySplashScreen: 0
   m_ShowUnitySplashLogo: 1
   m_SplashScreenOverlayOpacity: 1
   m_SplashScreenAnimation: 0
@@ -76,6 +76,7 @@ PlayerSettings:
   androidMinimumWindowWidth: 400
   androidMinimumWindowHeight: 300
   androidFullscreenMode: 1
+  androidAutoRotationBehavior: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
   runInBackground: 1
@@ -83,6 +84,7 @@ PlayerSettings:
   muteOtherAudioSources: 0
   Prepare IOS For Recording: 0
   Force IOS Speakers When Recording: 0
+  audioSpatialExperience: 0
   deferSystemGesturesMode: 15
   hideHomeButton: 0
   submitAnalytics: 1
@@ -136,8 +138,11 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
+  visionOSBundleVersion: 1.0
+  tvOSBundleVersion: 1.0
   bundleVersion: 3.6.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: b53a33ef0c67f6043b51e99af376bdc3, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -166,9 +171,9 @@ PlayerSettings:
     iPhone: 26
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 786
+  AndroidBundleVersionCode: 788
   AndroidMinSdkVersion: 26
-  AndroidTargetSdkVersion: 0
+  AndroidTargetSdkVersion: 36
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   stripEngineCode: 0
@@ -231,6 +236,7 @@ PlayerSettings:
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
   metalAPIValidation: 1
+  metalCompileShaderBinary: 0
   iOSRenderExtraFrameOnPause: 0
   iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
@@ -260,8 +266,8 @@ PlayerSettings:
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: 
-  AndroidKeyaliasName: 
+  AndroidKeystoreName: D:/Berserk_keystore/upload-keystore.jks
+  AndroidKeyaliasName: upload
   AndroidEnableArmv9SecurityFeatures: 0
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
@@ -480,6 +486,13 @@ PlayerSettings:
       m_Height: 76
       m_Kind: 0
       m_SubKind: iPad
+  - m_BuildTarget: VisionOS
+    m_Icons:
+    - m_Textures: []
+      m_Width: 1024
+      m_Height: 1024
+      m_Kind: 0
+      m_SubKind: 
   m_BuildTargetBatching: []
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs:
@@ -816,7 +829,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;EVENT_BATCHING_ALL;VUPLEX_STANDALONE;VUPLEX_DISABLE_SRP_WARNING;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;ODIN_INSPECTOR_3_1
+    Android: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;EVENT_BATCHING_ALL;VUPLEX_STANDALONE;VUPLEX_DISABLE_SRP_WARNING;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;ODIN_INSPECTOR_3_1;PRODUCTION
     CloudRendering: TextMeshPro
     EmbeddedLinux: TextMeshPro
     GameCoreXboxOne: TextMeshPro
@@ -826,12 +839,12 @@ PlayerSettings:
     PS5: TextMeshPro
     QNX: TextMeshPro
     Stadia: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2
-    Standalone: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;EVENT_BATCHING_ALL;USE_ZENJECT;VUPLEX_STANDALONE;VUPLEX_DISABLE_SRP_WARNING;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;ODIN_INSPECTOR_3_1;BESTHTTP_DISABLE_GZIP
+    Standalone: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;EVENT_BATCHING_ALL;USE_ZENJECT;VUPLEX_STANDALONE;VUPLEX_DISABLE_SRP_WARNING;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;ODIN_INSPECTOR_3_1;PRODUCTION
     VisionOS: TextMeshPro
     WebGL: TextMeshPro;ODIN_INSPECTOR;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR_3
     Windows Store Apps: RR_DEBUG;TextMeshPro;ODIN_INSPECTOR;ODIN_INSPECTOR_3
     XboxOne: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2
-    iPhone: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;EVENT_BATCHING_ALL;USE_ZENJECT;VUPLEX_STANDALONE;VUPLEX_DISABLE_SRP_WARNING;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1
+    iPhone: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;UNITASK_DOTWEEN_SUPPORT;EVENT_BATCHING_ALL;USE_ZENJECT;VUPLEX_STANDALONE;VUPLEX_DISABLE_SRP_WARNING;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;PRODUCTION
     tvOS: TextMeshPro;RR_DEBUG;UNITY_POST_PROCESSING_STACK_V2
   additionalCompilerArguments: {}
   platformArchitecture: {}
@@ -893,6 +906,7 @@ PlayerSettings:
   metroTileBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21568628, a: 0}
   metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628, a: 1}
   metroSplashScreenUseBackgroundColor: 0
+  syncCapabilities: 0
   platformCapabilities: {}
   metroTargetDeviceFamilies: {}
   metroFTAName: 
