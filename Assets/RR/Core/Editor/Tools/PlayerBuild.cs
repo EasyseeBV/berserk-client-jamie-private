@@ -177,7 +177,8 @@ namespace RR.Core.Editor.Tools
  				proj.AddBuildProperty(target, "OTHER_LDFLAGS", "-lz");
 
  				File.WriteAllText(projPath, proj.WriteToString());
- 			}
+			    CloudBuildPostExportIOSRelease(path);
+		    }
 #endif
         }
 
