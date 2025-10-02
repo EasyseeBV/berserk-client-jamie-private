@@ -44,9 +44,9 @@ namespace BerserkV3.Lobby.Network
 			return await GetAsync<Dictionary<string, List<LeaderBoardFactionModel>>>("PublicLeaderBoard/PlayersFactionsLeaderBoard");
 		}
 		
-		public static async Task<APIResponse<List<object>>> GetWhoBeatsWho()
+		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWho()
 		{
-			return await GetAsync<List<object>>("PublicLeaderBoard/WhoBeatsWho");
+			return await GetAsync<List<WhoBeatsWhoModel>>("PublicLeaderBoard/WhoBeatsWho");
 		}
 	}
 }

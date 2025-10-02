@@ -39,12 +39,12 @@ namespace BerserkV3.Lobby.LeaderBoard
 				: new Dictionary<string, List<LeaderBoardFactionModel>>();
 		}
 
-		public async UniTask<List<object>> GetWhoBeatsWho()
+		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWho()
 		{
 			var response = await LeaderBoardAPI.GetWhoBeatsWho();
 			return response != null && response.Data != null
 				? response.Data
-				: new List<object>();
+				: new List<WhoBeatsWhoModel>();
 		}
 	}
 }

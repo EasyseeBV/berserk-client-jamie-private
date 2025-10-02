@@ -58,4 +58,12 @@ namespace Berserk.Shared.Data.Lobby
 		
 		public double AverageSessionLengthSec { get; set; }
 	}
+	
+	public class WhoBeatsWhoModel
+	{
+		public string winner { get; set; }
+		public int winnerScore { get; set; }
+		public string loser { get; set; }
+		public int loserScore { get; set; }
+	}
 }
