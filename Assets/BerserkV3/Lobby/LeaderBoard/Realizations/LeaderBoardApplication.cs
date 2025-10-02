@@ -7,12 +7,12 @@ namespace BerserkV3.Lobby.LeaderBoard
 {
 	public class LeaderBoardApplication : ILeaderBoardApplication
 	{
-		public async UniTask<List<LeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoard(string leagueId)
+		public async UniTask<List<PublicLeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoard(string leagueId)
 		{
 			var response = await LeaderBoardAPI.GetLeagueLeaderBoard(leagueId);
 			return response != null && response.Data != null 
 				? response.Data 
-				: new List<LeaderBoardScoreByLeagueModel>();
+				: new List<PublicLeaderBoardScoreByLeagueModel>();
 		}
 
 		public async UniTask<List<LeaderBoardTargetModel>> GetAllPlayers()

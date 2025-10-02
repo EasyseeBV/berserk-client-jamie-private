@@ -40,4 +40,22 @@ namespace Berserk.Shared.Data.Lobby
 		
 		public double AverageSessionLengthSec { get; set; }
 	}
+	
+	public class PublicLeaderBoardScoreByLeagueModel : PublicLeaderBoardScoreByLeagueModelBase
+	{
+		public string UserName { get; set; }
+	}
+	
+	public class PublicLeaderBoardScoreByLeagueModelBase
+	{
+		public long ELO { get; set; }
+		public string LeagueName { get; set; }
+		
+		public long Wins { get; set; }
+		
+		public long Loses { get; set; }
+		public long Games { get; set; }
+		
+		public double AverageSessionLengthSec { get; set; }
+	}
 }

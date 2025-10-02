@@ -6,7 +6,7 @@ namespace BerserkV3.Lobby.LeaderBoard
 {
 	public interface ILeaderBoardApplication
 	{
-		UniTask<List<LeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoard(string leagueId);
+		UniTask<List<PublicLeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoard(string leagueId);
 		UniTask<List<LeaderBoardTargetModel>> GetAllPlayers();
 		UniTask<List<LeaderBoardFactionModel>> GetFactionsLeaderBoard();
 		UniTask<Dictionary<string, List<LeaderBoardFactionModel>>> GetPlayersFactionsLeaderBoard();

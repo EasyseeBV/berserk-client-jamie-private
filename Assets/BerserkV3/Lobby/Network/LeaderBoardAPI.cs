@@ -23,10 +23,10 @@ namespace BerserkV3.Lobby.Network
 			RRLogger.Warning(message);
 		}
 		
-		public static async Task<APIResponse<List<LeaderBoardScoreByLeagueModel>>> GetLeagueLeaderBoard(string leagueId)
+		public static async Task<APIResponse<List<PublicLeaderBoardScoreByLeagueModel>>> GetLeagueLeaderBoard(string leagueId)
 		{
 			var url = $"PublicLeaderBoard/LeagueLeaderBoard?leagueId={leagueId}";
-			return await GetAsync<List<LeaderBoardScoreByLeagueModel>>(url);
+			return await GetAsync<List<PublicLeaderBoardScoreByLeagueModel>>(url);
 		}
 		
 		public static async Task<APIResponse<List<LeaderBoardTargetModel>>> GetAllPlayers()
