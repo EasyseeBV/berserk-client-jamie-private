@@ -61,9 +61,9 @@ namespace Berserk.Shared.Data.Lobby
 	
 	public class WhoBeatsWhoModel
 	{
-		public string winner { get; set; }
-		public int winnerScore { get; set; }
-		public string loser { get; set; }
-		public int loserScore { get; set; }
+		public string Winner { get; set; }
+		public int WinnerScore { get; set; }
+		public string Loser { get; set; }
+		public int LoserScore { get; set; }
 	}
 }
