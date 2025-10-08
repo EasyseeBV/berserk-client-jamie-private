@@ -557,12 +557,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f0c15d0b8179274b83d4968913cdb16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlaceText: {fileID: 1979129760043435771}
-  UserNameText: {fileID: 7259754847162275083}
-  EloText: {fileID: 7852426016754220275}
-  WinsText: {fileID: 2558461692870935741}
-  GamesText: {fileID: 8700869859658975479}
-  AverageTimeText: {fileID: 862273893127024000}
+  Animations:
+    ShowAnimation: {fileID: 0}
+    CloseAnimation: {fileID: 0}
+    HideAnimation: {fileID: 0}
+  Sounds:
+    BackgroundSound: {fileID: 0}
+    OwnerSoundMode: 0
+    ShowSound: {fileID: 0}
+    CloseSound: {fileID: 0}
+    PlayButtonClickSound: 1
+    PlayButtonHoverSound: 0
+  ShowAtStart: 1
+  Concurrent: 0
+  AutoCloseChildren: 1
+  HideOwner: 0
+  FullscreenFade: 0
+  BackPrority: 0
+  DragMode: 0
+  SignatureOfBuildMethod: 
+  ButtonsCallOnChanged: 0
+  OnChangedCallRebuild: 1
+  SuppressAnyGesturesForOwners: 0
+  SuppressBack: 0
+  IsBlockingInteration: 0
+  BorderImage: {fileID: 0}
+  BlackImage: {fileID: 0}
+  OutlineImg: {fileID: 0}
+  AllText: {fileID: 0}
+  PlacePlayerText: {fileID: 1979129760043435771}
+  NicknamePlayerText: {fileID: 7259754847162275083}
+  ELOPlayerText: {fileID: 7852426016754220275}
+  WinsPlayerText: {fileID: 2558461692870935741}
+  GamesPlayerText: {fileID: 8700869859658975479}
+  AverageSessionLengthPlayerText: {fileID: 862273893127024000}
 --- !u!1 &1763383642429369432
 GameObject:
   m_ObjectHideFlags: 0

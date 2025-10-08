@@ -4,20 +4,35 @@ using Cysharp.Threading.Tasks;
 using BerserkV3.Lobby.LeaderBoard;
 using Berserk.Shared.Data.Lobby;
 using System.Linq;
-using UI;
+
 
 namespace BerserkV3.Lobby.UI.LeaderBoard
 {
-	public class LeaderBoardLeagueView : BaseView
+	public partial class LeaderBoardLeagueView : BaseView
 	{
-		[SerializeField] private ButtonView BackButton;
-		[SerializeField] private PlayersInLeaderBoardPanel PlayersPanel;
 		private const string HARDCODE_LEAGUE_ID = "65da744a-852a-4d9b-879d-7ef37df7e558";
 
-		private void OnEnable()
+		protected override void OnAwake()
+		{
+			BackButton.Subscribe(Close);
+		}
+		
+
+		public void InitAndShow()
+		{
+			Init();
+			Show();
+		}
+		/*private void OnEnable()
+		{
+			LoadLeaderBoardAsync().Forget();
+		}*/
+
+		private void Init()
 		{
 			LoadLeaderBoardAsync().Forget();
 		}
+		
 
 		private async UniTask LoadLeaderBoardAsync()
 		{
@@ -37,7 +52,7 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 				})
 				.ToList();
 
-			PlayersPanel.SetData(players);
+			PlayersInLeaderBoardPanel.SetData(players);
 		}
 	}
 }

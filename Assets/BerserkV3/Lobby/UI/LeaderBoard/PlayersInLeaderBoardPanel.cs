@@ -7,7 +7,7 @@ using UI;
 
 namespace BerserkV3.Lobby.UI.LeaderBoard
 {
-	public class PlayersInLeaderBoardPanel : BaseView
+	public partial class PlayersInLeaderBoardPanel : BaseView
 	{
 		[SerializeField] private LoopVerticalScrollRect ScrollRect;
 		private LoopScrollRefresher refresher;

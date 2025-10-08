@@ -1,28 +1,22 @@
 using UnityEngine;
 using TMPro;
 using Berserk.Shared.Data.Lobby;
+using RR.UI.FrameSystem;
 
 namespace BerserkV3.Lobby.UI.LeaderBoard
 {
-	public class LeaderBoardPanelItem : MonoBehaviour
+	public partial class LeaderBoardPanelItem : BaseView
 	{
-		[SerializeField] private TMP_Text PlaceText;
-		[SerializeField] private TMP_Text UserNameText;
-		[SerializeField] private TMP_Text EloText;
-		[SerializeField] private TMP_Text WinsText;
-		[SerializeField] private TMP_Text GamesText;
-		[SerializeField] private TMP_Text AverageTimeText;
-
 		public void SetScrollData(object obj)
 		{
 			if (obj is not PublicLeaderBoardScoreByLeagueModel data) return;
 
-			PlaceText.text = "-";
-			UserNameText.text = data.UserName;
-			EloText.text = data.ELO.ToString();
-			WinsText.text = data.Wins.ToString();
-			GamesText.text = data.Games.ToString();
-			AverageTimeText.text = FormatTime((float)data.AverageSessionLengthSec);
+			PlacePlayerText.text = "-";
+			NicknamePlayerText.text = data.UserName;
+			ELOPlayerText.text = data.ELO.ToString();
+			WinsPlayerText.text = data.Wins.ToString();
+			GamesPlayerText.text = data.Games.ToString();
+			AverageSessionLengthPlayerText.text = FormatTime((float)data.AverageSessionLengthSec);
 		}
 		
 		private static string FormatTime(float seconds)
