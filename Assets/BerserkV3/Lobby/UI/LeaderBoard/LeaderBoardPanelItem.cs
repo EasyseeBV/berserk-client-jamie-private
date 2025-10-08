@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 using Berserk.Shared.Data.Lobby;
 using RR.UI.FrameSystem;
 
@@ -10,8 +9,7 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 		public void SetScrollData(object obj)
 		{
 			if (obj is not PublicLeaderBoardScoreByLeagueModel data) return;
-
-			PlacePlayerText.text = "-";
+			PlacePlayerText.text = data.Rank.ToString();
 			NicknamePlayerText.text = data.UserName;
 			ELOPlayerText.text = data.ELO.ToString();
 			WinsPlayerText.text = data.Wins.ToString();

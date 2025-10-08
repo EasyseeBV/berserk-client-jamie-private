@@ -43,6 +43,7 @@ namespace Berserk.Shared.Data.Lobby
 	
 	public class PublicLeaderBoardScoreByLeagueModel : PublicLeaderBoardScoreByLeagueModelBase
 	{
+		public int Rank { get; set; }
 		public string UserName { get; set; }
 	}
 	
