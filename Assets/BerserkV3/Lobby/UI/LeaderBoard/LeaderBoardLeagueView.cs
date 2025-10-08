@@ -31,6 +31,7 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 		private void Init()
 		{
 			LoadLeaderBoardAsync().Forget();
+			LoadWhoBeatsWhoAsync().Forget();
 		}
 		
 
@@ -40,8 +41,9 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 
 			var players = apiData
 				.Take(25)
-				.Select(p => new PublicLeaderBoardScoreByLeagueModel
+				.Select((p, index) => new PublicLeaderBoardScoreByLeagueModel
 				{
+					Rank = index + 1,
 					UserName = p.UserName,
 					ELO = p.ELO,
 					LeagueName = p.LeagueName,
@@ -53,6 +55,24 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 				.ToList();
 
 			PlayersInLeaderBoardPanel.SetData(players);
+		}
+		
+		private async UniTask LoadWhoBeatsWhoAsync()
+		{
+			var apiData = await LeaderBoardApplicationAdapter.Application.GetWhoBeatsWho();
+
+			var pairs = apiData
+				.Take(25)
+				.Select(p => new WhoBeatsWhoModel
+				{
+					Winner = p.Winner,
+					WinnerScore = p.WinnerScore,
+					Loser = p.Loser,
+					LoserScore = p.LoserScore
+				})
+				.ToList();
+
+			WhoBeatsWhoLeaderBoardPanel.SetData(pairs);
 		}
 	}
 }
