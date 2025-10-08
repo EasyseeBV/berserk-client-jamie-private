@@ -10,7 +10,7 @@ namespace BerserkV3.Lobby.LeaderBoard
 		public async UniTask<List<PublicLeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoard(string leagueId)
 		{
 			var response = await LeaderBoardAPI.GetLeagueLeaderBoard(leagueId);
-			return response != null && response.Data != null 
+			return response.Data != null 
 				? response.Data 
 				: new List<PublicLeaderBoardScoreByLeagueModel>();
 		}
@@ -18,7 +18,7 @@ namespace BerserkV3.Lobby.LeaderBoard
 		public async UniTask<List<LeaderBoardTargetModel>> GetAllPlayers()
 		{
 			var response = await LeaderBoardAPI.GetAllPlayers();
-			return response != null && response.Data != null
+			return response.Data != null
 				? response.Data 
 				: new List<LeaderBoardTargetModel>();
 		}
@@ -26,7 +26,7 @@ namespace BerserkV3.Lobby.LeaderBoard
 		public async UniTask<List<LeaderBoardFactionModel>> GetFactionsLeaderBoard()
 		{
 			var response = await LeaderBoardAPI.GetFactionsLeaderBoard();
-			return response != null && response.Data != null
+			return response.Data != null
 				? response.Data
 				: new List<LeaderBoardFactionModel>();
 		}
@@ -34,7 +34,7 @@ namespace BerserkV3.Lobby.LeaderBoard
 		public async UniTask<Dictionary<string, List<LeaderBoardFactionModel>>> GetPlayersFactionsLeaderBoard()
 		{
 			var response = await LeaderBoardAPI.GetPlayersFactionsLeaderBoard();
-			return response != null && response.Data != null
+			return response.Data != null
 				? response.Data
 				: new Dictionary<string, List<LeaderBoardFactionModel>>();
 		}
@@ -42,7 +42,7 @@ namespace BerserkV3.Lobby.LeaderBoard
 		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWho()
 		{
 			var response = await LeaderBoardAPI.GetWhoBeatsWho();
-			return response != null && response.Data != null
+			return response.Data != null
 				? response.Data
 				: new List<WhoBeatsWhoModel>();
 		}
