@@ -48,5 +48,11 @@ namespace BerserkV3.Lobby.Network
 		{
 			return await GetAsync<List<WhoBeatsWhoModel>>("PublicLeaderBoard/WhoBeatsWho");
 		}
+		
+		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWhoByPlayer(string playerUsername)
+		{
+			var url = $"PublicLeaderBoard/WhoBeatsWhoByPlayer?playerUsername={playerUsername}";
+			return await GetAsync<List<WhoBeatsWhoModel>>(url);
+		}
 	}
 }

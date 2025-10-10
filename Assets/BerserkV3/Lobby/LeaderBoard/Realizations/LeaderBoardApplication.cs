@@ -46,5 +46,13 @@ namespace BerserkV3.Lobby.LeaderBoard
 				? response.Data
 				: new List<WhoBeatsWhoModel>();
 		}
+		
+		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWhoByPlayer(string playerUsername)
+		{
+			var response = await LeaderBoardAPI.GetWhoBeatsWhoByPlayer(playerUsername);
+			return response.Data != null
+				? response.Data
+				: new List<WhoBeatsWhoModel>();
+		}
 	}
 }

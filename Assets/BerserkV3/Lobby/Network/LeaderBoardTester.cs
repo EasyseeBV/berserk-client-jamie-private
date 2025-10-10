@@ -21,6 +21,7 @@ namespace BerserkV3.Lobby.Network
             await TestFactionsLeaderBoard();
             await TestPlayersFactionsLeaderBoard();
             await TestWhoBeatsWho();
+            await TestWhoBeatsWhoByPlayer();
         }
 
         private async UniTask TestLeagueLeaderBoard()
@@ -57,6 +58,14 @@ namespace BerserkV3.Lobby.Network
             var data = await LeaderBoardApplicationAdapter.Application.GetWhoBeatsWho();
             RRLogger.Warning("=== WhoBeatsWho ===");
             RRLogger.Warning(JsonConvert.SerializeObject(data, Formatting.Indented));
+        }
+        
+        private async UniTask TestWhoBeatsWhoByPlayer()
+        {
+	        var data = await LeaderBoardApplicationAdapter.Application.GetWhoBeatsWhoByPlayer(
+		        "berserkgaming597");
+	        RRLogger.Warning("=== WhoBeatsWhoByPlayer ===");
+	        RRLogger.Warning(JsonConvert.SerializeObject(data, Formatting.Indented));
         }
     }
 }

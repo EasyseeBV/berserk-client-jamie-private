@@ -11,5 +11,6 @@ namespace BerserkV3.Lobby.LeaderBoard
 		UniTask<List<LeaderBoardFactionModel>> GetFactionsLeaderBoard();
 		UniTask<Dictionary<string, List<LeaderBoardFactionModel>>> GetPlayersFactionsLeaderBoard();
 		UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWho();
+		UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWhoByPlayer(string playerUsername);
 	}
 }
