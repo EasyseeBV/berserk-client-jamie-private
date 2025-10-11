@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Berserk.Shared.Data.Lobby;
@@ -51,7 +52,8 @@ namespace BerserkV3.Lobby.Network
 		
 		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWhoByPlayer(string playerUsername)
 		{
-			var url = $"PublicLeaderBoard/WhoBeatsWhoByPlayer?playerUsername={playerUsername}";
+			var encodedUsername = Uri.EscapeDataString(playerUsername);
+			var url = $"PublicLeaderBoard/WhoBeatsWhoByPlayer?playerUsername={encodedUsername}";
 			return await GetAsync<List<WhoBeatsWhoModel>>(url);
 		}
 	}
