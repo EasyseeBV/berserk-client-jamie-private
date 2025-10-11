@@ -1,7 +1,7 @@
 using RR.UI.FrameSystem;
-using UnityEngine;
 using Cysharp.Threading.Tasks;
 using BerserkV3.Lobby.LeaderBoard;
+using BerserkV3.Startup.Authorization;
 using Berserk.Shared.Data.Lobby;
 using System.Linq;
 
@@ -15,6 +15,9 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 		protected override void OnAwake()
 		{
 			BackButton.Subscribe(Close);
+			
+			GlobalButton.Subscribe(() => LoadWhoBeatsWhoAsync().Forget());
+			LocalButton.Subscribe(() => LoadWhoBeatsWhoByPlayerAsync().Forget());
 		}
 		
 
@@ -60,6 +63,28 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 		private async UniTask LoadWhoBeatsWhoAsync()
 		{
 			var apiData = await LeaderBoardApplicationAdapter.Application.GetWhoBeatsWho();
+
+			var pairs = apiData
+				.Take(25)
+				.Select(p => new WhoBeatsWhoModel
+				{
+					Winner = p.Winner,
+					WinnerScore = p.WinnerScore,
+					Loser = p.Loser,
+					LoserScore = p.LoserScore
+				})
+				.ToList();
+
+			WhoBeatsWhoLeaderBoardPanel.SetData(pairs);
+		}
+		
+		private async UniTask LoadWhoBeatsWhoByPlayerAsync()
+		{
+			var username = User.UserName;
+			if (string.IsNullOrEmpty(username))
+				return;
+
+			var apiData = await LeaderBoardApplicationAdapter.Application.GetWhoBeatsWhoByPlayer(username);
 
 			var pairs = apiData
 				.Take(25)
