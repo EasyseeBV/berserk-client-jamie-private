@@ -39,20 +39,28 @@ namespace BerserkV3.Lobby.LeaderBoard
 				: new Dictionary<string, List<LeaderBoardFactionModel>>();
 		}
 
-		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWho()
+		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWho(int? limit = null)
 		{
-			var response = await LeaderBoardAPI.GetWhoBeatsWho();
+			var response = await LeaderBoardAPI.GetWhoBeatsWho(limit);
 			return response.Data != null
 				? response.Data
 				: new List<WhoBeatsWhoModel>();
 		}
 		
-		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWhoByPlayer(string playerUsername)
+		public async UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWhoByPlayer(string playerUsername, int? limit = null)
 		{
-			var response = await LeaderBoardAPI.GetWhoBeatsWhoByPlayer(playerUsername);
+			var response = await LeaderBoardAPI.GetWhoBeatsWhoByPlayer(playerUsername,  limit);
 			return response.Data != null
 				? response.Data
 				: new List<WhoBeatsWhoModel>();
+		}
+		
+		public async UniTask<List<PublicLeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoardBySeason(string leagueId, string seasonId)
+		{
+			var response = await LeaderBoardAPI.GetLeagueLeaderBoardBySeason(leagueId, seasonId);
+			return response.Data != null
+				? response.Data
+				: new List<PublicLeaderBoardScoreByLeagueModel>();
 		}
 	}
 }

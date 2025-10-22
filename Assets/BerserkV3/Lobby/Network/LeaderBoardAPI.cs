@@ -45,16 +45,29 @@ namespace BerserkV3.Lobby.Network
 			return await GetAsync<Dictionary<string, List<LeaderBoardFactionModel>>>("PublicLeaderBoard/PlayersFactionsLeaderBoard");
 		}
 		
-		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWho()
+		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWho(int? limit = null)
 		{
-			return await GetAsync<List<WhoBeatsWhoModel>>("PublicLeaderBoard/WhoBeatsWho");
+			var url = "PublicLeaderBoard/WhoBeatsWhoOptimized";
+			if (limit.HasValue)
+				url += $"?limit={limit.Value}";
+
+			return await GetAsync<List<WhoBeatsWhoModel>>(url);
 		}
 		
-		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWhoByPlayer(string playerUsername)
+		public static async Task<APIResponse<List<WhoBeatsWhoModel>>> GetWhoBeatsWhoByPlayer(string playerUsername, int? limit = null)
 		{
 			var encodedUsername = Uri.EscapeDataString(playerUsername);
-			var url = $"PublicLeaderBoard/WhoBeatsWhoByPlayer?playerUsername={encodedUsername}";
+			var url = $"PublicLeaderBoard/WhoBeatsWhoByPlayerOptimized?playerUsername={encodedUsername}";
+			if (limit.HasValue)
+				url += $"&limit={limit.Value}";
+
 			return await GetAsync<List<WhoBeatsWhoModel>>(url);
+		}
+		
+		public static async Task<APIResponse<List<PublicLeaderBoardScoreByLeagueModel>>> GetLeagueLeaderBoardBySeason(string leagueId, string seasonId)
+		{
+			var url = $"PublicLeaderBoard/LeagueLeaderBoardBySeason?leagueId={leagueId}&seasonId={seasonId}";
+			return await GetAsync<List<PublicLeaderBoardScoreByLeagueModel>>(url);
 		}
 	}
 }
