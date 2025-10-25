@@ -40,6 +40,7 @@ namespace BerserkV3.Common.PreviewSystem
 		public string Artist { get; set; }
 		public string Description { get; set; }
 		public string Tooltip { get; set; }
+		public int TurnThreshold { get; set; }
 
 		public PreviewCardData(ICardData cardData)
 		{
@@ -129,6 +130,7 @@ namespace BerserkV3.Common.PreviewSystem
 			Artist = cardData.Artist;
 			Description = cardData.Description;
 			Tooltip = cardData.Tooltip;
+			TurnThreshold = cardData.TurnThreshold;
 			IsToken = cardData.SubTypes != null && cardData.SubTypes.Contains(SubType.Token);
 		}
 

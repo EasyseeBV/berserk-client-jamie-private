@@ -40,6 +40,9 @@ namespace Berserk.Shared.GameCore.Commands.Cmd
 			
 			if (ArgsModel == default)
 				throw new Exception("Missing required args");
+			
+			if (cmdCard.Data.TurnThreshold > GameContext.Timer.RuntimeData.Turn)
+				throw new Exception($"You can play this card starting from turn {cmdCard.Data.TurnThreshold}!");
 
 			if (cmdCard.IsTableCard() && LogicContext.TargetConditionRepository.IsFullTable(RuntimePlayer.UserId))
 				throw new InvalidActionException(InvalidAction.TableIsFull, $"The maximum number of table cards is already on the table!");

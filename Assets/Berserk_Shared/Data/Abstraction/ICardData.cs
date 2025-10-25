@@ -16,5 +16,7 @@ namespace Berserk.Shared.Data.Abstraction
 		string Artist { get; set; }
 		string Description { get; set; }
 		string Tooltip { get; set; }
+		
+		int TurnThreshold { get; set; }
 	}
 }

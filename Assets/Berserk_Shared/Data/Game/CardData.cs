@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Utils;
+using Newtonsoft.Json;
 
 namespace Berserk.Shared.Data.Game
 {
@@ -28,6 +29,8 @@ namespace Berserk.Shared.Data.Game
 		public Quadrant Quadrant { get; set; }
 		public int LimitInDeck { get; set; }
 		public int AddAtRegistration { get; set; }
+		[JsonProperty(nameof(TurnThreshold))]
+		public int TurnThreshold { get; set; }
 		
 		// Info
 		public string Title { get; set; }
