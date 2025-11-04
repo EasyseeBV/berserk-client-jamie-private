@@ -139,10 +139,10 @@ namespace BerserkV3.GameCore.Controllers
 			var leagueId = gameContext.RuntimeData.LeagueId;
     		var league = LobbyBus.Leagues.Value?.Find(x => x.Id == leagueId);
 			var leagueName = league?.LeagueName;
-			return leagueName == "Ranked" ?
-			 playerStatistics.TryGet(x => x.UserId == userId, out var stat)
-				? $"MMR: {stat.EloTotal} {(stat.EloDelta >= 0 ? $"{"+" + stat.EloDelta}".Green() : $"{stat.EloDelta}".Red())}" : null 
-				: "";
+			return playerStatistics.TryGet(x => x.UserId == userId, out var stat)
+				? $"MMR: {stat.EloTotal} {(stat.EloDelta >= 0 ? $"{"+" + stat.EloDelta}".Green() : $"{stat.EloDelta}".Red())}" 
+				: null;
+
 		}
 
 		private static string GetReasonText(GameEndReason value, string userName)
