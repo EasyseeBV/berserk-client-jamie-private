@@ -24,7 +24,7 @@ namespace UI
 			DuelsBtn.Subscribe(() => DuelsApplicationAdapter.Application.OpenAsync().Forget());
 			ProfileBtn.Subscribe(() => ProfileView.Instance.InitAndShowAsync().Forget());
 			LavaShopBtn.Subscribe(() => LavaShopView.Instance.InitAndShowAsync().Forget());
-			LeaaderBoardBtn.Subscribe(()=> LeaderBoardLeagueView.Instance.InitAndShow());
+			LeaderBoardBtn.onClick.AddListener(()=> LeaderBoardLeagueView.Instance.InitAndShow());
 			LavaShopBtn.ShowAtStart = true;
 			LavaShopBtn.SetInteractable(false); // turn off lava shop (todo: remove when new shop will be developed)
 
