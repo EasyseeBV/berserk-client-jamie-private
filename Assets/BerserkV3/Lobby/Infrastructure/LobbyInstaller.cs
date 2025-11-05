@@ -2,6 +2,7 @@
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Lobby.Applications;
 using BerserkV3.Lobby.Deck;
+using BerserkV3.Lobby.LeaderBoard;
 using BerserkV3.Lobby.MatchMaking.Duels;
 using BerserkV3.Lobby.MatchMaking.Leagues;
 using BerserkV3.Lobby.MatchMaking.Practice;
@@ -16,6 +17,7 @@ namespace BerserkV3.Lobby.Infrastructure
 		public override void InstallBindings()
 		{
 			DeckInstaller.Install(Container);
+			LeaderBoardInstaller.Install(Container);
 			SessionsLobbyInstaller.Install(Container);
 			DuelsInstaller.Install(Container);
 			PracticeInstaller.Install(Container);
