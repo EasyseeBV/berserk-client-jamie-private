@@ -62,5 +62,13 @@ namespace BerserkV3.Lobby.LeaderBoard
 				? response.Data
 				: new List<PublicLeaderBoardScoreByLeagueModel>();
 		}
+		
+		public async UniTask<LeaderBoardMetaModel> GetLeaderBoardMeta()
+		{
+			var response = await LeaderBoardAPI.GetLeaderBoardMeta();
+			return response.Data != null
+				? response.Data
+				: new LeaderBoardMetaModel();
+		}
 	}
 }

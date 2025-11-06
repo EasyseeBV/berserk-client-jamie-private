@@ -13,5 +13,6 @@ namespace BerserkV3.Lobby.LeaderBoard
 		UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWho(int? limit = null);
 		UniTask<List<WhoBeatsWhoModel>> GetWhoBeatsWhoByPlayer(string playerUsername, int? limit = null);
 		UniTask<List<PublicLeaderBoardScoreByLeagueModel>> GetLeagueLeaderBoardBySeason(string leagueId, string seasonId);
+		UniTask<LeaderBoardMetaModel> GetLeaderBoardMeta();
 	}
 }

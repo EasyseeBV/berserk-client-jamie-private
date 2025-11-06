@@ -69,5 +69,10 @@ namespace BerserkV3.Lobby.Network
 			var url = $"PublicLeaderBoard/LeagueLeaderBoardBySeason?leagueId={leagueId}&seasonId={seasonId}";
 			return await GetAsync<List<PublicLeaderBoardScoreByLeagueModel>>(url);
 		}
+		
+		public static async Task<APIResponse<LeaderBoardMetaModel>> GetLeaderBoardMeta()
+		{
+			return await GetAsync<LeaderBoardMetaModel>("PublicLeaderBoard/LeaderBoardMeta");
+		}
 	}
 }
