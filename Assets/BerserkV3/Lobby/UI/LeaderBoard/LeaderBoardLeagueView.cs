@@ -4,15 +4,16 @@ using BerserkV3.Lobby.LeaderBoard;
 using BerserkV3.Startup.Authorization;
 using Berserk.Shared.Data.Lobby;
 using System.Linq;
+using System;
 
 
 namespace BerserkV3.Lobby.UI.LeaderBoard
 {
 	public partial class LeaderBoardLeagueView : BaseView
 	{
-		private const string HARDCODE_LEAGUE_ID = "65da744a-852a-4d9b-879d-7ef37df7e558";
-		private const string HARDCODE_LEAGUE_NAME = "RANKED";
-		private const string HARDCODE_SEASON_ID = "spring-2023";
+		private string currentLeagueId;
+		private string currentLeagueName;
+		private string currentSeasonId;
 		
 		private bool isLastSeason = false;
 		private bool isGlobalActive = true;
@@ -40,11 +41,26 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 			Show();
 		}
 
-		private void Init()
+		private async UniTask Init()
 		{
 			SetActiveButton(true);
-			LoadLeaderBoardAsync().Forget();
-			LoadWhoBeatsWhoAsync().Forget();
+				
+			var meta = await LeaderBoardApplicationAdapter.Application.GetLeaderBoardMeta();
+			if (meta != null && meta.Leagues != null && meta.Leagues.Count > 0)
+			{
+				var ranked = meta.Leagues.FirstOrDefault(l =>
+					             l.LeagueName.Equals("Ranked", StringComparison.OrdinalIgnoreCase))
+				             ?? meta.Leagues[0];
+
+				currentLeagueId = ranked.LeagueId;
+				currentLeagueName = ranked.LeagueName;
+				currentSeasonId = meta.SeasonId;
+
+				LeagueName.text = currentLeagueName;
+			}
+			
+			await LoadLeaderBoardAsync();
+			await LoadWhoBeatsWhoAsync();
 		}
 		
 		private void SetActiveButton(bool globalActive)
@@ -64,22 +80,22 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 			if (isLastSeason)
 			{
 				isLastSeason = false;
-				LeagueName.text = HARDCODE_LEAGUE_NAME;
+				LeagueName.text = currentLeagueName;
 				LastSeasonButtonText.text = "Last Season";
 				LoadLeaderBoardAsync().Forget();
 			}
 			else
 			{
 				isLastSeason = true;
-				LeagueName.text = HARDCODE_SEASON_ID;
-				LastSeasonButtonText.text = HARDCODE_LEAGUE_NAME;
+				LeagueName.text = currentSeasonId;
+				LastSeasonButtonText.text = currentSeasonId;
 				LoadLeaderBoardBySeasonAsync().Forget();
 			}
 		}
 		
 		private async UniTask LoadLeaderBoardAsync()
 		{
-			var apiData = await LeaderBoardApplicationAdapter.Application.GetLeagueLeaderBoard(HARDCODE_LEAGUE_ID);
+			var apiData = await LeaderBoardApplicationAdapter.Application.GetLeagueLeaderBoard(currentLeagueId);
 
 			var players = apiData
 				.Take(25)
@@ -101,7 +117,7 @@ namespace BerserkV3.Lobby.UI.LeaderBoard
 		
 		private async UniTask LoadLeaderBoardBySeasonAsync()
 		{
-			var apiData = await LeaderBoardApplicationAdapter.Application.GetLeagueLeaderBoardBySeason(HARDCODE_LEAGUE_ID, HARDCODE_SEASON_ID);
+			var apiData = await LeaderBoardApplicationAdapter.Application.GetLeagueLeaderBoardBySeason(currentLeagueId, currentSeasonId);
 
 			var players = apiData
 				.Take(25)
