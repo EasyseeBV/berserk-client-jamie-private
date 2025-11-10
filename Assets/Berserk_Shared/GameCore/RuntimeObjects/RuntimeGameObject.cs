@@ -102,6 +102,12 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 				return;
 			}
 			
+			if (HasAppliedNonDisabledEffect(EffectKeyword.ImmortalOneHit))
+			{
+				RemoveAppliedEffect(EffectKeyword.ImmortalOneHit);
+				damage = 0;
+			}
+			
 			if (damageType == DamageType.Direct && !exclude.Contains(EffectPhase.BeforeDefense))
 				ChangeEffectPhase(EffectPhase.BeforeDefense, initiator.RuntimeData.Id, damageType);
 
@@ -173,12 +179,12 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 				return false;
 			}
 
-			if (RuntimeData.ImmuneToDamage.TryGet(o => o.DamageType == dmgType, out var damageValue)
-			    && damageValue.IsFullResist())
-			{
-				reason = InvalidAction.ImmuneToDamage;
-				return false;
-			}
+			// if (RuntimeData.ImmuneToDamage.TryGet(o => o.DamageType == dmgType, out var damageValue)
+			//     && damageValue.IsFullResist())
+			// {
+			// 	reason = InvalidAction.ImmuneToDamage;
+			// 	return false;
+			// }
 
 			if (keywords.Length > 0 && RuntimeData.ImmuneToKeywords.Any(data => keywords.Contains(data.Keyword)))
 			{
