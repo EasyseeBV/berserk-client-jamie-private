@@ -422,7 +422,10 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 		protected virtual void HandleDamage(int damage, IRuntimeGameObject initiator, DamageType damageType)
 		{
 			if (damage <= 0)
-				return;
+			{
+    			OnHit?.Invoke(RuntimeData.Hp);
+    			return;
+			}
 			
 			if (RuntimeData.Armor.Current > 0)
 			{
