@@ -3,6 +3,7 @@ using RR.Core.Extensions;
 using SG;
 using UnityEngine;
 using UnityEngine.UI;
+using Berserk.Shared.Data.Enums;
 
 namespace UI
 {
@@ -10,9 +11,13 @@ namespace UI
 	{
 		private readonly LoopScrollRect loopScrollRect;
 		private static bool releasedPool;
+		
+		private readonly Faction deckFaction;
 
-		public LoopScrollRefresher(LoopScrollRect scrollRect)
+		public LoopScrollRefresher(LoopScrollRect scrollRect , Faction deckFaction)
 		{
+			this.deckFaction = deckFaction;
+			
 			// recreate prefabSource need to recreate pool instance
 			var prefabSource = scrollRect.PrefabSource;
 			var newPrefabSource = new LoopScrollPrefabSource
@@ -57,7 +62,7 @@ namespace UI
 		}
 		private void InitScroll(List<IDeckCardStack> deckCards)
 		{
-			loopScrollRect.Init(deckCards.ToArray(), loopScrollRect);
+			loopScrollRect.Init(deckCards.ToArray(), loopScrollRect, deckFaction);
 		}
 		
 		private void ScrollToIndex(int index, int maxIndex)

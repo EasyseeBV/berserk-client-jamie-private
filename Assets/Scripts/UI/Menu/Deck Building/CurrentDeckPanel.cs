@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Game;
 using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Enums;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.Common.TutorialSystem;
@@ -21,6 +22,8 @@ namespace UI
 	{
 		public DeckCardCollection CardCollection { get; private set; }
 		public IDeckValue DeckValue { get; private set; }
+
+		private Faction deckFaction;
 
 		public string DeckName
 		{
@@ -77,9 +80,10 @@ namespace UI
 			OwnedHero = value;
 		}
 
-		public void SetUp(DeckCardCollection cardCollection, bool isNewDeck = false)
+		public void SetUp(DeckCardCollection cardCollection, bool isNewDeck = false, Faction deckFaction = Faction.None)
 		{
-			loopScrollRefresher = new LoopScrollRefresher(LoopVerticalScrollRect);
+			this.deckFaction = deckFaction;
+			loopScrollRefresher = new LoopScrollRefresher(LoopVerticalScrollRect, deckFaction);
 
 			if (isNewDeck)
 				VulcaniteSelectionShow();

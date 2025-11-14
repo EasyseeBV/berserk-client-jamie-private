@@ -1,4 +1,5 @@
 using RR.UI.FrameSystem;
+using Berserk.Shared.Data.Enums;
 
 namespace UI
 {
@@ -7,9 +8,13 @@ namespace UI
 		private LoopScrollRefresher loopScrollRefresher;
 		public DeckCardCollection CardCollection { get; private set; }
 		
-		public void SetUp(DeckCardCollection cards)
+		private Faction deckFaction;
+		
+		public void SetUp(DeckCardCollection cards, Faction deckFaction)
 		{
-			loopScrollRefresher = new LoopScrollRefresher(LoopVerticalScrollRect);
+			this.deckFaction = deckFaction;
+
+			loopScrollRefresher = new LoopScrollRefresher(LoopVerticalScrollRect, deckFaction);
 			CardCollection = cards;
 			CardCollection.OnStackAdded += RefreshPanel;
 			CardCollection.OnStackRemoved += RefreshPanel;

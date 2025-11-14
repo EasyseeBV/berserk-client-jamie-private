@@ -21,7 +21,9 @@ namespace BerserkV3.Common.Utils
 		public int Attack { get; set; }
 		public int Armor { get; set; }
 		public int Hp { get; set; }
-		public int Lava { get; set; }
+		public int BaseLava { get; set; } 
+		public int Lava { get; set; }       
+		public bool HasFactionPenalty { get; set; }
 		public bool IsToken { get; set; }
 		public List<string> EffectsIds { get; set; }
 		public List<InvalidAction> InvalidActions { get; set; }
@@ -50,7 +52,9 @@ namespace BerserkV3.Common.Utils
 			Attack = data.Attack;
 			Armor = data.Armor;
 			Hp = data.Hp;
+			BaseLava = data.Mana;
 			Lava = data.Mana;
+			HasFactionPenalty = false;
 			EffectsIds = data.EffectsIds.ToList();
 			InvalidActions = data.InvalidActions.ToList();
 			Type = data.Type;
@@ -77,7 +81,9 @@ namespace BerserkV3.Common.Utils
 			Attack = data.Attack;
 			Armor = data.Armor;
 			Hp = data.Hp;
+			BaseLava = data.Mana;
 			Lava = data.Mana;
+			HasFactionPenalty = false;
 			EffectsIds = data.EffectsIds.ToList();
 			InvalidActions = data.InvalidActions.ToList();
 			Type = data.Type;
@@ -164,6 +170,39 @@ namespace BerserkV3.Common.Utils
 
 			progress.Report(1f);
 			onDone?.Invoke();
+		}
+		
+		public static CardDataAdapter ApplyDeckFactionCost(
+			this CardDataAdapter adapter,
+			Faction deckFaction,
+			int maxLava = 10)
+		{
+			if (adapter.Factions != null && adapter.Factions.Contains(deckFaction))
+			{
+				adapter.Lava = adapter.BaseLava;
+				adapter.HasFactionPenalty = false;
+				return adapter;
+			}
+
+			var baseLava = adapter.BaseLava;
+			
+			if (baseLava <= 0)
+			{
+				adapter.Lava = baseLava;
+				adapter.HasFactionPenalty = false;
+				return adapter;
+			}
+			
+			var increase = Mathf.CeilToInt(Mathf.Log(baseLava + 1, 2f));
+			var adjusted = baseLava + increase;
+
+			if (adjusted > maxLava)
+				adjusted = maxLava;
+
+			adapter.Lava = adjusted;
+			adapter.HasFactionPenalty = adjusted > baseLava;
+
+			return adapter;
 		}
 	}
 }

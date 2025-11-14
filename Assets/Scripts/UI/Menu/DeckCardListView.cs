@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Berserk.Shared.Data.Game;
 using Berserk.Shared.Data.Lobby;
+using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.LiveLinkRouter;
@@ -33,6 +34,7 @@ namespace UI
 		private DeckData currentDeck;
 		private CanvasGroup canvasGroup;
 		private bool hasChanges;
+		private Faction deckFaction;
 		
 		protected override void OnAwake()
 		{
@@ -77,8 +79,10 @@ namespace UI
 			{
 				await UniTask.Yield();
 				currentDeck = deckModel;
+				deckFaction = currentDeck != null ? currentDeck.Faction : Faction.None;
 				DeckCardListPanel.DeckName = currentDeck?.Name;
 				DeckCardListPanel.OwnedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
+				
 				hasChanges = false;
 				DisplayCards(isNewDeck);
 				await UniTask.Yield();
@@ -234,8 +238,9 @@ namespace UI
 			deckCollection.OnCardRemoved += ownedCard => allCardsCopyCollection.AddCard(ownedCard);
 			allCardsCopyCollection.OnCardRemoved += ownedCard => deckCollection.AddCard(ownedCard);
 
-			AllCardsCopyPanel.SetUp(allCardsCopyCollection);
-			DeckCardListPanel.SetUp(deckCollection, isNewDeck);
+			AllCardsCopyPanel.SetUp(allCardsCopyCollection, deckFaction);
+			
+			DeckCardListPanel.SetUp(deckCollection, isNewDeck, deckFaction);
 			SetActive(SortPanel, false);
 			disposables.Add(deckCollection);
 			disposables.Add(allCardsCopyCollection);

@@ -4,6 +4,7 @@ using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Lobby;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.PreviewSystem;
+using BerserkV3.Common.Utils;
 using Cysharp.Threading.Tasks;
 using RR.Core.ResourceManagament;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace UI
 		private Button removeButton;
 		private CancellationTokenSource updateArt;
 		private bool isLavaSet;
+		private Faction deckFaction;
 		
 		protected override void Start()
 		{
@@ -33,9 +35,16 @@ namespace UI
 				return;
 			
 			base.OnRefreshView(deckCardStack);
-			Set(LavaTxt, deckCardStack.CardData.Mana);
-			SetLavaImage(!deckCardStack.CardData.SubTypes.Contains(SubType.Token));
-			Set(DeckNameText, deckCardStack.CardData.Title);
+			
+			var adapter = deckCardStack.CardData
+				.ToCardDataAdapter()
+				.ApplyDeckFactionCost(deckFaction, maxLava: 10);
+			
+			Set(LavaTxt, adapter.Lava);
+			
+			SetLavaImage(adapter.SubTypes == null || !adapter.SubTypes.Contains(SubType.Token));
+
+			Set(DeckNameText, adapter.Title);
 			SetWarning(!deckCardStack.AllInStackValid);
 			SetCount(deckCardStack.Count);
 		}
