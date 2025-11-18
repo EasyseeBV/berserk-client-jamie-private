@@ -38,8 +38,7 @@ namespace BerserkV3.GameCore.UI
 				LavaFrameImage.LoadResourceAsync($"{prefix}_Lava_{frameUri}", updateToken, releasePrevious),
 				FactionFrameImage.LoadResourceAsync($"{prefix}_{nameof(Faction)}_{frameUri}", updateToken, releasePrevious),
 				FactionImage.LoadResourceAsync($"{data.Factions.FirstOrDefault()}_Icon", updateToken, releasePrevious),
-				SeasonFrameImage.LoadResourceAsync($"{prefix}_{nameof(Season)}_{frameUri}", updateToken, releasePrevious),
-				SeasonImage.LoadResourceAsync($"{data.Season}", updateToken, releasePrevious),
+				SetupSeasonArtAsync(data.Season, $"{prefix}_{nameof(Season)}_{frameUri}", updateToken),
 				SetupQuadrantArtAsync(data.Quadrant,$"{prefix}_{nameof(Quadrant)}_{frameUri}", updateToken),
 				SetupExtraArtAsync($"{prefix}_Extra", updateToken),
 				SetupAristArtAsync(data.Artist, "ArtistBrush", updateToken));
@@ -170,6 +169,23 @@ namespace BerserkV3.GameCore.UI
 				return UniTask.WhenAll(QuadrantFrameImage.LoadResourceAsync(quadrantArtUrl, token, releasePrevious),
 					QuadrantImage.LoadResourceAsync($"{quadrant}_Circle", token, releasePrevious));
 			
+			return UniTask.CompletedTask;
+		}
+		
+		public UniTask SetupSeasonArtAsync(Season season, string seasonFrameUrl, CancellationToken token)
+		{
+			var hasSeason = season != Season.None;
+
+			SetActive(SeasonFrameImage, hasSeason);
+			SetActive(SeasonImage, hasSeason);
+
+			if (hasSeason)
+			{
+				return UniTask.WhenAll(
+					SeasonFrameImage.LoadResourceAsync(seasonFrameUrl, token, releasePrevious),
+					SeasonImage.LoadResourceAsync($"{season}", token, releasePrevious));
+			}
+
 			return UniTask.CompletedTask;
 		}
 
