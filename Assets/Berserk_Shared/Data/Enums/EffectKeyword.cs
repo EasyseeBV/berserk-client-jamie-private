@@ -89,7 +89,6 @@ namespace Berserk.Shared.Data.Enums
 		ImmuneToSleepAura,
 		ImmuneToPoisonAura,
 		ImmortalAura,
-		ImmortalOneHit,
 		ManaGainOverflow,
 	}
 }
