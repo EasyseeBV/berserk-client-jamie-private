@@ -18,7 +18,6 @@ namespace UI
 		private Button removeButton;
 		private CancellationTokenSource updateArt;
 		private bool isLavaSet;
-		private Faction deckFaction;
 		
 		protected override void Start()
 		{
@@ -28,17 +27,24 @@ namespace UI
 			SetLavaImage(true);
 			PreviewSystemAdapter.Instance.Registration(this);
 		}
-		
 		protected override void OnRefreshView(IDeckCardStack deckCardStack)
 		{
 			if (deckCardStack == null || deckCardStack.Count == 0)
 				return;
 			
 			base.OnRefreshView(deckCardStack);
+			var deckFaction = DeckCardListView.CurrentDeckFaction;
 			
 			var adapter = deckCardStack.CardData
 				.ToCardDataAdapter()
 				.ApplyDeckFactionCost(deckFaction, maxLava: 10);
+			
+			Debug.Log(
+				$"[DeckPanelItemView] Card='{adapter.Title}' | " +
+				$"DeckFaction={deckFaction} | " +
+				$"CardFactions=[{string.Join(", ", adapter.Factions ?? System.Array.Empty<Faction>())}] | " +
+				$"BaseLava={adapter.BaseLava} -> Lava={adapter.Lava}"
+			);
 			
 			Set(LavaTxt, adapter.Lava);
 			

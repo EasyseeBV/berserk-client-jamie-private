@@ -36,6 +36,9 @@ namespace UI
 		private bool hasChanges;
 		private Faction deckFaction;
 		
+		public static DeckData CurrentDeck { get; private set; }
+		public static Faction CurrentDeckFaction { get; private set; }
+		
 		protected override void OnAwake()
 		{
 			TryGetComponent(out canvasGroup);
@@ -80,6 +83,8 @@ namespace UI
 				await UniTask.Yield();
 				currentDeck = deckModel;
 				deckFaction = currentDeck != null ? currentDeck.Faction : Faction.None;
+				CurrentDeck = currentDeck;
+				CurrentDeckFaction = deckFaction;
 				DeckCardListPanel.DeckName = currentDeck?.Name;
 				DeckCardListPanel.OwnedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
 				

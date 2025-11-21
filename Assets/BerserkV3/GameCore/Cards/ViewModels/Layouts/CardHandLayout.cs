@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Game;
+using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Abstraction;
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Common.Utils;
@@ -19,32 +20,44 @@ namespace BerserkV3.GameCore.Cards
 
 		public CardHandArtView HandArtView => HandCardArtView;
 		
+		private Faction deckFaction = Faction.None;
+		public void SetDeckFaction(Faction faction) => deckFaction = faction;
+		
 		protected override async UniTask OnEnabledAsync(CancellationToken token)
 		{
 			if (RuntimeGameObject.Data is not CardData data)
 				throw new NotImplementedException($"Can't use data for this layout : {RuntimeGameObject.Data}");
+
 			SetActive(ExchangeTxt,false);
 			token.ThrowIfCancellationRequested();
+
 			SelfContainer
 				.SetHintTarget($"{TutorialTrigger.FullCardBounds}_{GetOwner()}_{RuntimeData.State}_{RuntimeGameObject.Data.Id}")
 				.Init();
+			
+			var adapter = data.ToCardDataAdapter();
+
+
+			if (deckFaction != Faction.None)
+				adapter = adapter.ApplyDeckFactionCost(deckFaction, maxLava: 10);
+
 
 			await UniTask.WhenAll(
 				base.OnEnabledAsync(token),
-				HandCardArtView.SetupAsync(data.ToCardDataAdapter(), token));
+				HandCardArtView.SetupAsync(adapter, token));
 
 			token.ThrowIfCancellationRequested();
 
-			HandCardArtView.SetAttackText(RuntimeData.Attack); // after setup update to original values
-			HandCardArtView.SetArmorText(RuntimeData.Armor); // after setup update to original values
-			HandCardArtView.SetHealthText(RuntimeData.Hp); // after setup update to original values
-			HandCardArtView.SetManaText(RuntimeData.Mana); // after setup update to original values
-			
+			HandCardArtView.SetAttackText(RuntimeData.Attack);
+			HandCardArtView.SetArmorText(RuntimeData.Armor);
+			HandCardArtView.SetHealthText(RuntimeData.Hp);
+			HandCardArtView.SetManaText(adapter.Lava);
+
 			RuntimeData.Attack.OnChanged += HandCardArtView.SetAttackText;
 			RuntimeData.Armor.OnChanged += HandCardArtView.SetArmorText;
 			RuntimeData.Hp.OnChanged += HandCardArtView.SetHealthText;
-			RuntimeData.Mana.OnChanged += HandCardArtView.SetManaText;
 		}
+
 
 		protected override void OnDisabled()
 		{
