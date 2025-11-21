@@ -12,6 +12,7 @@ using BerserkV3.Common.Utils;
 using BerserkV3.GameCore.Customisations;
 using BerserkV3.GameCore.LogicEventsProcessor;
 using BerserkV3.GameCore.Network;
+using Lobby;
 using BerserkV3.GameCore.Repository;
 using BerserkV3.GameCore.UI;
 using BerserkV3.Generic.Customisation;
@@ -116,8 +117,9 @@ namespace BerserkV3.GameCore.Controllers
 			var victoryHero = gameContext.GameRuntimePool.GetHeroByUserId(victory.UserId);
 			var victoryCust = customisationApplication.Get<AssetData>(victory.UserId, CustomisationType.AvatarFrame);
 			var artMaskUrl = "Vulcanite_Mask";
-			
-			await UniTask.WhenAll(			
+
+
+            await UniTask.WhenAll(			
 				gameEndView.SetPlayerDefeatAsync(defeat.UserName.Ellipsis(16), defeatHero.Data.ArtUrl, artMaskUrl, defeatCust.URL, GetPlayerStatistic(defeat.UserId), Token), 
 				gameEndView.SetPlayerVictoryAsync(victory.UserName.Ellipsis(16), victoryHero.Data.ArtUrl, artMaskUrl, victoryCust.URL, GetPlayerStatistic(victory.UserId), Token),
 				UniTask.Delay(1000));
@@ -134,9 +136,13 @@ namespace BerserkV3.GameCore.Controllers
 
 		private string GetPlayerStatistic(string userId)
 		{
+			var leagueId = gameContext.RuntimeData.LeagueId;
+    		var league = LobbyBus.Leagues.Value?.Find(x => x.Id == leagueId);
+			var leagueName = league?.LeagueName;
 			return playerStatistics.TryGet(x => x.UserId == userId, out var stat)
 				? $"MMR: {stat.EloTotal} {(stat.EloDelta >= 0 ? $"{"+" + stat.EloDelta}".Green() : $"{stat.EloDelta}".Red())}" 
 				: null;
+
 		}
 
 		private static string GetReasonText(GameEndReason value, string userName)

@@ -14,5 +14,6 @@ namespace Berserk.Shared.Data.Enums
 		Seasons_of_Change,
 		PlaceHolder_Season,
 		Sands_of_Time,
+		None,
 	}
 }

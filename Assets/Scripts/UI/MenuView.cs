@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BerserkV3.Common.DataBase;
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Lobby.MatchMaking.Duels;
+using BerserkV3.Lobby.UI.LeaderBoard;
 using BerserkV3.Lobby.UI.Leagues;
 using Cysharp.Threading.Tasks;
 using Lobby;
@@ -23,6 +24,7 @@ namespace UI
 			DuelsBtn.Subscribe(() => DuelsApplicationAdapter.Application.OpenAsync().Forget());
 			ProfileBtn.Subscribe(() => ProfileView.Instance.InitAndShowAsync().Forget());
 			LavaShopBtn.Subscribe(() => LavaShopView.Instance.InitAndShowAsync().Forget());
+			LeaderBoardBtn.onClick.AddListener(()=> LeaderBoardLeagueView.Instance.InitAndShow());
 			LavaShopBtn.ShowAtStart = true;
 			LavaShopBtn.SetInteractable(false); // turn off lava shop (todo: remove when new shop will be developed)
 

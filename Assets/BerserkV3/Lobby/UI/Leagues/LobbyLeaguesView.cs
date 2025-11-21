@@ -299,10 +299,21 @@ namespace BerserkV3.Lobby.UI.Leagues
 			var currentLeague = LobbyBus.Leagues.Value[currentLeagueIndex];
 			
 			Set(leagueNameText, currentLeague.LeagueName);
-			Set(leagueDescriptionText, currentLeague.GetDescription());
 			
+
 			var elo = leagueStatistics?.FirstOrDefault(m => m.LeagueId == currentLeague.Id)?.ELO ?? DEFAULT_MMR;
 			MMRText.SetText($"MMR: {elo}");
+			if (currentLeague.LeagueName == "Ranked")
+			{
+				Set(leagueDescriptionText, currentLeague.GetDescription());
+			}
+			else
+			{
+				Set(leagueDescriptionText, "");
+			}
+
+			Debug.Log($"[League Description] {currentLeague.GetDescription()}");
+			
 			
 			EnumerableExtensions.ForEach(deckItems.Values, UpdateItem);
 			selectedDeck = null;

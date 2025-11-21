@@ -118,9 +118,11 @@ namespace BerserkV3.Lobby.MatchMaking.Leagues
 		private void ReceiveAcceptMatch(LeagueMatchReadyToAcceptModel readyToAcceptModel)
 		{
 			OnInSearch();
-			var delta = readyToAcceptModel.AcceptionTimeout.Subtract(sharedTime.Current).TotalSeconds;
-			var totalSeconds = Mathf.Max(0, (int) delta);
+			var msLeft = (int)Math.Max(0, (readyToAcceptModel.AcceptionTimeout - sharedTime.Current).TotalMilliseconds);
+			var totalSeconds = Mathf.Max(0, msLeft / 1000);
 			matchSearchApplication.FoundMatch(totalSeconds);
+			RequestAcceptMatchAsync(true).Forget();
+			AutoRequestStateAsync(sharedConfig.AutoMatchAcceptTimeoutMs + EXTRA_MS, 2).Forget();
 		}
 
 		private async UniTask RequestAcceptMatchAsync(bool accepted)
@@ -153,7 +155,8 @@ namespace BerserkV3.Lobby.MatchMaking.Leagues
 		
 		private void OnAcceptTimeOut()
 		{
-			AcceptedMatch(true);
+			//AcceptedMatch(true);
+			RequestAcceptMatchAsync(true).Forget();
 			//matchSearchApplication.LoadingDeclinedAndEndQueue();
 		}
 
