@@ -14,6 +14,7 @@ using RR.Game.TutorialSystemV2.Realizations;
 using RR.UI.FrameSystem;
 using UnityEngine;
 using UnityEngine.UI.ProceduralImage;
+using System;
 
 namespace UI
 {
@@ -21,6 +22,9 @@ namespace UI
 	{
 		public DeckCardCollection CardCollection { get; private set; }
 		public IDeckValue DeckValue { get; private set; }
+		
+		private readonly Dictionary<string, int> baseManaByCardId = new();
+		private readonly Dictionary<(string cardId, int heroQuadrant), int> adjustedManaCache = new();
 
 		public string DeckName
 		{
@@ -46,6 +50,7 @@ namespace UI
 		private LoopScrollRefresher loopScrollRefresher;
 		private OwnedVulcanite ownedHero;
 		private HeroData heroData;
+
 
 		protected override void OnAwake()
 		{
@@ -107,8 +112,48 @@ namespace UI
 		private void RefreshPanel(IDeckCardStack deckCardStack = null)
 		{
 			var deckCards = CardCollection.ToFiltered();
+
+			var heroQuadrant = heroData.Quadrant;
+
+			foreach (var stack in deckCards)
+			{
+				var cardData = stack.CardData;
+				
+				if (cardData.Quadrant == heroQuadrant)
+					continue;
+				
+				if (!baseManaByCardId.TryGetValue(cardData.Id, out var baseMana))
+				{
+					baseMana = cardData.Mana;
+					baseManaByCardId[cardData.Id] = baseMana;
+				}
+				
+				var cacheKey = (cardData.Id, (int)heroQuadrant);
+				if (!adjustedManaCache.TryGetValue(cacheKey, out var adjustedMana))
+				{
+					adjustedMana = CalculateAdjustedCost(baseMana);
+					adjustedManaCache[cacheKey] = adjustedMana;
+				}
+				
+				cardData.Mana = adjustedMana;
+			}
+
 			loopScrollRefresher.ScrollToCard(deckCards, deckCardStack);
 			SetActive(InfoText, CardCollection.Count == 0);
+		}
+
+		
+		public static int CalculateAdjustedCost(int baseLava)
+		{
+			if (baseLava <= 0)
+				return 1;
+			
+			double logValue = Math.Log(baseLava + 1, 2);
+			int increase = (int)Math.Ceiling(logValue);
+    
+			int adjustedLava = baseLava + increase;
+    
+			return Math.Min(adjustedLava, 10);
 		}
 
 		protected override void OnClosed()
