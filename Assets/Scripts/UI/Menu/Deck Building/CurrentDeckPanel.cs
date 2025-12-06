@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using Berserk.Shared.Data.Abstraction;
+using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Game;
 using Berserk.Shared.Data.Lobby;
 using BerserkV3.Common.DataBase;
@@ -9,22 +11,22 @@ using BerserkV3.Common.UIKit;
 using BerserkV3.Lobby.Deck;
 using BerserkV3.Lobby.UI;
 using Cysharp.Threading.Tasks;
+using RR.Core.DebugSystem;
 using RR.Core.ResourceManagament;
 using RR.Game.TutorialSystemV2.Realizations;
 using RR.UI.FrameSystem;
 using UnityEngine;
 using UnityEngine.UI.ProceduralImage;
-using System;
+using Zenject;
 
 namespace UI
 {
 	public partial class CurrentDeckPanel : BaseView
 	{
+		[Inject]
+		private ISharedConfig sharedConfig;
 		public DeckCardCollection CardCollection { get; private set; }
 		public IDeckValue DeckValue { get; private set; }
-		
-		private readonly Dictionary<string, int> baseManaByCardId = new();
-		private readonly Dictionary<(string cardId, int heroQuadrant), int> adjustedManaCache = new();
 
 		public string DeckName
 		{
@@ -50,7 +52,6 @@ namespace UI
 		private LoopScrollRefresher loopScrollRefresher;
 		private OwnedVulcanite ownedHero;
 		private HeroData heroData;
-
 
 		protected override void OnAwake()
 		{
@@ -112,48 +113,68 @@ namespace UI
 		private void RefreshPanel(IDeckCardStack deckCardStack = null)
 		{
 			var deckCards = CardCollection.ToFiltered();
-
-			var heroQuadrant = heroData.Quadrant;
-
-			foreach (var stack in deckCards)
-			{
-				var cardData = stack.CardData;
-				
-				if (cardData.Quadrant == heroQuadrant)
-					continue;
-				
-				if (!baseManaByCardId.TryGetValue(cardData.Id, out var baseMana))
-				{
-					baseMana = cardData.Mana;
-					baseManaByCardId[cardData.Id] = baseMana;
-				}
-				
-				var cacheKey = (cardData.Id, (int)heroQuadrant);
-				if (!adjustedManaCache.TryGetValue(cacheKey, out var adjustedMana))
-				{
-					adjustedMana = CalculateAdjustedCost(baseMana);
-					adjustedManaCache[cacheKey] = adjustedMana;
-				}
-				
-				cardData.Mana = adjustedMana;
-			}
-
 			loopScrollRefresher.ScrollToCard(deckCards, deckCardStack);
 			SetActive(InfoText, CardCollection.Count == 0);
 		}
 
-		
-		public static int CalculateAdjustedCost(int baseLava)
+		public int CalculateOffFactionLavaForCard(ICardData cardData)
 		{
-			if (baseLava <= 0)
-				return 1;
-			
-			double logValue = Math.Log(baseLava + 1, 2);
-			int increase = (int)Math.Ceiling(logValue);
-    
-			int adjustedLava = baseLava + increase;
-    
-			return Math.Min(adjustedLava, 10);
+			var offFactionConfig = sharedConfig.OffFactionLavaConfig;
+
+			if (offFactionConfig == null)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanel] Config is NULL, return base mana");
+				return cardData.Mana;
+			}
+
+			if (!offFactionConfig.Enabled)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanel] Feature DISABLED in config, return base mana");
+				return cardData.Mana;
+			}
+
+			if (heroData == null)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanel] heroData is NULL (vulcanite not selected yet?), return base mana");
+				return cardData.Mana;
+			}
+
+			var heroQuadrant = heroData.Quadrant;
+			var cardQuadrant = cardData.Quadrant;
+			var baseLava = cardData.Mana;
+			var maxLava = sharedConfig.PlayerMaxMana;
+
+			var isNeutral =
+				offFactionConfig.NeutralQuadrants != null &&
+				offFactionConfig.NeutralQuadrants.Contains(cardQuadrant);
+
+			RRLogger.Log(
+				$"[OffFactionLava][DeckPanel] Card='{cardData.Title}', HeroQ={heroQuadrant}, CardQ={cardQuadrant}, Base={baseLava}, IsNeutral={isNeutral}");
+
+			var effectiveLava = baseLava;
+
+			if (!isNeutral && cardQuadrant != heroQuadrant)
+			{
+				effectiveLava = baseLava + offFactionConfig.PenaltyPerCard;
+				RRLogger.Log(
+					$"[OffFactionLava][DeckPanel] OFF-FACTION: +{offFactionConfig.PenaltyPerCard} → {effectiveLava}");
+			}
+			else
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanel] No penalty applied");
+			}
+
+			if (effectiveLava > maxLava)
+			{
+				RRLogger.Log(
+					$"[OffFactionLava][DeckPanel] Clamp {effectiveLava} to maxLava {maxLava}");
+				effectiveLava = maxLava;
+			}
+
+			RRLogger.Log(
+				$"[OffFactionLava][DeckPanel] RESULT: Card='{cardData.Title}', Base={baseLava}, Effective={effectiveLava}");
+
+			return effectiveLava;
 		}
 
 		protected override void OnClosed()
