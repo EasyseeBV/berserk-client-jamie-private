@@ -51,7 +51,7 @@ namespace BerserkV3.GameCore.Controllers
 		private IDisposable tutorialHandlers;
 		private IProgress<float> startupProgress;
 		private readonly ISharedConfig sharedConfig;
-		
+		private readonly Dictionary<string, int> baseManaByCardTitle = new Dictionary<string, int>();
 		public StartupController(
 			IPreviewSystem previewSystem,
 			IHoveringSystem hoveringSystem,
@@ -192,8 +192,20 @@ namespace BerserkV3.GameCore.Controllers
 			var opponentHeroQuadrant = opponentHero.Data.Quadrant;
 			
 			var cardQuadrant = view.RuntimeGameObject.Data.Quadrant;
-			var baseMana = view.RuntimeGameObject.Data.Mana;
 			
+			var cardTitle = view.RuntimeGameObject.Data.Title;
+			int baseMana;
+
+			if (!baseManaByCardTitle.TryGetValue(cardTitle, out baseMana))
+			{
+				baseMana = view.RuntimeGameObject.Data.Mana;
+				baseManaByCardTitle[cardTitle] = baseMana;
+				RRLogger.Log($"[OffFactionLava] Cache base mana {baseMana} for '{cardTitle}'");
+			}
+			else
+			{
+				RRLogger.Log($"[OffFactionLava] Use cached base mana {baseMana} for '{cardTitle}'");
+			}
 			var heroQuadrant = view.IsSelf ? myHeroQuadrant : opponentHeroQuadrant;
 			
 			var isNeutral =
@@ -215,12 +227,12 @@ namespace BerserkV3.GameCore.Controllers
 			if (view.IsSelf)
 			{
 				RRLogger.Log(
-					$"[OffFactionLava][SELF] Hero={myHeroQuadrant}, Card={cardQuadrant}, Base={baseMana}, Effective={effectiveMana}, Title={view.RuntimeGameObject.Data.Title}, OffFaction={isOffFaction}");
+					$"[OffFactionLava][SELF] Hero={myHeroQuadrant}, Card={cardQuadrant}, Base={baseMana}, Effective={effectiveMana}, Title={cardTitle}, OffFaction={isOffFaction}");
 			}
 			else
 			{
 				RRLogger.Log(
-					$"[OffFactionLava][OPP] Hero={opponentHeroQuadrant}, Card={cardQuadrant}, Base={baseMana}, Effective={effectiveMana}, Title={view.RuntimeGameObject.Data.Title}, OffFaction={isOffFaction}");
+					$"[OffFactionLava][OPP] Hero={opponentHeroQuadrant}, Card={cardQuadrant}, Base={baseMana}, Effective={effectiveMana}, Title={cardTitle}, OffFaction={isOffFaction}");
 			}
 			view.RuntimeData.Mana
 				.SetMax(effectiveMana)
