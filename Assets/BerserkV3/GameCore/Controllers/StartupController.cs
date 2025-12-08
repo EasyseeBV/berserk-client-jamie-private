@@ -24,6 +24,7 @@ using BerserkV3.Generic.UndoSystem;
 using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;
+using UnityEngine;
 using Zenject;
 
 namespace BerserkV3.GameCore.Controllers
@@ -117,6 +118,7 @@ namespace BerserkV3.GameCore.Controllers
 		{
 			try
 			{
+				baseManaByCardTitle.Clear();
 				if (!data.ReInitialize)
 					await gameHub.PerformCommandAsync<ReadyToPlayCmd>();
 
@@ -168,7 +170,6 @@ namespace BerserkV3.GameCore.Controllers
 					return view;
 				}).ToArray();
 		}
-		
 
 		public void CalculateOffFactionLava(ICardView view)
 		{
@@ -223,6 +224,11 @@ namespace BerserkV3.GameCore.Controllers
 			
 			if (effectiveMana > maxLava)
 				effectiveMana = maxLava;
+			
+			if (isOffFaction)
+				view.Layout.SetLavaTextColor(Color.red);
+			else
+				view.Layout.SetLavaTextColor(Color.white);
 			
 			if (view.IsSelf)
 			{
