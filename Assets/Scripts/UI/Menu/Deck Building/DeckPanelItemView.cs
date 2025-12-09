@@ -123,6 +123,16 @@ namespace UI
 			DeckCardStack?.RequestToRemove(DeckCardStack?.Get(StackSelector));
 		}
 
+		public void ForceOffFactionRefresh()
+		{
+			if (DeckCardStack == null || DeckCardStack.Count == 0)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanelItem] ForceOffFactionRefresh: empty stack, skip");
+				return;
+			}
+			OnRefreshView(DeckCardStack);
+		}
+
 		#region Previewable
 
 		public GameObject TargetView => gameObject;

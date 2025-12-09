@@ -81,7 +81,15 @@ namespace UI
 		private void SelectVulcanite(OwnedVulcanite value)
 		{
 			OwnedHero = value;
+			
+			var items = GetComponentsInChildren<DeckPanelItemView>(true);
+			foreach (var item in items)
+			{
+				item.ForceOffFactionRefresh();
+			}
+			RefreshCount();
 		}
+
 
 		public void SetUp(DeckCardCollection cardCollection, bool isNewDeck = false)
 		{
@@ -106,9 +114,17 @@ namespace UI
 		{
 			Set(CardsCountText, $"{CardCollection.FullCount}/{CardCollection.Limit}");
 			var deckCards = CardCollection.GetAll();
+			
 			DeckValue.Refresh(deckCards.SelectMany(x => x.GetAll()));
-			HistogramView.Refresh(deckCards.SelectMany(x => Enumerable.Repeat(x.CardData, x.Count)).ToArray());
+			
+			var histogramCosts = deckCards
+				.SelectMany(x => Enumerable.Repeat(x.CardData, x.Count))
+				.Select(cardData => CalculateOffFactionLavaForCard(cardData))
+				.ToArray();
+
+			HistogramView.Refresh(histogramCosts);
 		}
+
 
 		private void RefreshPanel(IDeckCardStack deckCardStack = null)
 		{
