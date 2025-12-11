@@ -99,6 +99,7 @@ namespace UI
 				VulcaniteSelectionShow();
 
 			CardCollection = cardCollection;
+			CardCollection.SetLavaCostCalculator(CalculateOffFactionLavaForCard);
 			CardCollection.OnStackAdded += RefreshPanel;
 			CardCollection.OnStackRemoved += RefreshPanel;
 			CardCollection.OnCollectionChanged += RefreshCount;
