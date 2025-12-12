@@ -225,10 +225,10 @@ namespace BerserkV3.GameCore.Controllers
 			if (effectiveMana > maxLava)
 				effectiveMana = maxLava;
 			
-			if (isOffFaction)
+			/*if (isOffFaction)
 				view.Layout.SetLavaTextColor(Color.red);
 			else
-				view.Layout.SetLavaTextColor(Color.white);
+				view.Layout.SetLavaTextColor(Color.white);*/
 			
 			if (view.IsSelf)
 			{
