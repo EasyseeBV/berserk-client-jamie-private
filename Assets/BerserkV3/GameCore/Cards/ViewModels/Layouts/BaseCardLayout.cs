@@ -50,6 +50,8 @@ namespace BerserkV3.GameCore.Cards
 			return CanvasGroup.alpha;
 		}
 
+		public virtual void SetLavaTextColor(Color color) {}
+
 		private void OnDestroy()
 		{
 			Disable();
