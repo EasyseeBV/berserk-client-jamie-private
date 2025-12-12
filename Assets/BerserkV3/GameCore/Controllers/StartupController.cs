@@ -24,6 +24,7 @@ using BerserkV3.Generic.UndoSystem;
 using Cysharp.Threading.Tasks;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;
+using UnityEngine;
 using Zenject;
 
 namespace BerserkV3.GameCore.Controllers
@@ -50,7 +51,8 @@ namespace BerserkV3.GameCore.Controllers
 		private readonly IGameHub gameHub;
 		private IDisposable tutorialHandlers;
 		private IProgress<float> startupProgress;
-		
+		private readonly ISharedConfig sharedConfig;
+		private readonly Dictionary<string, int> baseManaByCardTitle = new Dictionary<string, int>();
 		public StartupController(
 			IPreviewSystem previewSystem,
 			IHoveringSystem hoveringSystem,
@@ -68,7 +70,8 @@ namespace BerserkV3.GameCore.Controllers
 			IGameRepository gameRepository,
 			IInstantiator instantiator,
 			IUndoSystem undoSystem,
-			IGameHub gameHub)
+			IGameHub gameHub,
+			ISharedConfig sharedConfig)
 		{
 			this.previewSystem = previewSystem;
 			this.hoveringSystem = hoveringSystem;
@@ -87,6 +90,7 @@ namespace BerserkV3.GameCore.Controllers
 			this.instantiator = instantiator;
 			this.undoSystem = undoSystem;
 			this.gameHub = gameHub;
+			this.sharedConfig = sharedConfig;
 		}
 
 		public void Initialize()
@@ -114,6 +118,7 @@ namespace BerserkV3.GameCore.Controllers
 		{
 			try
 			{
+				baseManaByCardTitle.Clear();
 				if (!data.ReInitialize)
 					await gameHub.PerformCommandAsync<ReadyToPlayCmd>();
 
@@ -161,8 +166,83 @@ namespace BerserkV3.GameCore.Controllers
 				{
 					var view = cardViewFactory.Create(x);
 					view.SetLocalState(x.RuntimeData.State);
+					CalculateOffFactionLava(view);
 					return view;
 				}).ToArray();
+		}
+
+		public void CalculateOffFactionLava(ICardView view)
+		{
+			var offFactionConfig = sharedConfig.OffFactionLavaConfig;
+			
+			if (offFactionConfig == null || !offFactionConfig.Enabled)
+				return;
+
+			var maxLava = sharedConfig.PlayerMaxMana;
+			
+			var myHero = sessionProcessor.Context.GameRuntimePool.GetHeroByUserId(gameRepository.SelfId);
+			var opponentHero = sessionProcessor.Context.GameRuntimePool.GetHeroByUserId(gameRepository.OpponentId);
+
+			if (myHero == null || opponentHero == null)
+			{
+				RRLogger.Error("[CalculateOffFactionLava] Hero not found for Self or Opponent");
+				return;
+			}
+
+			var myHeroQuadrant = myHero.Data.Quadrant;
+			var opponentHeroQuadrant = opponentHero.Data.Quadrant;
+			
+			var cardQuadrant = view.RuntimeGameObject.Data.Quadrant;
+			
+			var cardTitle = view.RuntimeGameObject.Data.Title;
+			int baseMana;
+
+			if (!baseManaByCardTitle.TryGetValue(cardTitle, out baseMana))
+			{
+				baseMana = view.RuntimeGameObject.Data.Mana;
+				baseManaByCardTitle[cardTitle] = baseMana;
+				RRLogger.Log($"[OffFactionLava] Cache base mana {baseMana} for '{cardTitle}'");
+			}
+			else
+			{
+				RRLogger.Log($"[OffFactionLava] Use cached base mana {baseMana} for '{cardTitle}'");
+			}
+			var heroQuadrant = view.IsSelf ? myHeroQuadrant : opponentHeroQuadrant;
+			
+			var isNeutral =
+				offFactionConfig.NeutralQuadrants != null &&
+				offFactionConfig.NeutralQuadrants.Contains(cardQuadrant);
+
+			int effectiveMana = baseMana;
+			bool isOffFaction = false;
+
+			if (!isNeutral && cardQuadrant != heroQuadrant)
+			{
+				isOffFaction = true;
+				effectiveMana = baseMana + offFactionConfig.PenaltyPerCard;
+			}
+			
+			if (effectiveMana > maxLava)
+				effectiveMana = maxLava;
+			
+			/*if (isOffFaction)
+				view.Layout.SetLavaTextColor(Color.red);
+			else
+				view.Layout.SetLavaTextColor(Color.white);*/
+			
+			if (view.IsSelf)
+			{
+				RRLogger.Log(
+					$"[OffFactionLava][SELF] Hero={myHeroQuadrant}, Card={cardQuadrant}, Base={baseMana}, Effective={effectiveMana}, Title={cardTitle}, OffFaction={isOffFaction}");
+			}
+			else
+			{
+				RRLogger.Log(
+					$"[OffFactionLava][OPP] Hero={opponentHeroQuadrant}, Card={cardQuadrant}, Base={baseMana}, Effective={effectiveMana}, Title={cardTitle}, OffFaction={isOffFaction}");
+			}
+			view.RuntimeData.Mana
+				.SetMax(effectiveMana)
+				.ResetToMax(true);
 		}
 
 		private void InitializeViews(ICardView[] cardViews)

@@ -215,7 +215,11 @@ namespace BerserkV3.GameCore.UI
 				ArtistBrushImage.LoadResourceAsync(artistArtUrl, token, releasePrevious) 
 				: UniTask.CompletedTask;
 		}
-		
+
+		public void SetLavaTextColor(Color color)
+		{
+			LavaText.color = color;
+		}
 		public void SwitchType(ObjectType type)
 		{
 			if (!AttackImage || !HealthImage || !ArmorImage)

@@ -36,6 +36,7 @@ namespace Berserk.Shared.GameCore.LogicContext
 		public DeckRarityValueModel[] DeckRarityValueModels { get; set; }
 		public DeckNftBonusModel[] DeckBonusValueModels { get; set; }
 		public ExternalProvider[] AvailableSocials { get; set; }
+		public OffFactionLavaConfig OffFactionLavaConfig { get; set; }
 		[JsonIgnore] public bool Initialized { get; private set; }
 
 		public void FillFromJson(string json)

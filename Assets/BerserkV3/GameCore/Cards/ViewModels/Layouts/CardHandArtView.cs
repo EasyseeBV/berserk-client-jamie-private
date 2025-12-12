@@ -128,5 +128,11 @@ namespace BerserkV3.GameCore.UI
 			currentLayout = ArtLayouts.First();
 			RRLogger.Error($"Missing {artType}, setup as default : {currentLayout.ArtType}");
 		}
+
+		public void SetLavaTextColor(Color color)
+		{
+			currentLayout.SetLavaTextColor(color);
+		}
+		
 	}
 }

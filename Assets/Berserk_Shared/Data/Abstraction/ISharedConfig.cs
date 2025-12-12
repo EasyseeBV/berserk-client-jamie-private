@@ -29,6 +29,7 @@ namespace Berserk.Shared.Data.Abstraction
 		DeckRarityValueModel[] DeckRarityValueModels { get; }
 		DeckNftBonusModel[] DeckBonusValueModels { get; }
 		ExternalProvider[] AvailableSocials { get; }
+		OffFactionLavaConfig OffFactionLavaConfig { get; set; }
 
 		bool Initialized { get; }
 		void FillFromJson(string json);

@@ -16,5 +16,6 @@ namespace BerserkV3.GameCore.Cards
 		void Refresh();
 		
 		float GetAlpha();
+		void SetLavaTextColor(Color color);
 	}
 }

@@ -5,6 +5,7 @@ using Berserk.Shared.Data.Lobby;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.PreviewSystem;
 using Cysharp.Threading.Tasks;
+using RR.Core.DebugSystem;
 using RR.Core.ResourceManagament;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,12 +31,46 @@ namespace UI
 		protected override void OnRefreshView(IDeckCardStack deckCardStack)
 		{
 			if (deckCardStack == null || deckCardStack.Count == 0)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanelItem] OnRefreshView: empty stack");
 				return;
+			}
 			
 			base.OnRefreshView(deckCardStack);
-			Set(LavaTxt, deckCardStack.CardData.Mana);
-			SetLavaImage(!deckCardStack.CardData.SubTypes.Contains(SubType.Token));
-			Set(DeckNameText, deckCardStack.CardData.Title);
+
+			var cardData = deckCardStack.CardData;
+			if (cardData == null)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanelItem] OnRefreshView: CardData is null");
+				return;
+			}
+			
+			var effectiveLava = cardData.Mana;
+
+			var deckPanel = GetComponentInParent<CurrentDeckPanel>();
+			if (deckPanel != null)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanelItem] Found CurrentDeckPanel via GetComponentInParent");
+			}
+			else
+			{
+				deckPanel = Object.FindObjectOfType<CurrentDeckPanel>();
+				if (deckPanel != null)
+					RRLogger.Log("[OffFactionLava][DeckPanelItem] Found CurrentDeckPanel via FindObjectOfType");
+				else
+					RRLogger.Log("[OffFactionLava][DeckPanelItem] CurrentDeckPanel NOT FOUND, using base mana");
+			}
+
+			if (deckPanel != null)
+			{
+				effectiveLava = deckPanel.CalculateOffFactionLavaForCard(cardData);
+				RRLogger.Log(
+					$"[OffFactionLava][DeckPanelItem] Card='{cardData.Title}', Base={cardData.Mana}, Effective={effectiveLava}");
+			}
+			
+			Set(LavaTxt, effectiveLava);
+			SetLavaImage(!cardData.SubTypes.Contains(SubType.Token));
+			Set(DeckNameText, cardData.Title);
 			SetWarning(!deckCardStack.AllInStackValid);
 			SetCount(deckCardStack.Count);
 		}
@@ -86,6 +121,16 @@ namespace UI
 		{
 			PreviewSystemAdapter.Instance.Close();
 			DeckCardStack?.RequestToRemove(DeckCardStack?.Get(StackSelector));
+		}
+
+		public void ForceOffFactionRefresh()
+		{
+			if (DeckCardStack == null || DeckCardStack.Count == 0)
+			{
+				RRLogger.Log("[OffFactionLava][DeckPanelItem] ForceOffFactionRefresh: empty stack, skip");
+				return;
+			}
+			OnRefreshView(DeckCardStack);
 		}
 
 		#region Previewable
