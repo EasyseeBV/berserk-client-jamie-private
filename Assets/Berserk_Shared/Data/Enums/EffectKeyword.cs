@@ -92,5 +92,6 @@ namespace Berserk.Shared.Data.Enums
 		ImmortalOneHit,
 		ManaGainOverflow,
 		AttackAuraGain,
+		BuffReplaceAttackLimit,
 	}
 }
