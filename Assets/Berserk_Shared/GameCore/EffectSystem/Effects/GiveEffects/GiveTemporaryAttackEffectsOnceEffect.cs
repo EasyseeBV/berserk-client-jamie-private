@@ -6,7 +6,6 @@ using Berserk.Shared.GameCore.Utils;
 namespace Berserk.Shared.GameCore.EffectSystem.Effects.GiveEffects
 {
 	[EffectKeyword(EffectKeyword.AttackAuraGain)]
-	[EffectKeyword(EffectKeyword.GiveTemporaryEffectsOnce)]
 	public class GiveTemporaryAttackEffectsOnceEffect : GiveTemporaryEffectsEffect
 	{
 		public override bool CanExecute()
