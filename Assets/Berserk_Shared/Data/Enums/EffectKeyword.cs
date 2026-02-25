@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Berserk.Shared.Data.Enums
@@ -89,6 +89,10 @@ namespace Berserk.Shared.Data.Enums
 		ImmuneToSleepAura,
 		ImmuneToPoisonAura,
 		ImmortalAura,
+		ImmortalOneHit,
 		ManaGainOverflow,
+		Fast,
+		AttackAuraGain,
+		BuffReplaceAttackLimit,
 	}
 }

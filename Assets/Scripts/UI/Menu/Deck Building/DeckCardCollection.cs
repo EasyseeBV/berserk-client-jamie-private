@@ -29,6 +29,24 @@ namespace UI
 		public int Limit { get; private set; }
 		public int Count => collection.Count;
 		public int FullCount => collection.Values.Sum(stack => stack.Count);
+		
+		/// <summary>
+		/// Injects callback that calculates the effective mana cost.
+		/// </summary>
+		private Func<ICardData, int> lavaCostCalculator;
+		
+		public void SetLavaCostCalculator(Func<ICardData, int> calculator)
+		{
+			lavaCostCalculator = calculator;
+		}
+		
+		/// <summary>
+		/// Returns effective mana value using injected calculator or fallback.
+		/// </summary>
+		public int GetEffectiveMana(ICardData card)
+		{
+			return lavaCostCalculator?.Invoke(card) ?? card.Mana;
+		}
 
 		public DeckCardCollection(IEnumerable<OwnedCard> cardDataList, int limit = int.MaxValue)
 		{
@@ -81,7 +99,7 @@ namespace UI
 			{
 				SortingType.Quadrant => card => ((int)card.Quadrant + 1) * 1000 + GetManaOrder(card),
 				SortingType.Rarity => card => (((int)card.Rarity + 1) * 1000) + GetManaOrder(card),
-				SortingType.Lava => GetManaOrder,
+				SortingType.Lava => GetEffectiveManaOrder,
 				_ => throw new NotImplementedException($"Unknown {nameof(SortingType)} : {acceptedSorting}")
 			};
 
@@ -90,6 +108,14 @@ namespace UI
 				return card.SubTypes != null && card.SubTypes.Contains(SubType.Token)
 					? -100 + (int)card.Rarity
 					: card.Mana;
+			}
+			
+			int GetEffectiveManaOrder(ICardData card)
+			{
+				if (card.SubTypes != null && card.SubTypes.Contains(SubType.Token))
+					return -100 + (int)card.Rarity;
+
+				return GetEffectiveMana(card);
 			}
 
 			OnCardSortFilter?.Invoke();

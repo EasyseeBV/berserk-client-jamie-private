@@ -20,6 +20,7 @@ namespace Berserk.Shared.Data.Enums
 		Heal,
 		Lava_Gain,
 		Undead,
+		Fly,
 		Card_Draw,
 		Player_Heal,
 		Random_Attack,

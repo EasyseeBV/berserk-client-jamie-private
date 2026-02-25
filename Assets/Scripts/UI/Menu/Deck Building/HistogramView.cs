@@ -24,13 +24,26 @@ namespace UI
 
 		public void Refresh(IReadOnlyCollection<CardData> deckCards)
 		{
+			var costs = deckCards.Select(x => x.Mana).ToArray();
+			Refresh(costs);
+		}
+
+		public void Refresh(IReadOnlyCollection<int> cardCosts)
+		{
 			SetHistogram();
 			const int maxManna = 7;
+
+			var allCardsCount = (float)cardCosts.Count;
+
 			for (var i = 0; i < maxManna; i++)
 			{
 				var mana = i + 1;
-				var manaCostCardsCount = deckCards.Count(x => mana == maxManna ? x.Mana >= mana : x.Mana == mana);
-				var allCardsCount = (float) deckCards.Count;
+
+				var manaCostCardsCount = cardCosts.Count(x =>
+					mana == maxManna
+						? x >= mana
+						: x == mana);
+
 				var columnValue = allCardsCount != 0
 					? Math.Min(manaCostCardsCount / allCardsCount * fillHistogramOffset, 1f)
 					: 0f;

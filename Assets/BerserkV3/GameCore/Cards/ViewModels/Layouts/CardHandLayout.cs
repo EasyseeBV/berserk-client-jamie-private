@@ -8,6 +8,7 @@ using BerserkV3.Common.Utils;
 using BerserkV3.GameCore.UI;
 using Cysharp.Threading.Tasks;
 using RR.Game.TutorialSystemV2.Realizations;
+using UnityEngine;
 
 namespace BerserkV3.GameCore.Cards
 {
@@ -75,6 +76,11 @@ namespace BerserkV3.GameCore.Cards
 
 			SetActive(ExchangeTxt, !string.IsNullOrEmpty(value));
 			Set(ExchangeTxt, value);
+		}
+
+		public void SetLavaTextColor(Color color)
+		{
+			HandCardArtView.SetLavaTextColor(color);
 		}
 	}
 
