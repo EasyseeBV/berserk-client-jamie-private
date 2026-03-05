@@ -141,6 +141,9 @@ namespace Berserk.Shared.GameCore.RuntimeObjects
 			
 			if (!exclude.Contains(EffectPhase.AfterHeal))
 				ChangeEffectPhase(EffectPhase.AfterHeal);
+
+			if (!exclude.Contains(EffectPhase.AfterHeroHealed) && Data.Type == ObjectType.Hero && initiator.RuntimeData.OwnerUserId == RuntimeData.OwnerUserId)
+				ChangeEffectPhase(EffectPhase.AfterHeroHealed);
 		}
 
 		public virtual void TryCounterAttack(

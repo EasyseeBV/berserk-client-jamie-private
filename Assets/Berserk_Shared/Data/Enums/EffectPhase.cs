@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Berserk.Shared.Data.Enums
@@ -34,12 +34,12 @@ namespace Berserk.Shared.Data.Enums
 		AfterDraw,
 		AfterHeal,
 		AfterDisable,
-
+		AfterHeroHealed,
 		#region Logic state accept phases
-		
+
 		// Use it only with effects which created trough GiveEffect.
 		// It excepts phase handle from other effects already in use.
-		
+
 		InShowAccepted,
 		InChooseAccepted,
 		InDiscardAccepted,
