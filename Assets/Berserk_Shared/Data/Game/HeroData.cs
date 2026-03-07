@@ -18,6 +18,8 @@ namespace Berserk.Shared.Data.Game
 		public int LevelAtRegistration { get; set; }
 		public ObjectType Type { get; set; }
 		public ArtType ArtType { get; set; }
+		public int AbilityCost { get; set; }
+		public int AbilityHpCost { get; set; }
 
 		// info
 		public string ArtUrl { get; set; }
