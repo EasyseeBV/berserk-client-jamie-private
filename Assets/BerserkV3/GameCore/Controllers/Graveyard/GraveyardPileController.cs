@@ -99,10 +99,21 @@ namespace BerserkV3.GameCore.Controllers.Graveyard
 	#region Previewable
 		GameObject IPreviewable.TargetView => graveyardPileView.TargetView;
 
-		public IPreviewData PreviewData => gameContext.GameRuntimePool
-			.GetCardsFilterBy(RuntimeState.InDiscard, gameRepository.GetUserIdByOwner(Owner), asQuery: true)
-			.OrderByDescending(x=> x.RuntimeData.RelativePositionX)
-			.FirstOrDefault()?.Data?.ToPreviewData();
+		public IPreviewData PreviewData
+		{
+			get
+			{
+				var topCard = gameContext.GameRuntimePool
+					.GetCardsFilterBy(RuntimeState.InDiscard, gameRepository.GetUserIdByOwner(Owner), asQuery: true)
+					.OrderByDescending(x => x.RuntimeData.RelativePositionX)
+					.FirstOrDefault();
+
+				if (topCard == null)
+					return null;
+
+				return new PreviewCardData(topCard.RuntimeData, topCard.Data);
+			}
+		}
 
 		public IPreviewSetting PreviewSettings { get; }
 
