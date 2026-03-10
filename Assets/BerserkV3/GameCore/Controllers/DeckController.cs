@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.LogicEvents;
@@ -27,6 +28,7 @@ namespace BerserkV3.GameCore.Controllers
 		private readonly IPreviewSystem previewSystem;
 		private readonly IDragDropSystem dragDropSystem;
 		private readonly IList<IDeckHolderView> views;
+		private readonly ISharedConfig sharedConfig;
 
 		[Inject]
 		public DeckController(IEnumerable<IDeckHolderView> holderViews,
@@ -35,7 +37,8 @@ namespace BerserkV3.GameCore.Controllers
 			IGameLogicEventsSource gameLogicEventsSource,
 			IGameRepository gameRepository,
 			IPreviewSystem previewSystem,
-			IDragDropSystem dragDropSystem)
+			IDragDropSystem dragDropSystem,
+			ISharedConfig sharedConfig)
 		{
 			this.gameCustomisationApplication = gameCustomisationApplication;
 			this.manualArrowSystem = manualArrowSystem;
@@ -43,6 +46,7 @@ namespace BerserkV3.GameCore.Controllers
 			this.gameRepository = gameRepository;
 			this.previewSystem = previewSystem;
 			this.dragDropSystem = dragDropSystem;
+			this.sharedConfig = sharedConfig;
 
 
 			views = new List<IDeckHolderView>(holderViews);
@@ -92,12 +96,57 @@ namespace BerserkV3.GameCore.Controllers
 
 	#region Previewable
 		public GameObject TargetView => GetViewByOwner(Owner.Self).TargetView;
-		public IPreviewData PreviewData => gameRepository.NextDeckCard?.ToPreviewData();
+		public IPreviewData PreviewData
+		{
+			get
+			{
+				var nextCard = gameRepository.NextDeckCard;
+				if (nextCard == null)
+					return null;
+
+				var preview = new PreviewCardData(nextCard);
+				ApplyOffFactionLava(preview);
+				return preview;
+			}
+		}
 		public IPreviewSetting PreviewSettings { get; }
 		public bool CanPreview()
 		{
 			return !manualArrowSystem.IsActive && !dragDropSystem.AnyDragged && PreviewData != null;
 		}
 	#endregion
+	
+	private void ApplyOffFactionLava(PreviewCardData preview)
+	{
+		if (preview == null)
+			return;
+
+		var offFactionConfig = sharedConfig.OffFactionLavaConfig;
+		if (offFactionConfig == null || !offFactionConfig.Enabled)
+			return;
+
+		var selfHero = gameRepository.GetHeroByUserId(gameRepository.SelfId);
+		if (selfHero == null)
+			return;
+
+		var heroQuadrant = selfHero.RuntimeGameObject.Data.Quadrant;
+		var cardQuadrant = preview.Quadrant;
+		var baseMana = preview.Mana;
+		var maxLava = sharedConfig.PlayerMaxMana;
+
+		var isNeutral =
+			offFactionConfig.NeutralQuadrants != null &&
+			offFactionConfig.NeutralQuadrants.Contains(cardQuadrant);
+
+		var effectiveMana = baseMana;
+
+		if (!isNeutral && cardQuadrant != heroQuadrant)
+			effectiveMana = baseMana + offFactionConfig.PenaltyPerCard;
+
+		if (effectiveMana > maxLava)
+			effectiveMana = maxLava;
+
+		preview.SetPreviewMana(effectiveMana);
+	}
 	}
 }

@@ -141,5 +141,10 @@ namespace BerserkV3.Common.PreviewSystem
 		{
 			RefreshRuntimeData();
 		}
+		public void SetPreviewMana(int value)
+		{
+			Mana = value;
+			OnUpdatePreview?.Invoke();
+		}
 	}
 }
