@@ -94,5 +94,6 @@ namespace Berserk.Shared.Data.Enums
 		Fast,
 		AttackAuraGain,
 		BuffReplaceAttackLimit,
+		SummonRandomFromMeta,
 	}
 }

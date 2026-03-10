@@ -40,6 +40,7 @@ namespace Berserk.Shared.Data.Enums
 		Confused,
 		Lava_gain,
 		AOE_Attack_Spell,
+		Illusion,
 		
 		/// <summary>
 		/// Except flag for better experience in the config
