@@ -7,5 +7,6 @@
 		TargetsCount,
 		CompareTurn,
 		CompareRound,
+		FriendlyOrEnemy,
 	}
 }
