@@ -195,10 +195,10 @@ namespace BerserkV3.GameCore.Cards
 
 		private void OnHoverExit(IHoverable hoverable)
 		{
+			TooltipController.Close();
+			
 			if (IsAllowedExternal || !IsHoverAllowed || View?.Layout?.GlowView == null || hoverable != this)
 				return;
-			
-			TooltipController.Close();
 			
 			View.GlowView.Enable(false, GlowType.Targeting);
 		}
