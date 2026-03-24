@@ -31,6 +31,9 @@ namespace UI
 			SettingsButton.onClick.AddListener(() => SettingsView.Instance.Show());
 			LobbyBus.CurrentOnlineCount.Subscribe(this, UpdateOnlineView);
 			UpdateOnlineView(LobbyBus.CurrentOnlineCount.Value);
+
+			// Jamie's PBT Redesign — wire up bottom panel buttons
+			InitRedesignButtons();
 			
 			disposables.Add(DeckBtn.SetHintTarget(TutorialTrigger.DecksBtn.ToString()).SetTransitionFactorSize().Init().Subscribe(DeckBtn.Get()));
 			disposables.Add(PlayBtn.SetHintTarget(TutorialTrigger.LeaguesBtn.ToString()).SetTransitionFactorSize().Init().Subscribe(PlayBtn.Get()));
