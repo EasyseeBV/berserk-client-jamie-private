@@ -19,6 +19,11 @@ namespace BerserkV3.GameCore.SplineSystem
 		public SplineType SplineType => splineType;
 		public int SegmentCount { get; set; } = 6;
 		private IGameContext gameContext;
+
+		public float GetArcSize() => arcSize;
+		public void SetArcSize(float value) => arcSize = value;
+		public Vector2 GetArcScale() => arcScale;
+		public void SetArcScale(Vector2 value) => arcScale = value;
 		
 		public TargetTransform Evaluate(float relativePositionX)
 		{

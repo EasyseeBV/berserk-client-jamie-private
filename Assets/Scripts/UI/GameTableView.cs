@@ -23,6 +23,7 @@ namespace UI
 		protected override void Start()
 		{
 			base.Start();
+			GameTableViewMinimal.EnsureInitialized();
 			YourTurnPanelOverlay.gameObject.SetActive(false);
 			yourTurnCvG = YourTurnPanelOverlay.GetComponent<CanvasGroup>();
 
