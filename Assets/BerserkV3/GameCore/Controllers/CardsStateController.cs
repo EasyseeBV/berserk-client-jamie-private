@@ -22,6 +22,7 @@ using BerserkV3.GameCore.UI;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Sirenix.Utilities;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -97,11 +98,13 @@ namespace BerserkV3.GameCore.Controllers
 		public void Initialize()
 		{
 			gameLogicEventsSource.Subscribe<ChangeCardsState>(ChangeCardsStateAsync, Token);
+			BoardLayoutSettings.Changed += OnBoardLayoutChanged;
 		}
 
 		public override void Dispose()
 		{
 			base.Dispose();
+			BoardLayoutSettings.Changed -= OnBoardLayoutChanged;
 			rearrangeTableSelf?.Cancel();
 			rearrangeTableSelf?.Dispose();
 			rearrangeTableOpponent?.Cancel();
@@ -114,8 +117,12 @@ namespace BerserkV3.GameCore.Controllers
 		{
 			var changedCards = state.CardIds
 				.Select(gameRepository.GetCardViewByRuntimeId)
+				.Where(x => x != null && x.RuntimeData != null)
 				.OrderBy(x => x.RuntimeData.RelativePositionX)
 				.ToArray();
+
+			if (changedCards.Length == 0)
+				return;
 
 			var selfChangedCards = changedCards
 				.Where(c => c.IsSelf)
@@ -302,9 +309,15 @@ namespace BerserkV3.GameCore.Controllers
 		{
 			newCardsOnTableViews?.ForEach(x =>
 			{
+				x.SetLocalState(RuntimeState.InTable);
 				x.SelfContainer.SetAnchorsInCenter();
 				x.SelfContainer.SetParent(gameContainers.TableContainer, false);
 				x.SelfContainer.localRotation = Quaternion.identity;
+				x.SelfContainer.localScale = Vector3.one;
+				x.SelfContainer.SetAsLastSibling();
+				x.Layout?.SetAlpha(1f);
+				x.SetSize(GetTableCardScale(gameRepository.GetOwnerByUserId(x.RuntimeData.OwnerUserId)));
+				x.Refresh();
 			});
 		}
 
@@ -435,6 +448,35 @@ namespace BerserkV3.GameCore.Controllers
 			return animatorApplication.RestorePositionsAsync(targets, token.Value, duration:duration);
 		}
 
+		private void OnBoardLayoutChanged()
+		{
+			ApplyTableCardSizing(Owner.Self);
+			ApplyTableCardSizing(Owner.Opponent);
+			RearrangeTableAsync(true, Owner.Self).Forget();
+			RearrangeTableAsync(true, Owner.Opponent).Forget();
+		}
+
+		private void ApplyTableCardSizing(Owner owner)
+		{
+			var scale = GetTableCardScale(owner);
+			foreach (var cardView in GetCardsInTable(owner))
+			{
+				cardView.SetSize(scale);
+				cardView.Refresh();
+			}
+		}
+
+		private float GetTableCardScale(Owner owner)
+		{
+			if (!BoardLayoutSettings.IsCompact())
+				return 1f;
+
+			var count = GetCardsInTable(owner).Length;
+			var isMinimal = BoardLayoutSettings.IsMinimal();
+			var scale = (isMinimal ? 0.90f : 0.92f) - Mathf.Max(0, count - 1) * (isMinimal ? 0.06f : 0.06f);
+			return Mathf.Clamp(scale, isMinimal ? 0.58f : 0.58f, isMinimal ? 0.85f : 0.84f);
+		}
+
 		private UniTask RearrangeHandCardsAsync(ICardView[] selfCards)
 		{
 			var tasks = new List<UniTask>();
@@ -488,6 +530,7 @@ namespace BerserkV3.GameCore.Controllers
 			return gameContext.GameRuntimePool
 				.GetCardsFilterBy(RuntimeState.InTable, gameRepository.GetUserIdByOwner(owner), ObjectType.TableCardsMask)
 				.Select(c => gameRepository.GetCardViewByRuntimeId(c.RuntimeData.Id))
+				.Where(c => c != null && c.RuntimeData != null)
 				.OrderBy(c => c.RuntimeData.RelativePositionX)
 				.ToArray();
 		}

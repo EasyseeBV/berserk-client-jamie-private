@@ -1,4 +1,7 @@
-﻿using Berserk.Shared.GameCore.Abstraction;
+﻿using System;
+using System.Linq;
+using Berserk.Shared.Data.Enums;
+using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.RuntimeObjects;
 using BerserkV3.Common.InputSystem.DragDropSystem;
 using BerserkV3.Common.InputSystem.HoveringSystem;
@@ -6,6 +9,7 @@ using BerserkV3.Common.InputSystem.SelectionSystem;
 using BerserkV3.Common.PreviewSystem;
 using BerserkV3.GameCore.TargetSystem.Abstraction;
 using BerserkV3.GameCore.TooltipPopup;
+using UI;
 using UnityEngine;
 using Zenject;
 
@@ -23,7 +27,7 @@ namespace BerserkV3.GameCore.Cards
 		protected IGameLogicContext GameLogicContext;
 		protected ITooltipPopupDoubleSidedController TooltipController;
 		public IEffectHintsApplication EffectHintsApplication { get; private set; }
-		protected virtual float CardSize => 1f;
+		protected virtual float CardSize => ResolveCardSize();
 		public override ICardView View { get; set; }
 		
 		[Inject]
@@ -76,6 +80,27 @@ namespace BerserkV3.GameCore.Cards
 			View.SetSize(CardSize);
 			View.Layout.Refresh();
 			SetTitleTextActive(View.MarkedAsSelected);
+		}
+
+		private float ResolveCardSize()
+		{
+			if (!BoardLayoutSettings.IsCompact())
+				return 1f;
+
+			var ownerUserId = View?.RuntimeData?.OwnerUserId;
+			if (string.IsNullOrWhiteSpace(ownerUserId) || GameContext?.GameRuntimePool == null)
+				return 0.72f;
+
+			var count = GameContext.GameRuntimePool
+				.OfType<IRuntimeGameCard>()
+				.Count(card =>
+					card.RuntimeData.State == RuntimeState.InTable &&
+					card.RuntimeData.OwnerUserId == ownerUserId &&
+					ObjectType.TableCardsMask.HasFlag(card.Data.Type));
+
+			var isMinimal = BoardLayoutSettings.IsMinimal();
+			var scale = (isMinimal ? 0.90f : 0.92f) - Math.Max(0, count - 1) * (isMinimal ? 0.06f : 0.06f);
+			return Mathf.Clamp(scale, isMinimal ? 0.58f : 0.58f, isMinimal ? 0.85f : 0.84f);
 		}
 		
 		protected override void OnAllowPreviewChanged()

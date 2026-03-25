@@ -23,16 +23,31 @@ namespace UI
 		protected override void Start()
 		{
 			base.Start();
+			GameTableViewMinimal.EnsureInitialized();
 			YourTurnPanelOverlay.gameObject.SetActive(false);
 			yourTurnCvG = YourTurnPanelOverlay.GetComponent<CanvasGroup>();
 
 			GameBus.CurrentRound.Subscribe(this, OnNextRound);
 			GameBus.OnVulcaniteDies.Subscribe(this, OnActorDies);
 
-			SettingsBtn.Subscribe(() => SettingsView.Instance.Show());
+			SettingsBtn.Subscribe(ShowSettings);
 			VersionTxt.SetText(EnvironmentSwitcher.GetCurrentVersion());
 
 			ResolverBus.OnMulliganFinished.Subscribe(this, ShowCommend);
+		}
+
+		private static void ShowSettings()
+		{
+			var view = SettingsView.Instance;
+			if (view == null)
+			{
+				var views = Resources.FindObjectsOfTypeAll<SettingsView>();
+				if (views != null && views.Length > 0)
+					view = views[0];
+			}
+
+			if (view != null)
+				view.Show();
 		}
 
 		private async void ShowCommend()

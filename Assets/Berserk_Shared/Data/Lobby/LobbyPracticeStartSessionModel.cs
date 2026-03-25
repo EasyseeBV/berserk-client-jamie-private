@@ -7,5 +7,6 @@ namespace Berserk.Shared.Data.Lobby
 		public MatchMode MatchMode { get; set; }
 		public PracticeMode Difficulty { get; set; }
 		public string DeckId { get; set; }
+		public string BotDeckId { get; set; }
 	}
 }

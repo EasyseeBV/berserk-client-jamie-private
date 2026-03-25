@@ -172,28 +172,31 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 
 		private static void RearrangeHorizontal(IReadOnlyList<ICardView> cardViews)
 		{
-			if (cardViews == null)
+			if (cardViews == null || cardViews.Count == 0)
 				return;
 
-			var space = 150f;
-			var cardSize = cardViews.Max(x => x.SelfContainer.rect.width);
-			var halfCardSize = cardSize / 2f;
-			var layoutOffset = (GetPosition(cardViews.Count - 1) - cardSize) / 2f;
+			if (cardViews.Count == 1)
+			{
+				var only = cardViews[0];
+				var centeredPosition = only.SelfContainer.localPosition;
+				centeredPosition.x = 0f;
+				only.SelfContainer.localPosition = centeredPosition;
+				return;
+			}
+
+			var parent = cardViews[0].SelfContainer.parent as RectTransform;
+			var availableWidth = parent != null
+				? Mathf.Clamp(parent.rect.width * 0.78f, 1400f, 2100f)
+				: 1600f;
+			var startX = -availableWidth / 2f;
+			var step = availableWidth / (cardViews.Count - 1);
 
 			for (var i = 0; i < cardViews.Count; i++)
 			{
 				var view = cardViews[i];
 				var position = view.SelfContainer.localPosition;
-
-				position.x = GetPosition(i) - layoutOffset;
+				position.x = startX + (step * i);
 				view.SelfContainer.localPosition = position;
-			}
-
-			return;
-
-			float GetPosition(int index)
-			{
-				return ((cardSize + space) * index) - (halfCardSize + space);
 			}
 		}
 

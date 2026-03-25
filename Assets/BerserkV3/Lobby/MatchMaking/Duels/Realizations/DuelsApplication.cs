@@ -111,10 +111,16 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		
 		private async UniTask StartPracticeAsync()
 		{
+			if (deckApplication.Current == null)
+			{
+				NotifyClientException(gameDatabase.GetLocalization("ClientDuels_ValidateDeck_NoDeckSelected"));
+				return;
+			}
+
 			var model = new LobbyPracticeStartSessionModel
 			{
 				MatchMode = MatchMode.Practice,
-				Difficulty = PracticeMode.Normal,
+				Difficulty = PracticeMode.Hard,
 				DeckId = deckApplication.Current.Id
 			};
 			var response = await LobbyAPI.PostPracticeStartSession(model);
@@ -133,7 +139,10 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 		
 		private UniTask RefreshUserInfoAsync()
 		{
-			var ownedVulcanite = User.OwnedVulcanites.FirstOrDefault(x=> x.Id == deckApplication.Current.OwnedVulcaniteId);
+			var currentDeck = deckApplication.Current;
+			var ownedVulcanite = currentDeck == null
+				? null
+				: User.OwnedVulcanites.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
 			var heroData = gameDatabase.GetHero(ownedVulcanite?.VulcaniteId);
 			var frameUrl = customisationsRepository.GetFirstEquipped(CustomisationType.AvatarFrame)?.PreviewURL;
 			var avatarUrl = heroData?.ArtUrl;

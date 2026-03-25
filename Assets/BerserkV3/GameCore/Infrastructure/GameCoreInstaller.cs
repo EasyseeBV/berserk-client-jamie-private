@@ -69,6 +69,10 @@ namespace BerserkV3.GameCore.Infrastructure
 				.AsSingle()
 				.NonLazy();
 
+			Container.BindInterfacesTo<AutoPilotController>()
+				.AsSingle()
+				.NonLazy();
+
 			Container.BindInterfacesTo<TableController>()
 				.AsSingle()
 				.NonLazy();

@@ -63,8 +63,12 @@ namespace BerserkV3.Init.Applications
 			try
 			{
 				HTTPManager.Setup();
+#if UNITY_EDITOR
+				EnvironmentSwitcher.SwitchEnvironment(Environment.LocalHost);
+#else
 				if (EnvironmentSwitcher.CurrentEnvironment <= Environment.Staging)
 					await ServerChoiceView.Instance.Init();
+#endif
 
 				if (EnvironmentSwitcher.CurrentEnvironment > Environment.LocalHost)
 					HTTPManager.RequestTimeout = TimeSpan.FromSeconds(60);

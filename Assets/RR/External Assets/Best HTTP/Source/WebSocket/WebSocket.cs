@@ -127,6 +127,13 @@ namespace BestHTTP.WebSocket
         public WebSocket(Uri uri)
             :this(uri, string.Empty, string.Empty)
         {
+#if UNITY_EDITOR
+            if (uri.AbsolutePath.IndexOf("/hubs/game", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                this.Extensions = Array.Empty<IExtension>();
+                return;
+            }
+#endif
 #if (!UNITY_WEBGL || UNITY_EDITOR) && !BESTHTTP_DISABLE_GZIP
             this.Extensions = new IExtension[] { new PerMessageCompression(/*compression level: */           Decompression.Zlib.CompressionLevel.Default,
                                                                            /*clientNoContextTakeover: */     false,
@@ -141,6 +148,13 @@ namespace BestHTTP.WebSocket
         public WebSocket(Uri uri, string origin, string protocol)
             :this(uri, origin, protocol, null)
         {
+#if UNITY_EDITOR
+            if (uri.AbsolutePath.IndexOf("/hubs/game", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                this.Extensions = Array.Empty<IExtension>();
+                return;
+            }
+#endif
 #if !BESTHTTP_DISABLE_GZIP
             this.Extensions = new IExtension[] { new PerMessageCompression(/*compression level: */           Decompression.Zlib.CompressionLevel.Default,
                                                                            /*clientNoContextTakeover: */     false,

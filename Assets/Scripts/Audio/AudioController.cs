@@ -23,6 +23,10 @@ namespace Vulcan.Audio
 		{
 			if (clip == Clip.None)
 				return;
+
+#if UNITY_EDITOR
+			return;
+#endif
 			
 			var source = Instance.GetFreeSource();
 			source.LoadResourceAsync(clip.ToString())

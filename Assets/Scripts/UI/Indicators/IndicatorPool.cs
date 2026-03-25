@@ -2,6 +2,7 @@ using Events;
 using Lean.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Mathf = UnityEngine.Mathf;
 
 namespace UI
 {
@@ -24,7 +25,7 @@ namespace UI
         private void ShowDamageIndicator(Vector3 targetPos, int damage)
         {
             var indicator = GetIndicator(IndicatorType.Damage);
-            indicator.Show(targetPos, -damage);
+            indicator.Show(targetPos, Mathf.Abs(damage));
         }
 
         private Indicator GetIndicator(IndicatorType type)

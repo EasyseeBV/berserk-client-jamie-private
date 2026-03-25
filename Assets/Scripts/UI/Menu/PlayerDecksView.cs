@@ -89,14 +89,21 @@ namespace UI
 				SetActive(deckItem, true);
 				deckItems.Add(deck.Id, deckItem);
 			}
-			
-			SelectDeck(DeckApplicationAdapter.Application.Current.Id);
+
+			SelectDeck(DeckApplicationAdapter.Application.Current?.Id ?? deckModels.FirstOrDefault()?.Id);
 			OnRentRefreshed();
 		}
 		
 		private void SetSelectedDeckFirst()
 		{
-			var currentDeck = deckModels.FirstOrDefault(x => x.Id == DeckApplicationAdapter.Application.Current.Id);
+			var currentId = DeckApplicationAdapter.Application.Current?.Id;
+			if (string.IsNullOrEmpty(currentId))
+				return;
+
+			var currentDeck = deckModels.FirstOrDefault(x => x.Id == currentId);
+			if (currentDeck == null)
+				return;
+
 			deckModels.Remove(currentDeck);
 			deckModels.Insert(0, currentDeck);
 		}
@@ -176,15 +183,30 @@ namespace UI
 			if (string.IsNullOrEmpty(selectedDeck) || !deckModels.Exists(deck => deck.Id == selectedDeck))
 			{
 				RRLogger.Warning($"[{nameof(PlayerDecksView)}] - selected deck does not represented in collection");
-				selectedDeck = DeckApplicationAdapter.Application.Current.Id;
+				selectedDeck = DeckApplicationAdapter.Application.Current?.Id ?? deckModels.FirstOrDefault()?.Id;
 			}
+
+			if (string.IsNullOrEmpty(selectedDeck))
+				return;
 			
 			var currentDeck = GetCurrentDeckModel();
-			DeckTitleText.SetText(currentDeck.Name);
+			if (currentDeck == null)
+				return;
 
+			DeckTitleText.SetText(currentDeck.Name);
+	
 			var gameDataBase = GameDataBaseAdapter.Instance;
 			var ownedHero = VulcaniteHandler.Owned.FirstOrDefault(x => x.Id == currentDeck.OwnedVulcaniteId);
 			var heroData = gameDataBase.GetHero(ownedHero?.VulcaniteId);
+			if (heroData == null)
+			{
+				playerView.SetArt(null);
+				playerView.SetName("No Vulcanite");
+				DescriptionContainer.gameObject.SetActive(false);
+				LevelTxt.text = "-";
+				EffectTxt.text = string.Empty;
+				return;
+			}
 			playerView.SetArt(heroData.ArtUrl);
 			playerView.SetName(heroData.Name);
 			DescriptionContainer.gameObject.SetActive(heroData.EffectsIds.Any());

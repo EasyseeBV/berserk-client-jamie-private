@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using Vulcan.Audio;
+using Mathf = UnityEngine.Mathf;
 
 namespace BerserkV3.GameCore.EffectsVisual.Visuals
 {
@@ -39,7 +40,8 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 		{
 			var target = Executor.SelfContainer;
 			var arg = Model.GetRuntimeArg<ObjectStatEffectArg>();
-			var damageText = $"{arg.To - arg.From}";
+			var damageValue = Mathf.Abs(arg.From - arg.To);
+			var damageText = $"{damageValue}";
 			var indicator = (VFXText) VfxApplication.SpawnVfxToParent(EffectVisualKeyword.TakeHit);
 			indicator.SetPosition(target.position);
 			indicator.SetText(damageText);

@@ -106,6 +106,13 @@ namespace BerserkV3.GameCore.Network
 			await SendAsync("ReadyToInitialize").AsUniTask();
 			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] Sent successful ReadyToInitialize");
 		}
+
+		public async UniTask AutoPerformCommandAsync()
+		{
+			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] Try send AutoPerformCommand");
+			await SendAsync("AutoPerformCommand").AsUniTask();
+			DefaultSharedLogger.Log($"[{GetType().Name.Orange()}] Sent successful AutoPerformCommand");
+		}
 		
 		private bool HandleInternalSignalTypes(Message message)
 		{

@@ -8,8 +8,8 @@ namespace BerserkV3.GameCore.SplineSystem
 {
 	public class HandSpline : MonoBehaviour, ISpline
 	{
-		[SerializeField] private float arcSize = 8;
-		[SerializeField] private Vector2 arcScale = new Vector2(300, 200);
+		[SerializeField] private float arcSize = 7.6f;
+		[SerializeField] private Vector2 arcScale = new Vector2(1300, 777.8f);
 		[SerializeField] private SplineType splineType = SplineType.HandSelf;
 		[SerializeField] private Transform splineCenter;
 	#if UNITY_EDITOR
@@ -19,6 +19,26 @@ namespace BerserkV3.GameCore.SplineSystem
 		public SplineType SplineType => splineType;
 		public int SegmentCount { get; set; } = 6;
 		private IGameContext gameContext;
+
+		public float GetArcSize()
+		{
+			return arcSize;
+		}
+
+		public void SetArcSize(float value)
+		{
+			arcSize = value;
+		}
+
+		public Vector2 GetArcScale()
+		{
+			return arcScale;
+		}
+
+		public void SetArcScale(Vector2 value)
+		{
+			arcScale = value;
+		}
 		
 		public TargetTransform Evaluate(float relativePositionX)
 		{

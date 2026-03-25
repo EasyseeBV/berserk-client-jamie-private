@@ -25,7 +25,6 @@ namespace RR.Network.SignalRCore
 				RRLogger.Log($"[{GetType().Name.Orange().Bold()}] : Already Initialized!");
 				return this;
 			}
-			
 			this.serverAddress = serverAddress;
 			this.hubName = hubName;
 

@@ -42,6 +42,10 @@ namespace Vulcan.Audio
 				RRLogger.Error($"Cant play Clip.{clip} music");
 				return;
 			}
+
+#if UNITY_EDITOR
+			return;
+#endif
 			
 			var source = Instance.GetFreeSource();
 			source.LoadResourceAsync(clip.ToString())

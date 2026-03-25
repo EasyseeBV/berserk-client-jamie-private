@@ -66,7 +66,7 @@ namespace BerserkV3.Lobby.UI.Leagues
 		public void SetDeclineButtonVisible(bool value)
 		{
 			DeclineBtn.gameObject.SetActive(value);
-			AcceptBtn.SetInteractable(value);
+			DeclineBtn.SetInteractable(value);
 		}
 
 		public void SetCancelButtonVisible(bool value)

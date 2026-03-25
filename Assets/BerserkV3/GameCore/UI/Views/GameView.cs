@@ -3,6 +3,7 @@ using DG.Tweening;
 using RR.Game.TutorialSystemV2.Realizations;
 using RR.UI.FrameSystem;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BerserkV3.GameCore.UI
 {
@@ -53,9 +54,19 @@ namespace BerserkV3.GameCore.UI
 		protected override void OnAwake()
 		{
 			base.OnAwake();
+			EnsureHeroRenderPriority(SelfHeroPoint);
+			EnsureHeroRenderPriority(OpponentHeroPoint);
 			TutorialGameBoardRect.SetHintTarget($"{TutorialTrigger.GameBoard}").SetTransitionFactorSize().Init();
 			HandSelfContainer.SetHintTarget($"{TutorialTrigger.GameHandSelf}").SetTransitionFactorSize().Init();
 			SetActiveCommendText(false);
+		}
+
+		private static void EnsureHeroRenderPriority(RectTransform heroPoint)
+		{
+			if (!heroPoint)
+				return;
+
+			heroPoint.SetAsLastSibling();
 		}
 
 		public void SetActiveteYourTurn(bool value)

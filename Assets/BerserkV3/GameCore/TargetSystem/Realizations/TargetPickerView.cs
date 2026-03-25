@@ -25,17 +25,30 @@ namespace BerserkV3.GameCore.TargetSystem
 		private void Awake()
 		{
 			gameObject.SetActive(Enabled = false);
+			EnsureLineInitialized();
+			line.enabled = false;
+			arrowHeadImage.enabled = false;
 			arrowBodyPlaceHolder.LoadResourceAsync("Arrow_Body", relesePrevious:releasePrevious)
-				.ContinueWith(() => line.sprite = arrowBodyPlaceHolder.sprite)
+				.ContinueWith(() => line.sprite = arrowBodyPlaceHolder.sprite != null ? arrowBodyPlaceHolder.sprite : arrowHeadImage.sprite)
 				.Forget();
 			
-			arrowHeadImage.LoadResourceAsync("Arrow_Head", relesePrevious:releasePrevious).Forget();
+			arrowHeadImage.LoadResourceAsync("Arrow_Head", relesePrevious:releasePrevious)
+				.ContinueWith(() =>
+				{
+					if (!line.sprite)
+						line.sprite = arrowHeadImage.sprite;
+				})
+				.Forget();
 			releasePrevious = true;
 		}
 
 		public void Enable(Transform fromTaget)
 		{
 			fromTarget = fromTaget;
+			EnsureLineInitialized();
+			transform.SetAsLastSibling();
+			line.enabled = true;
+			arrowHeadImage.enabled = true;
 			gameObject.SetActive(Enabled = true);
 			RRLogger.Log("Arrow init drag");
 		}
@@ -43,14 +56,18 @@ namespace BerserkV3.GameCore.TargetSystem
 		public void Disable()
 		{
 			fromTarget = null;
+			line.enabled = false;
+			arrowHeadImage.enabled = false;
 			gameObject.SetActive(Enabled = false);
 			RRLogger.Log("Arrow end drag");
 		}
 		
 		public void Drag(Vector3 position)
 		{
-			if (!Enabled || !fromTarget.Value() || line.Points.Length == 0)
+			if (!Enabled || !fromTarget.Value())
 				return;
+
+			EnsureLineInitialized();
 
 			var localPos = selfContainer.parent.InverseTransformPoint(position);
 			selfContainer.localPosition = new Vector3(localPos.x, localPos.y, 0);
@@ -60,7 +77,7 @@ namespace BerserkV3.GameCore.TargetSystem
 			var e = (v1 - v0).normalized * segmentLength;
 			v0 += e / 2;
 
-			var length = (int)((v1 - v0).magnitude / segmentLength);
+			var length = Mathf.Max(1, (int)((v1 - v0).magnitude / segmentLength));
 			var angle = Mathf.Atan2(e.y, e.x) * Mathf.Rad2Deg;
 
 			line.Points = new Vector2[length + 1];
@@ -72,6 +89,21 @@ namespace BerserkV3.GameCore.TargetSystem
 
 			arrowRect.localRotation = Quaternion.AngleAxis(angle, Vector3.forward);
 			line.Rebuild(CanvasUpdate.PostLayout);
+		}
+
+		private void EnsureLineInitialized()
+		{
+			if (line == null)
+				return;
+
+			if (line.Points != null && line.Points.Length > 0)
+				return;
+
+			line.Points = new[]
+			{
+				Vector2.zero,
+				new Vector2(segmentLength, 0)
+			};
 		}
 
 		private void OnDestroy()

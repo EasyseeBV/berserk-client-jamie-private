@@ -1,4 +1,5 @@
 ﻿using BerserkV3.Common.Abstractions;
+using BerserkV3.Common.Network;
 using BerserkV3.Common.SceneService;
 using BerserkV3.Common.TutorialSystem;
 using BerserkV3.Common.Utils;
@@ -7,6 +8,7 @@ using BerserkV3.Lobby.MatchMaking.Sessions;
 using BerserkV3.Startup.Abstractions;
 using BerserkV3.Startup.Authorization;
 using Cysharp.Threading.Tasks;
+using Environment = BerserkV3.Startup.Network.Enums.Environment;
 
 namespace BerserkV3.Startup.Applications
 {
@@ -41,6 +43,15 @@ namespace BerserkV3.Startup.Applications
 				await authenticationApplication.AuthenticationAsync();
 			
 			User.RemoveRedirections<IAuthArg>();
+
+#if UNITY_EDITOR
+			if (EnvironmentSwitcher.CurrentEnvironment == Environment.LocalHost)
+			{
+				await sceneService.LoadAsync(Scene.Lobby).AddLoadingTask();
+				return true;
+			}
+#endif
+
 			await tutorialApplication.InitAsync().AddLoadingTask();
 			if (await sessionsApplication.TryConnectGameAsync().AddLoadingTask())
 				return true; // redirected

@@ -12,6 +12,7 @@ using BerserkV3.GameCore.Cards;
 using BerserkV3.GameCore.LogicEventsProcessor;
 using BerserkV3.GameCore.Repository;
 using RR.Core.Extensions;
+using UI;
 using Zenject;
 using Object = UnityEngine.Object;
 
@@ -74,10 +75,22 @@ namespace BerserkV3.GameCore.Controllers
 			mockRuntimeObject.UpdateState(RuntimeState.InHand);
 		}
 		
-		private void Evaluate(int count)
-		{
-			if (count < existedCards.Count)
+			private void Evaluate(int count)
 			{
+				if (BoardLayoutSettings.IsCompact())
+				{
+					foreach (var cardView in existedCards.ToArray())
+					{
+						existedCards.Remove(cardView);
+						if (cardView?.SelfContainer != null && cardView.SelfContainer.Value())
+							Object.Destroy(cardView.SelfContainer.gameObject);
+					}
+
+					return;
+				}
+
+				if (count < existedCards.Count)
+				{
 				var removeCount = existedCards.Count - count;
 				var remove = existedCards.TakeLast(removeCount).ToArray();
 				foreach (var cardView in remove)
