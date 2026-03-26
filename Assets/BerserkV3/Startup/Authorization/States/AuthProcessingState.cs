@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Berserk.Shared.GameCore.Abstraction;
 using Berserk.Shared.GameCore.LogicContext;
 using BerserkV3.Common.AnalyticsSystem;
+using BerserkV3.Common.Network;
 using BerserkV3.Common.SerializedHelper;
 using BerserkV3.Common.StateMachine;
 using BerserkV3.Common.Utils;
-using BerserkV3.Common.Network;
 using BerserkV3.Generic.Customisation;
 using BerserkV3.Lobby.Deck;
 using BerserkV3.Startup.Abstractions;
@@ -14,7 +14,6 @@ using BerserkV3.Startup.Network;
 using BerserkV3.Startup.UI;
 using BerserkV3.Startup.Utils;
 using Cysharp.Threading.Tasks;
-using Environment = BerserkV3.Startup.Network.Enums.Environment;
 
 namespace BerserkV3.Startup.Authorization
 {
@@ -60,10 +59,6 @@ namespace BerserkV3.Startup.Authorization
 
 			try
 			{
-#if UNITY_EDITOR
-				if (EnvironmentSwitcher.CurrentEnvironment == Environment.LocalHost)
-					model.IsAcceptedPrivacyPolicy = true;
-#endif
 				if (!model.IsAcceptedPrivacyPolicy)
 				{
 					var authThermsArg = AuthThermsArgs.Default();
