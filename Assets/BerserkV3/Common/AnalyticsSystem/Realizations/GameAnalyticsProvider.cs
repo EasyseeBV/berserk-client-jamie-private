@@ -18,6 +18,12 @@ namespace BerserkV3.Common.AnalyticsSystem
 		public GameAnalyticsProvider()
 		{
 			var loadedAnalyticsGameObject = Resources.Load(GAME_ANALYTICS_PREFAB_PATH);
+			if (loadedAnalyticsGameObject == null)
+			{
+				RRLogger.Error($"{typeof(GameAnalyticsProvider)} missing Resources/{GAME_ANALYTICS_PREFAB_PATH}. Analytics init will be skipped.");
+				return;
+			}
+
 			var analyticsGameObject = Object.Instantiate(loadedAnalyticsGameObject);
 			Object.DontDestroyOnLoad(analyticsGameObject);
 		}
