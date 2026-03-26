@@ -34,7 +34,7 @@ namespace BerserkV3.Lobby.MatchMaking.Practice
 		{
 			var model = new LobbyPracticeStartSessionModel
 			{
-				Difficulty = PracticeMode.Normal,
+				Difficulty = PracticeMode.Hard,
 				MatchMode = MatchMode.Practice,
 				DeckId = deckApplication.Current?.Id
 			};

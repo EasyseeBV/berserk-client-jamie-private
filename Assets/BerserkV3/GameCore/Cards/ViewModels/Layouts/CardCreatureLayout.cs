@@ -12,6 +12,7 @@ using RR.Core.ResourceManagament;
 using RR.Core.DebugSystem;
 using RR.Game.TutorialSystemV2.Realizations;
 using TMPro;
+using UI;
 using UnityEngine;
 
 namespace BerserkV3.GameCore.Cards
@@ -51,6 +52,17 @@ namespace BerserkV3.GameCore.Cards
 		private ArtType? loadedArtType;
 		private FaceId? currentFaceId;
 		private readonly List<FaceId> faceIdStack = new();
+		private bool compactStatOffsetsCached;
+		private Vector2 attackStatOriginalPosition;
+		private Vector2 healthStatOriginalPosition;
+			private Vector2 armorStatOriginalPosition;
+			private Vector3 attackStatOriginalScale;
+			private Vector3 healthStatOriginalScale;
+			private Vector3 armorStatOriginalScale;
+			private bool compactStatCanvasConfigured;
+			private Canvas attackStatCanvas;
+			private Canvas healthStatCanvas;
+			private Canvas armorStatCanvas;
 		
 		protected virtual string TurnShineArtUrl => "Card_Shine_{0}";
 		protected virtual string TargetShineArtUrl => TurnShineArtUrl;
@@ -66,10 +78,12 @@ namespace BerserkV3.GameCore.Cards
 		public bool IsArmorVisible { get; protected set; }
 		public bool IsAttackVisible { get; protected set; } = true;
 
-		protected override async UniTask OnEnabledAsync(CancellationToken token)
-		{
-			SetupHintTargets();
-			await UniTask.WhenAll(
+			protected override async UniTask OnEnabledAsync(CancellationToken token)
+			{
+				CacheCompactStatOffsets();
+				ConfigureCompactStatCanvases();
+				SetupHintTargets();
+				await UniTask.WhenAll(
 				base.OnEnabledAsync(token),
 				AddFaceAsync(FaceId.Default, token),
 				LoadMainArt(RuntimeGameObject.Data.ArtType, RuntimeGameObject.Data.ArtUrl, token),
@@ -78,6 +92,7 @@ namespace BerserkV3.GameCore.Cards
 				ArmorStatImage.LoadResourceAsync(ArmorArtUrl, token, previouseCommonRelease));
 
 			previouseCommonRelease = true;
+			ApplyCompactStatLayout();
 			Refresh();
 			
 			RuntimeData.Armor.OnChangedFrom += OnArmorChanged;
@@ -142,6 +157,7 @@ namespace BerserkV3.GameCore.Cards
 		public override void Refresh()
 		{
 			base.Refresh();
+			ApplyCompactStatLayout();
 			
 			if (RuntimeData == null)
 				return;
@@ -199,6 +215,106 @@ namespace BerserkV3.GameCore.Cards
 			AttackStatImage.SetHintTarget($"{TutorialTrigger.CreatureAttack}_{GetOwner()}_{RuntimeGameObject.Data.Id}").SetTransitionFactorSize().Init();
 			selfContainer.SetHintTarget($"{TutorialTrigger.CreatureBounds}_{GetOwner()}_{RuntimeGameObject.Data.Id}").SetTransitionFactorSize().Init();
 		}
+
+			private void CacheCompactStatOffsets()
+			{
+			if (compactStatOffsetsCached)
+				return;
+
+			if (AttackStatImage != null)
+			{
+				attackStatOriginalPosition = AttackStatImage.rectTransform.anchoredPosition;
+				attackStatOriginalScale = AttackStatImage.rectTransform.localScale;
+			}
+
+			if (HealthStatImage != null)
+			{
+				healthStatOriginalPosition = HealthStatImage.rectTransform.anchoredPosition;
+				healthStatOriginalScale = HealthStatImage.rectTransform.localScale;
+			}
+
+			if (ArmorStatImage != null)
+			{
+				armorStatOriginalPosition = ArmorStatImage.rectTransform.anchoredPosition;
+				armorStatOriginalScale = ArmorStatImage.rectTransform.localScale;
+			}
+
+				compactStatOffsetsCached = true;
+			}
+
+			private void ConfigureCompactStatCanvases()
+			{
+				if (compactStatCanvasConfigured)
+					return;
+
+				attackStatCanvas = EnsureStatCanvas(AttackStatImage, 200);
+				healthStatCanvas = EnsureStatCanvas(HealthStatImage, 201);
+				armorStatCanvas = EnsureStatCanvas(ArmorStatImage, 202);
+				compactStatCanvasConfigured = true;
+			}
+
+			private static Canvas EnsureStatCanvas(Component statComponent, int sortingOrder)
+			{
+				if (!statComponent)
+					return null;
+
+				var canvas = statComponent.GetComponent<Canvas>();
+				if (!canvas)
+					canvas = statComponent.gameObject.AddComponent<Canvas>();
+
+				canvas.overrideSorting = true;
+				canvas.sortingOrder = sortingOrder;
+				return canvas;
+			}
+
+			private void ApplyCompactStatLayout()
+			{
+				if (!compactStatOffsetsCached)
+					return;
+
+				var compact = BoardLayoutSettings.IsCompact();
+				var minimal = BoardLayoutSettings.IsMinimal();
+				// Minimal: nudge stats outward so they don't overlap card art or neighbors
+			// Attack is bottom-LEFT (orig x:-95), Health is bottom-RIGHT (orig x:+95)
+			var attackOffset = compact ? new Vector2(-12f, -10f) : Vector2.zero;
+			var healthOffset = compact ? new Vector2(12f, -10f) : Vector2.zero;
+			var armorOffset = compact ? new Vector2(-8f, 4f) : Vector2.zero;
+			var scale = compact ? 0.78f : 1f;
+				var statScale = Vector3.one * scale;
+				ApplyStatCanvasState(attackStatCanvas, compact, 200);
+				ApplyStatCanvasState(healthStatCanvas, compact, 201);
+				ApplyStatCanvasState(armorStatCanvas, compact, 202);
+
+				if (AttackStatImage != null)
+				{
+					AttackStatImage.rectTransform.SetAsLastSibling();
+					AttackStatImage.rectTransform.anchoredPosition = attackStatOriginalPosition + attackOffset;
+					AttackStatImage.rectTransform.localScale = Vector3.Scale(attackStatOriginalScale, statScale);
+				}
+
+				if (HealthStatImage != null)
+				{
+					HealthStatImage.rectTransform.SetAsLastSibling();
+					HealthStatImage.rectTransform.anchoredPosition = healthStatOriginalPosition + healthOffset;
+					HealthStatImage.rectTransform.localScale = Vector3.Scale(healthStatOriginalScale, statScale);
+				}
+
+				if (ArmorStatImage != null)
+				{
+					ArmorStatImage.rectTransform.SetAsLastSibling();
+					ArmorStatImage.rectTransform.anchoredPosition = armorStatOriginalPosition + armorOffset;
+					ArmorStatImage.rectTransform.localScale = Vector3.Scale(armorStatOriginalScale, statScale);
+				}
+			}
+
+			private static void ApplyStatCanvasState(Canvas canvas, bool compact, int sortingOrder)
+			{
+				if (!canvas)
+					return;
+
+				canvas.overrideSorting = compact;
+				canvas.sortingOrder = compact ? sortingOrder : 0;
+			}
 
 		protected override void OnDisabled()
 		{

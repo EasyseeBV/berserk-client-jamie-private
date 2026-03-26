@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Audio;
+using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Customisation;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.GameCore.Abstraction;
@@ -23,6 +24,7 @@ using Cysharp.Threading.Tasks;
 using Events;
 using RR.Core.DebugSystem;
 using RR.Core.Extensions;
+using UI;
 using Vulcan.Audio;
 using Zenject;
 
@@ -30,6 +32,8 @@ namespace BerserkV3.GameCore.Controllers
 {
 	public class GameEndController : DisposableWithCts, IInitializable
 	{
+		private const string DefaultAvatarFrameArtUrl = "Vulcanite_Border_Neutral";
+
 		private readonly IGameCustomisationApplication customisationApplication;
 		private readonly IGameLogicEventsSource gameLogicEventsSource;
 		private readonly IGameRepository gameRepository;
@@ -120,19 +124,20 @@ namespace BerserkV3.GameCore.Controllers
 
 
             await UniTask.WhenAll(			
-				gameEndView.SetPlayerDefeatAsync(defeat.UserName.Ellipsis(16), defeatHero.Data.ArtUrl, artMaskUrl, defeatCust.URL, GetPlayerStatistic(defeat.UserId), Token), 
-				gameEndView.SetPlayerVictoryAsync(victory.UserName.Ellipsis(16), victoryHero.Data.ArtUrl, artMaskUrl, victoryCust.URL, GetPlayerStatistic(victory.UserId), Token),
+				gameEndView.SetPlayerDefeatAsync(defeat.UserName.Ellipsis(16), defeatHero?.Data?.ArtUrl, artMaskUrl, GetFrameArtUrl(defeatCust), GetPlayerStatistic(defeat.UserId), Token), 
+				gameEndView.SetPlayerVictoryAsync(victory.UserName.Ellipsis(16), victoryHero?.Data?.ArtUrl, artMaskUrl, GetFrameArtUrl(victoryCust), GetPlayerStatistic(victory.UserId), Token),
 				UniTask.Delay(1000));
 
 			if (Token.IsCancellationRequested)
 				return;
 
-			gameEndView.SetAllowCommend(!defeat.IsBot && !victory.IsBot);
-			gameEndView.SetAllowPlayAgain(!string.IsNullOrWhiteSpace(gameContext.RuntimeData.LeagueId));
-			gameEndView.SetReason(GetReasonText(gameEndModel.Reason, defeat.UserName));
-			gameEndView.Show();
-			AudioController.Play(victory.UserId == User.Id ? Clip.VictoryPopup : Clip.LostPopup);
-		}
+				gameEndView.SetAllowCommend(!defeat.IsBot && !victory.IsBot);
+				gameEndView.SetAllowPlayAgain(!string.IsNullOrWhiteSpace(gameContext.RuntimeData.LeagueId));
+				gameEndView.SetReason(GetReasonText(gameEndModel.Reason, defeat.UserName));
+				RegisterGauntletProgressIfNeeded(defeat, victory);
+				gameEndView.Show();
+				AudioController.Play(victory.UserId == User.Id ? Clip.VictoryPopup : Clip.LostPopup);
+			}
 
 		private string GetPlayerStatistic(string userId)
 		{
@@ -178,9 +183,31 @@ namespace BerserkV3.GameCore.Controllers
 			await GameAPI.PostUserCommend(commendModel);
 		}
 
-		private void PlayCommend(bool victory)
-		{
-			gameEndView.PlayCommend(victory,gameContext.GameDatabase.GetLocalization("GameEndGG"));
+			private void PlayCommend(bool victory)
+			{
+				gameEndView.PlayCommend(victory,gameContext.GameDatabase.GetLocalization("GameEndGG"));
+			}
+
+			private void RegisterGauntletProgressIfNeeded(IRuntimePlayerData defeat, IRuntimePlayerData victory)
+			{
+				if (gameContext.RuntimeData?.MatchMode != MatchMode.Practice)
+					return;
+
+				var botDeckId = defeat.IsBot ? defeat.DeckId : victory.IsBot ? victory.DeckId : null;
+				if (!GauntletProgressSettings.IsGauntletDeckId(botDeckId))
+					return;
+
+				if (victory.UserId == User.Id)
+					GauntletProgressSettings.RegisterVictory(botDeckId);
+
+				User.AddRedirection(new SoloAdventuresRedirectArg(true));
+			}
+
+			private static string GetFrameArtUrl(AssetData customisation)
+			{
+				return string.IsNullOrWhiteSpace(customisation?.URL)
+					? DefaultAvatarFrameArtUrl
+					: customisation.URL;
+			}
 		}
 	}
-}

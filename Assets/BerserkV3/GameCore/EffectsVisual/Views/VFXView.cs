@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Audio;
 using Cysharp.Threading.Tasks;
 using RR.Core.Extensions;
+using RR.Core.DebugSystem;
 using UnityEngine;
 
 namespace BerserkV3.GameCore.EffectsVisual
@@ -41,6 +43,7 @@ namespace BerserkV3.GameCore.EffectsVisual
 			}
 
 			SetupDetph();
+			DisableBrokenRenderers();
 
 			if (forceDestroyDelayS > 0 && lifetimeTokenSource != null)
 				UniTask.Delay(TimeSpan.FromSeconds(forceDestroyDelayS), cancellationToken: lifetimeTokenSource.Token).ContinueWith(DestroyInstance);
@@ -59,6 +62,32 @@ namespace BerserkV3.GameCore.EffectsVisual
 			var order = onTop ? sortingOrders.y : sortingOrders.x;
 			foreach (var particle in renderers)
 				particle.sortingOrder = order;
+		}
+
+		private void DisableBrokenRenderers()
+		{
+			var allRenderers = GetComponentsInChildren<Renderer>(true);
+			foreach (var renderer in allRenderers)
+			{
+				if (!renderer)
+					continue;
+
+				var materials = renderer.sharedMaterials;
+				if (materials == null || materials.Length == 0)
+					continue;
+
+				var hasBrokenMaterial = materials.Any(material =>
+					material == null
+					|| material.shader == null
+					|| material.shader.name == "Hidden/InternalErrorShader"
+					|| !material.shader.isSupported);
+
+				if (!hasBrokenMaterial)
+					continue;
+
+				renderer.enabled = false;
+				RRLogger.Warning($"Disabled broken VFX renderer on {name}");
+			}
 		}
 
 		public virtual void SetArguments(params object[] args)

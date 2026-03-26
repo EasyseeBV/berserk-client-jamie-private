@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using BerserkV3.GameCore.SplineSystem;
@@ -5,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using GameCoreView = BerserkV3.GameCore.UI.GameView;
+using GameCoreBackgroundView = BerserkV3.GameCore.UI.BackgroundView;
 
 namespace UI
 {
@@ -35,13 +37,18 @@ namespace UI
 			public Vector2 ArcScale;
 		}
 
-		private static GameTableViewMinimal instance;
+			private static GameTableViewMinimal instance;
 
 		private readonly Dictionary<RectTransform, RectState> rectStates = new();
 		private readonly Dictionary<Graphic, GraphicState> graphicStates = new();
 		private readonly Dictionary<HandSpline, SplineState> splineStates = new();
+		private static readonly FieldInfo ArcSizeField = typeof(HandSpline).GetField("arcSize", BindingFlags.Instance | BindingFlags.NonPublic);
+		private static readonly FieldInfo ArcScaleField = typeof(HandSpline).GetField("arcScale", BindingFlags.Instance | BindingFlags.NonPublic);
 		private bool cached;
+		private bool applied;
+		private List<Transform> cachedBgRoots;
 		private GameObject dividerLine;
+		private GameObject minimalSurface;
 
 		public static void EnsureInitialized()
 		{
@@ -66,38 +73,86 @@ namespace UI
 
 		private void LateUpdate()
 		{
-			if (BoardLayoutSettings.IsMinimal())
+			// Only re-apply if minimal is active and we haven't applied yet
+			// This avoids per-frame FindObjectsOfType spam
+			if (BoardLayoutSettings.IsMinimal() && !applied)
+				ApplyCurrentLayout();
+			else if (!BoardLayoutSettings.IsMinimal() && applied)
 				ApplyCurrentLayout();
 		}
 
 		private void ApplyCurrentLayout()
 		{
-			if (!cached)
+			var isMinimal = BoardLayoutSettings.IsMinimal();
+
+			// Lazy-find background roots (only once)
+			if (cachedBgRoots == null || cachedBgRoots.Count == 0)
+				cachedBgRoots = FindAllBackgroundRoots();
+
+			if (!cached && cachedBgRoots.Count > 0)
 				CacheOriginalValues();
 
-			if (BoardLayoutSettings.IsMinimal())
+			Debug.Log($"[Minimal] isMinimal={isMinimal} bgRoots={cachedBgRoots.Count} cached={cached}");
+
+			if (isMinimal)
+			{
 				ApplyMinimalLayout();
+				applied = true;
+			}
 			else
+			{
 				RestoreClassicLayout();
+				applied = false;
+			}
+		}
+
+		/// <summary>
+		/// Finds ALL background roots in the scene — tries GameCore, UI, and brute-force FindObjectOfType.
+		/// Returns every BackgroundView transform found so we can hide decorative elements on all of them.
+		/// </summary>
+		private List<Transform> FindAllBackgroundRoots()
+		{
+			var roots = new List<Transform>();
+
+			var gcBg = GameCoreBackgroundView.Instance;
+			if (gcBg) roots.Add(gcBg.transform);
+
+			var uiBg = BackgroundView.Instance;
+			if (uiBg && (!gcBg || uiBg.transform != gcBg.transform))
+				roots.Add(uiBg.transform);
+
+			// Brute force: find ANY BackgroundView-like object by name
+			foreach (var go in FindObjectsOfType<RectTransform>(true))
+			{
+				if (go && (go.name.Contains("BackgrounView") || go.name.Contains("BackgroundView")))
+				{
+					if (!roots.Contains(go.transform))
+						roots.Add(go.transform);
+				}
+			}
+
+			return roots;
 		}
 
 		private void CacheOriginalValues()
 		{
 			cached = true;
 
-			var background = BackgroundView.Instance;
-			if (background)
+			if (cachedBgRoots != null)
 			{
-				CacheRect(background.transform as RectTransform);
-				CacheRect(FindRect(background.transform, "BackgroundImage"));
-				CacheGraphic(FindGraphic(background.transform, "BackgroundImage"));
-				CacheGraphic(FindGraphic(background.transform, "Plane"));
-				CacheGraphic(FindGraphic(background.transform, "TableBase"));
-				CacheGraphic(FindGraphic(background.transform, "TableBorders"));
-				CacheGraphic(FindGraphic(background.transform, "TopLeftCorner"));
-				CacheGraphic(FindGraphic(background.transform, "TopRightCorner"));
-				CacheGraphic(FindGraphic(background.transform, "BottomLeftCorner"));
-				CacheGraphic(FindGraphic(background.transform, "BottomRightCorner"));
+				foreach (var bgRoot in cachedBgRoots)
+				{
+					if (!bgRoot) continue;
+					CacheRect(bgRoot as RectTransform);
+					foreach (var graphic in bgRoot.GetComponentsInChildren<Graphic>(true))
+					{
+						if (graphic) CacheGraphic(graphic);
+					}
+					foreach (var rt in bgRoot.GetComponentsInChildren<RectTransform>(true))
+					{
+						if (rt) CacheRect(rt);
+					}
+				}
 			}
 
 			var gameView = GameCoreView.Instance;
@@ -144,20 +199,46 @@ namespace UI
 
 		private void ApplyMinimalBackground()
 		{
-			var background = BackgroundView.Instance;
-			if (!background)
+			if (cachedBgRoots == null || cachedBgRoots.Count == 0)
 				return;
 
-			StretchRect(background.transform as RectTransform);
-			StretchRect(FindRect(background.transform, "BackgroundImage"));
+			foreach (var bgRoot in cachedBgRoots)
+			{
+				if (!bgRoot) continue;
 
-			SetGraphicEnabled(FindGraphic(background.transform, "Plane"), false);
-			SetGraphicEnabled(FindGraphic(background.transform, "TableBase"), false);
-			SetGraphicEnabled(FindGraphic(background.transform, "TableBorders"), false);
-			SetGraphicEnabled(FindGraphic(background.transform, "TopLeftCorner"), false);
-			SetGraphicEnabled(FindGraphic(background.transform, "TopRightCorner"), false);
-			SetGraphicEnabled(FindGraphic(background.transform, "BottomLeftCorner"), false);
-			SetGraphicEnabled(FindGraphic(background.transform, "BottomRightCorner"), false);
+				StretchRect(bgRoot as RectTransform);
+
+				Graphic[] children;
+				try { children = bgRoot.GetComponentsInChildren<Graphic>(true); }
+				catch { continue; }
+
+				foreach (var graphic in children)
+				{
+					if (!graphic || !graphic.gameObject) continue;
+
+					var gName = graphic.gameObject.name;
+
+					// KEEP the full-screen background image
+					if (gName == "BackgroundImage")
+					{
+						StretchRect(graphic.transform as RectTransform);
+						continue;
+					}
+
+					// KEEP gameplay UI (counters, active zones)
+					if (gName.Contains("Counter") || gName.Contains("ActiveZone"))
+						continue;
+
+					// HIDE decorative chrome: corners, table frame, plane, borders
+					if (gName.Contains("Corner") || gName.Contains("Table") || gName.Contains("Plane") ||
+					    gName.Contains("Border") || gName.Contains("Base") || gName.Contains("base"))
+					{
+						CacheGraphic(graphic);
+						graphic.enabled = false;
+						graphic.gameObject.SetActive(false);
+					}
+				}
+			}
 		}
 
 		private void ApplyMinimalPlayField()
@@ -167,28 +248,24 @@ namespace UI
 				return;
 
 			var table = gameView.TableContainer;
-			table.anchorMin = new Vector2(0.06f, 0.18f);
-			table.anchorMax = new Vector2(0.94f, 0.82f);
+			// Narrower than before — keep cards centered, not edge-to-edge
+			table.anchorMin = new Vector2(0.15f, 0.18f);
+			table.anchorMax = new Vector2(0.85f, 0.78f);
 			table.offsetMin = Vector2.zero;
 			table.offsetMax = Vector2.zero;
 			table.anchoredPosition = Vector2.zero;
 			table.localScale = Vector3.one;
+			EnsureMinimalSurface(table);
 
+			// Scale down heroes so they don't obscure board cards
 			if (gameView.SelfHeroContainer)
-			{
-				gameView.SelfHeroContainer.anchorMin = new Vector2(0f, 0f);
-				gameView.SelfHeroContainer.anchorMax = new Vector2(0f, 0f);
-				gameView.SelfHeroContainer.pivot = new Vector2(0f, 0f);
-				gameView.SelfHeroContainer.anchoredPosition = new Vector2(72f, 24f);
-			}
+				gameView.SelfHeroContainer.localScale = Vector3.one * 0.65f;
 
 			if (gameView.OpponentHeroContainer)
-			{
-				gameView.OpponentHeroContainer.anchorMin = new Vector2(0.5f, 1f);
-				gameView.OpponentHeroContainer.anchorMax = new Vector2(0.5f, 1f);
-				gameView.OpponentHeroContainer.pivot = new Vector2(0.5f, 1f);
-				gameView.OpponentHeroContainer.anchoredPosition = new Vector2(0f, -18f);
-			}
+				gameView.OpponentHeroContainer.localScale = Vector3.one * 0.65f;
+
+			// Card play area renders LAST = on top of heroes
+			table.SetAsLastSibling();
 		}
 
 		private void ApplyMinimalActors()
@@ -293,13 +370,13 @@ namespace UI
 			{
 				if (spline.SplineType == SplineType.HandSelf)
 				{
-					spline.SetArcSize(2f);
-					spline.SetArcScale(new Vector2(320f, 160f));
+					SetSplineArcSize(spline, 2f);
+					SetSplineArcScale(spline, new Vector2(320f, 160f));
 				}
 				else if (spline.SplineType == SplineType.HandOpponent)
 				{
-					spline.SetArcSize(1.4f);
-					spline.SetArcScale(new Vector2(260f, 90f));
+					SetSplineArcSize(spline, 1.4f);
+					SetSplineArcScale(spline, new Vector2(260f, 90f));
 				}
 			}
 		}
@@ -325,6 +402,33 @@ namespace UI
 			rect.pivot = new Vector2(0.5f, 0.5f);
 			rect.anchoredPosition = Vector2.zero;
 			rect.sizeDelta = new Vector2(0f, 3f);
+		}
+
+		private void EnsureMinimalSurface(RectTransform table)
+		{
+			if (!minimalSurface)
+			{
+				minimalSurface = new GameObject("MinimalSurface", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Outline));
+				minimalSurface.transform.SetParent(table, false);
+				var image = minimalSurface.GetComponent<Image>();
+				// Dark semi-transparent surface — very different from the classic board
+				image.color = new Color(0.02f, 0.02f, 0.04f, 0.82f);
+				image.raycastTarget = false;
+				// Subtle gold border to frame the play area
+				var outline = minimalSurface.GetComponent<Outline>();
+				outline.effectColor = new Color(0.85f, 0.65f, 0.15f, 0.5f);
+				outline.effectDistance = new Vector2(3f, -3f);
+				outline.useGraphicAlpha = false;
+			}
+
+			var rect = minimalSurface.GetComponent<RectTransform>();
+			rect.anchorMin = new Vector2(0.02f, 0.02f);
+			rect.anchorMax = new Vector2(0.98f, 0.98f);
+			rect.offsetMin = Vector2.zero;
+			rect.offsetMax = Vector2.zero;
+			rect.anchoredPosition = Vector2.zero;
+			rect.sizeDelta = Vector2.zero;
+			rect.SetAsFirstSibling();
 		}
 
 		private void RestoreClassicLayout()
@@ -359,12 +463,17 @@ namespace UI
 				if (!spline)
 					continue;
 
-				spline.SetArcSize(state.ArcSize);
-				spline.SetArcScale(state.ArcScale);
+				SetSplineArcSize(spline, state.ArcSize);
+				SetSplineArcScale(spline, state.ArcScale);
 			}
 
 			if (dividerLine)
 				Destroy(dividerLine);
+			dividerLine = null;
+
+			if (minimalSurface)
+				Destroy(minimalSurface);
+			minimalSurface = null;
 		}
 
 		private void OnDestroy()
@@ -414,9 +523,29 @@ namespace UI
 
 			splineStates[spline] = new SplineState
 			{
-				ArcSize = spline.GetArcSize(),
-				ArcScale = spline.GetArcScale()
+				ArcSize = GetSplineArcSize(spline),
+				ArcScale = GetSplineArcScale(spline)
 			};
+		}
+
+		private static float GetSplineArcSize(HandSpline spline)
+		{
+			return ArcSizeField?.GetValue(spline) is float value ? value : 7.6f;
+		}
+
+		private static Vector2 GetSplineArcScale(HandSpline spline)
+		{
+			return ArcScaleField?.GetValue(spline) is Vector2 value ? value : new Vector2(1300f, 777.8f);
+		}
+
+		private static void SetSplineArcSize(HandSpline spline, float value)
+		{
+			ArcSizeField?.SetValue(spline, value);
+		}
+
+		private static void SetSplineArcScale(HandSpline spline, Vector2 value)
+		{
+			ArcScaleField?.SetValue(spline, value);
 		}
 
 		private void SetGraphicEnabled(Graphic graphic, bool enabled)
@@ -449,6 +578,23 @@ namespace UI
 			return target ? target.GetComponent<Graphic>() : null;
 		}
 
+		/// <summary>
+		/// Finds a graphic by combining two name parts — tries "Part1Part2", "Part1 Part2", and "Part1_Part2"
+		/// to handle prefab naming inconsistencies (e.g. "TableBase" vs "Table Base").
+		/// </summary>
+		private static Graphic FindGraphicFuzzy(Transform root, string part1, string part2)
+		{
+			var g = FindGraphic(root, part1 + part2);            // TableBase
+			if (g) return g;
+			g = FindGraphic(root, part1 + " " + part2);         // Table Base
+			if (g) return g;
+			g = FindGraphic(root, part1 + "_" + part2);         // Table_Base
+			if (g) return g;
+			// Also try with trailing space (seen in prefab: 'TopRightCorner ')
+			g = FindGraphic(root, part1 + part2 + " ");
+			return g;
+		}
+
 		private static RectTransform FindRect(Transform root, string name)
 		{
 			return FindDescendant(root, name) as RectTransform;
@@ -459,7 +605,8 @@ namespace UI
 			if (!root)
 				return null;
 
-			if (root.name == name)
+			// Compare with trim to handle trailing spaces in prefab names
+			if (root.name == name || root.name.Trim() == name.Trim())
 				return root;
 
 			for (var i = 0; i < root.childCount; i++)

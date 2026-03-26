@@ -11,22 +11,21 @@ namespace BerserkV3.GameCore.Cards
 {
 	public class TableCardsPositioning : ITableCardsPositioning
 	{
-		private float width = 10;
-		private float height = 15;
+		private float width = 20;
+		private float height = 18;
 		private Owner owner = Owner.None;
 
 		public IEnumerable<TargetTransform> CalculatePositions(int objectsCount)
 		{
-			var effectiveWidth = width * GetHorizontalSpacingFactor(objectsCount);
-			var halfWidth = effectiveWidth * .5f;
-			var yOffset = BoardLayoutSettings.IsMinimal() ? 112f : 100f;
-			var leftShift = -objectsCount * halfWidth + halfWidth;
+			var yOffset = 170f;
+			var spacing = GetHorizontalSpacing(objectsCount);
+			var leftShift = -spacing * Mathf.Max(0, objectsCount - 1) * 0.5f;
 			var ownerFactor = GetOwnerFactor();
 			var positionY = (yOffset + GetVerticalOffset()) * ownerFactor;
 			var rotation = Quaternion.identity;
 			for (var i = 0; i < objectsCount; ++i)
 			{
-				yield return new TargetTransform(new Vector2(leftShift + i * effectiveWidth, positionY), rotation);
+				yield return new TargetTransform(new Vector2(leftShift + i * spacing, positionY), rotation);
 			}
 		}
 
@@ -40,10 +39,7 @@ namespace BerserkV3.GameCore.Cards
 
 		private float GetVerticalOffset()
 		{
-			if (BoardLayoutSettings.IsMinimal())
-				return owner == Owner.Self ? -8f : 12f;
-
-			return owner == Owner.Self ? 0 : 5f;
+			return owner == Owner.Self ? 0 : 10f;
 		}
 
 		private int GetOwnerFactor()
@@ -51,18 +47,24 @@ namespace BerserkV3.GameCore.Cards
 			return owner == Owner.Self ? -1 : 1;
 		}
 
-		private static float GetHorizontalSpacingFactor(int objectsCount)
+		private float GetHorizontalSpacing(int objectsCount)
 		{
-			if (!BoardLayoutSettings.IsMinimal())
-				return 1f;
+			if (objectsCount <= 1)
+				return 0f;
 
-			if (objectsCount >= 7)
-				return 1.22f;
+			var cardWidth = Mathf.Max(1f, width);
+			var minimal = BoardLayoutSettings.IsMinimal();
+			var spacingMultiplier = minimal ? 1.35f : 1.08f;
+			var desiredSpacing = cardWidth * spacingMultiplier;
+			if (minimal)
+			{
+				// Ensure stat orbs (HP bubbles) don't overlap neighboring cards
+				desiredSpacing = Mathf.Max(desiredSpacing, cardWidth + 60f);
+			}
 
-			if (objectsCount >= 5)
-				return 1.16f;
-
-			return 1.1f;
+			// Cap total spread so cards stay centered, not edge-to-edge
+			var maxSpread = minimal ? 1200f : 980f;
+			return Mathf.Min(desiredSpacing, maxSpread / (objectsCount - 1));
 		}
 	}
 }

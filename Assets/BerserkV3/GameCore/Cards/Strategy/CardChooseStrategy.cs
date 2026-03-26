@@ -13,7 +13,7 @@ namespace BerserkV3.GameCore.Cards
 		private readonly ISelectionSystem selectionSystem;
 		private IRuntimePlayer runtimePlayer;
 		
-		private static float CardSize => 1.2f;
+		private static float CardSize => 1.5f;
 		public override ICardView View { get; set; }
 		
 		public CardChooseStrategy(

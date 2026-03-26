@@ -28,6 +28,8 @@ namespace BerserkV3.GameCore.Controllers
 		{
 			RRConsole.AddCommand(nameof(AddCard), AddCard, "Add card to self or opponent");
 			RRConsole.AddCommand(nameof(PlayCard), PlayCard, "Play card to self or opponent");
+			RRConsole.AddCommand(nameof(AutoPilot), AutoPilot, "Toggle local autoplay for your turns");
+			RRConsole.AddCommand(nameof(AutoMove), AutoMove, "Request one automatic move for the current user");
 			RRConsole.AddCommand(nameof(AddMana), AddMana, "Add manna to self");
 			RRConsole.AddCommand(nameof(FullHp), FullHp, "Restore all Hp self");
 			RRConsole.AddCommand(nameof(Timer), Timer, "Set timer pause/unpause");
@@ -89,6 +91,42 @@ namespace BerserkV3.GameCore.Controllers
 
 			gameHub.PerformCommandAsync<PlayCardDebugCmd>(new CmdParamsModel(runtimeTimer.RuntimeData.TimeHash, args.JoinToString(""))).Forget();
 			return GetDefaultRemoteResponce();
+		}
+
+		private string AutoMove(string[] args)
+		{
+			gameHub.AutoPerformCommandAsync().Forget();
+			return GetDefaultRemoteResponce();
+		}
+
+		private string AutoPilot(string[] args)
+		{
+			if (!LocalAutoPilot.IsAvailable)
+				return "AutoPilot is only available in editor localhost sessions.".Orange();
+
+			if (args == null || args.Length == 0)
+				return $"AutoPilot is currently {(LocalAutoPilot.Enabled ? "ON".Green() : "OFF".Orange())}.";
+
+			var value = args[0].ToLowerInvariant();
+			if (value is "on" or "true" or "1")
+			{
+				LocalAutoPilot.Enabled = true;
+				return "AutoPilot enabled.".Green();
+			}
+
+			if (value is "off" or "false" or "0")
+			{
+				LocalAutoPilot.Enabled = false;
+				return "AutoPilot disabled.".Orange();
+			}
+
+			if (value == "toggle")
+			{
+				LocalAutoPilot.Enabled = !LocalAutoPilot.Enabled;
+				return $"AutoPilot is now {(LocalAutoPilot.Enabled ? "ON".Green() : "OFF".Orange())}.";
+			}
+
+			return "Use: AutoPilot on|off|toggle".Orange();
 		}
 
 		private string AddMana(string[] args)

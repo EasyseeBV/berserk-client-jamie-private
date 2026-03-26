@@ -29,7 +29,8 @@ namespace RR.Network.SignalRCore
 		{
 			if (HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri) != SupportedProtocols.HTTP)
 			{
-				request.Uri = PrepareUriImpl(request.Uri);
+				if (HTTPProtocolFactory.GetProtocolFromUri(request.Uri) != SupportedProtocols.WebSocket)
+					request.Uri = PrepareUriImpl(request.Uri);
 				return;
 			}
 
@@ -54,6 +55,13 @@ namespace RR.Network.SignalRCore
 		{
 			var negotiationToken = Connection?.NegotiationResult?.AccessToken;
 			var token = string.IsNullOrEmpty(negotiationToken) ? Token : negotiationToken;
+			if (string.IsNullOrEmpty(token))
+				return uri;
+
+			if (!string.IsNullOrEmpty(uri.Query) &&
+				uri.Query.IndexOf("access_token=", StringComparison.OrdinalIgnoreCase) >= 0)
+				return uri;
+
 			var query = string.IsNullOrEmpty(uri.Query) ? "" : uri.Query + "&";
 			var uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath, query + "access_token=" + token);
 			return uriBuilder.Uri;

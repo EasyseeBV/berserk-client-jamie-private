@@ -1,17 +1,16 @@
-using Berserk.Shared.Data.Customisation;
 using BerserkV3.GameCore.Customisations;
-using BerserkV3.Generic.Customisation;
 using Cysharp.Threading.Tasks;
 using RR.Core.ResourceManagament;
 using RR.UI.FrameSystem;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 namespace BerserkV3.GameCore.UI
 {
-	public partial class BackgroundView : BaseView
-	{
+		public partial class BackgroundView : BaseView
+		{
 		[SerializeField] private RawImage BackgroundImage;
 		[SerializeField] private RawImage Plane;
 		[SerializeField] private RawImage BottomLeftCorner;
@@ -22,30 +21,98 @@ namespace BerserkV3.GameCore.UI
 		[Inject]
 		private void Construct()
 		{
-			GameCustomisationsAdapter.Application.SubscribeOnReady(LoadCustomisations);
+			ApplyFullscreenBackgroundLayout();
+			GameCustomisationsAdapter.Application.SubscribeOnReady(LoadArenaTheme);
+			ArenaThemeSettings.Changed += OnArenaThemeChanged;
+			BoardLayoutSettings.Changed += OnBoardLayoutChanged;
 		}
 
-		private async UniTask LoadCustomisations()
+		private async UniTask LoadArenaTheme()
 		{
+			ApplyFullscreenBackgroundLayout();
 			var token = this.GetCancellationTokenOnDestroy();
-			var gameboardAssetData = GameCustomisationsAdapter.Application
-				.GetSelf<GameboardAssetData>(CustomisationType.Gameboard);
-			
-			var backgroundAssetData = GameCustomisationsAdapter.Application
-				.GetSelf<AssetData>(CustomisationType.Background);
+			var selectedTheme = ArenaThemeSettings.Current;
 
 			await UniTask.WhenAll(
-				BackgroundImage.LoadResourceAsync(backgroundAssetData.URL, token),
-				Plane.LoadResourceAsync(gameboardAssetData.URL, token),
-				BottomLeftCorner.LoadResourceAsync(gameboardAssetData.BottomLeftCornerUrl, token),
-				BottomRightCorner.LoadResourceAsync(gameboardAssetData.BottomRightCornerUrl, token),
-				TopLeftCorner.LoadResourceAsync(gameboardAssetData.TopLeftCornerUrl, token),
-				TopRightCorner.LoadResourceAsync(gameboardAssetData.TopRightCornerUrl, token))
+					BackgroundImage.LoadResourceAsync(selectedTheme.BackgroundResourceId, token),
+					Plane.LoadResourceAsync(selectedTheme.GameboardResourceId, token),
+					BottomLeftCorner.LoadResourceAsync(selectedTheme.BottomLeftCornerResourceId, token),
+				BottomRightCorner.LoadResourceAsync(selectedTheme.BottomRightCornerResourceId, token),
+				TopLeftCorner.LoadResourceAsync(selectedTheme.TopLeftCornerResourceId, token),
+				TopRightCorner.LoadResourceAsync(selectedTheme.TopRightCornerResourceId, token))
 				.AttachExternalCancellation(token);
+
+			ApplyBoardLayoutVisibility();
+		}
+
+		private void OnArenaThemeChanged()
+		{
+			LoadArenaTheme().Forget();
+		}
+
+			private void OnBoardLayoutChanged()
+			{
+				ApplyBoardLayoutVisibility();
+			}
+
+			private void Update()
+			{
+				ApplyBoardLayoutVisibility();
+			}
+
+		private void ApplyFullscreenBackgroundLayout()
+		{
+			StretchToFill(transform as RectTransform);
+			StretchToFill(BackgroundImage ? BackgroundImage.rectTransform : null);
+			StretchToFill(Plane ? Plane.rectTransform : null);
+		}
+
+		private void ApplyBoardLayoutVisibility()
+		{
+			var isMinimal = BoardLayoutSettings.IsMinimal();
+			SetGraphicVisible(Plane, !isMinimal);
+			SetGraphicVisible(TableBase, !isMinimal);
+			SetGraphicVisible(TableBorders, !isMinimal);
+			ApplyCornerVisibility(!isMinimal);
+		}
+
+		private void ApplyCornerVisibility(bool isVisible)
+		{
+			SetGraphicVisible(BottomLeftCorner, isVisible);
+			SetGraphicVisible(BottomRightCorner, isVisible);
+			SetGraphicVisible(TopLeftCorner, isVisible);
+			SetGraphicVisible(TopRightCorner, isVisible);
+		}
+
+		private static void SetGraphicVisible(Graphic graphic, bool isVisible)
+		{
+			if (!graphic)
+				return;
+
+			graphic.enabled = isVisible;
+
+			if (graphic.gameObject.activeSelf != isVisible)
+				graphic.gameObject.SetActive(isVisible);
+		}
+
+		private static void StretchToFill(RectTransform rectTransform)
+		{
+			if (!rectTransform)
+				return;
+
+			rectTransform.anchorMin = Vector2.zero;
+			rectTransform.anchorMax = Vector2.one;
+			rectTransform.anchoredPosition = Vector2.zero;
+			rectTransform.sizeDelta = Vector2.zero;
+			rectTransform.offsetMin = Vector2.zero;
+			rectTransform.offsetMax = Vector2.zero;
+			rectTransform.localScale = Vector3.one;
 		}
 
 		private void OnDestroy()
 		{
+			ArenaThemeSettings.Changed -= OnArenaThemeChanged;
+			BoardLayoutSettings.Changed -= OnBoardLayoutChanged;
 			Plane.ReleaseResource();
 			BottomLeftCorner.ReleaseResource();
 			BottomRightCorner.ReleaseResource();

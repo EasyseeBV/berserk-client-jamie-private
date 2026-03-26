@@ -38,34 +38,29 @@ namespace UI
 	public static class ArenaThemeSettings
 	{
 		public const string PreferenceKey = "SelectedArenaTheme";
-		public const string Vulcan = "vulcan";
+		public const string Classic = "classic";
 		public const string Boreas = "boreas";
 		public const string Arcadia = "arcadia";
 		public const string Hades = "hades";
 		public const string Notus = "notus";
 		public const string Colosseum = "colosseum";
-		private const string DefaultTheme = Colosseum;
 
 		private const string TopLeftDefault = "Corner_Top_Left_Boreas_Default";
 		private const string TopRightDefault = "Corner_Top_Right_Arcadia_Default";
 		private const string BottomLeftDefault = "Corner_Bottom_Left_Hades_Default";
 		private const string BottomRightDefault = "Corner_Bottom_Right_Notus_Default";
-		private const string TopLeftVulcan = "corner_top_left_vulcan";
-		private const string TopRightVulcan = "corner_top_right_vulcan";
-		private const string BottomLeftVulcan = "corner_bottom_left_vulcan";
-		private const string BottomRightVulcan = "corner_bottom_right_vulcan";
 
 		private static readonly ArenaThemeDefinition[] Definitions =
 		{
 			new(
-				Vulcan,
-				"Vulcan",
-				"arena_background_vulcan",
-				"Gameboard_Vulcan",
-				TopLeftVulcan,
-				TopRightVulcan,
-				BottomLeftVulcan,
-				BottomRightVulcan),
+				Classic,
+				"Classic",
+				"Background_Fire",
+				"Gameboard_Neutral",
+				TopLeftDefault,
+				TopRightDefault,
+				BottomLeftDefault,
+				BottomRightDefault),
 			new(
 				Boreas,
 				"Boreas",
@@ -101,25 +96,24 @@ namespace UI
 				TopLeftDefault,
 				TopRightDefault,
 				BottomLeftDefault,
-				BottomRightDefault),
+				BottomRightDefault)
+			,
 			new(
 				Colosseum,
 				"Colosseum",
 				"Background_Colosseum",
 				"Gameboard_Colosseum",
-				TopLeftVulcan,
-				TopRightVulcan,
-				BottomLeftVulcan,
-				BottomRightVulcan)
+				TopLeftDefault,
+				TopRightDefault,
+				BottomLeftDefault,
+				BottomRightDefault)
 		};
 
-#if UNITY_EDITOR
-		private static bool editorDefaultApplied;
-#endif
+		private static string runtimeOverrideValue;
 
 		public static event Action Changed;
 
-		public static ArenaThemeDefinition Current => GetDefinition(GetSelectedValue());
+		public static ArenaThemeDefinition Current => GetDefinition(GetCurrentValue());
 
 		public static ArenaThemeDefinition[] GetDefinitions()
 		{
@@ -128,17 +122,27 @@ namespace UI
 
 		public static string GetSelectedValue()
 		{
-#if UNITY_EDITOR
-			if (Application.isPlaying && !editorDefaultApplied)
-			{
-				editorDefaultApplied = true;
-				PlayerPrefs.SetString(PreferenceKey, DefaultTheme);
-				PlayerPrefs.Save();
-				return DefaultTheme;
-			}
-#endif
-			var rawValue = PlayerPrefs.GetString(PreferenceKey, DefaultTheme);
+			var rawValue = PlayerPrefs.GetString(PreferenceKey, Classic);
 			return GetDefinition(rawValue).PreferenceValue;
+		}
+
+		public static void SetRuntimeOverride(string preferenceValue)
+		{
+			var resolved = GetDefinition(preferenceValue).PreferenceValue;
+			if (string.Equals(runtimeOverrideValue, resolved, StringComparison.OrdinalIgnoreCase))
+				return;
+
+			runtimeOverrideValue = resolved;
+			Changed?.Invoke();
+		}
+
+		public static void ClearRuntimeOverride()
+		{
+			if (string.IsNullOrWhiteSpace(runtimeOverrideValue))
+				return;
+
+			runtimeOverrideValue = null;
+			Changed?.Invoke();
 		}
 
 		public static void SetSelected(string preferenceValue)
@@ -151,8 +155,8 @@ namespace UI
 
 		public static ArenaThemeDefinition GetDefinition(string preferenceValue)
 		{
-			if (string.Equals(preferenceValue, "classic", StringComparison.OrdinalIgnoreCase))
-				preferenceValue = Vulcan;
+			if (string.Equals(preferenceValue, "vulcan", StringComparison.OrdinalIgnoreCase))
+				preferenceValue = Classic;
 
 			foreach (var definition in Definitions)
 			{
@@ -162,5 +166,15 @@ namespace UI
 
 			return Definitions[0];
 		}
+
+			private static string GetCurrentValue()
+			{
+				if (!string.IsNullOrWhiteSpace(GauntletMatchPresentation.ForcedArenaTheme))
+					return GetDefinition(GauntletMatchPresentation.ForcedArenaTheme).PreferenceValue;
+
+				return string.IsNullOrWhiteSpace(runtimeOverrideValue)
+					? GetSelectedValue()
+					: runtimeOverrideValue;
+			}
 	}
 }

@@ -23,17 +23,15 @@ namespace UI
 			PlayBtn.Subscribe(() => LobbyLeaguesView.Instance.InitAndShowAsync().Forget());
 			DuelsBtn.Subscribe(() => DuelsApplicationAdapter.Application.OpenAsync().Forget());
 			ProfileBtn.Subscribe(() => ProfileView.Instance.InitAndShowAsync().Forget());
-			LavaShopBtn.Subscribe(() => LavaShopView.Instance.InitAndShowAsync().Forget());
 			LeaderBoardBtn.onClick.AddListener(()=> LeaderBoardLeagueView.Instance.InitAndShow());
-			LavaShopBtn.ShowAtStart = true;
-			LavaShopBtn.SetInteractable(false); // turn off lava shop (todo: remove when new shop will be developed)
+			LavaShopBtn.ShowAtStart = false;
+			LavaShopBtn.gameObject.SetActive(false);
 
-			SettingsButton.onClick.AddListener(() => SettingsView.Instance.Show());
+			SettingsButton.onClick.AddListener(ShowSettings);
 			LobbyBus.CurrentOnlineCount.Subscribe(this, UpdateOnlineView);
 			UpdateOnlineView(LobbyBus.CurrentOnlineCount.Value);
-
-			// Jamie's PBT Redesign — wire up bottom panel buttons
 			InitRedesignButtons();
+			InitSoloMenuShell();
 			
 			disposables.Add(DeckBtn.SetHintTarget(TutorialTrigger.DecksBtn.ToString()).SetTransitionFactorSize().Init().Subscribe(DeckBtn.Get()));
 			disposables.Add(PlayBtn.SetHintTarget(TutorialTrigger.LeaguesBtn.ToString()).SetTransitionFactorSize().Init().Subscribe(PlayBtn.Get()));
@@ -57,12 +55,31 @@ namespace UI
 
 		protected override void OnShown()
 		{
-			LavaShopBtn.gameObject.SetActive(true);
+			LavaShopBtn.gameObject.SetActive(false);
 		}
 
 		private void UpdateOnlineView(int count)
 		{
 			OnlineText.SetText($"Online: {count}");
+		}
+
+		private static void ShowSettings()
+		{
+			var view = SettingsView.Instance;
+			if (view == null && UIManager.StaticViews.TryGetValue(nameof(SettingsView), out var staticView))
+				view = staticView as SettingsView;
+
+			if (view == null)
+			{
+				var views = Resources.FindObjectsOfTypeAll<SettingsView>();
+				if (views != null && views.Length > 0)
+					view = views[0];
+			}
+
+			if (view != null)
+				view.Show();
+			else
+				Debug.LogError("SettingsView could not be resolved from MenuView.ShowSettings()");
 		}
 
 		private void OnDestroy()

@@ -14,6 +14,10 @@ using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace RR.Core.ResourceManagament
 {
 	// See an expression in the asmdef to enable this feature
@@ -82,14 +86,21 @@ namespace RR.Core.ResourceManagament
 				}
 				
 				ThrowIfCancelled(token);
-				if (handle.OperationException != null)
-					throw new Exception($"Resource not loaded for id : {id}, " +
-					                    $"requested resource type : {nameof(T)}, " +
-					                    $"original Exception : {handle.OperationException}");
-				
-				if (!handle.Result)
+				if (handle.OperationException != null || !handle.Result)
+				{
+#if UNITY_EDITOR
+					var editorAsset = LoadFromEditorAssetDatabase<T>(id);
+					if (editorAsset)
+						return editorAsset;
+#endif
+					if (handle.OperationException != null)
+						throw new Exception($"Resource not loaded for id : {id}, " +
+						                    $"requested resource type : {nameof(T)}, " +
+						                    $"original Exception : {handle.OperationException}");
+
 					throw new ApplicationException($"Internal error resource not loaded for id : {id}, " +
 					                               $"requested resource type : {nameof(T)}");
+				}
 				
 				return handle.Result;
 			}
@@ -200,6 +211,42 @@ namespace RR.Core.ResourceManagament
 			if(Directory.Exists(catalogPath))
 			   Directory.Delete(catalogPath,true);
 		}
+
+#if UNITY_EDITOR && ADDRESSABLES_INCLUDED
+		private static T LoadFromEditorAssetDatabase<T>(string id) where T : Object
+		{
+			var guids = AssetDatabase.FindAssets($"{id} t:{typeof(T).Name}", new[] {"Assets"});
+			foreach (var guid in guids)
+			{
+				var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+				if (string.IsNullOrEmpty(assetPath))
+					continue;
+
+				var asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+				if (asset)
+					return asset;
+			}
+
+			// Some addressable entries are textures imported as sprites, so
+			// this fallback keeps editor-local play mode usable for both.
+			if (typeof(T) == typeof(Texture) || typeof(T) == typeof(Texture2D))
+			{
+				var guidsByName = AssetDatabase.FindAssets(id, new[] {"Assets"});
+				foreach (var guid in guidsByName)
+				{
+					var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+					if (string.IsNullOrEmpty(assetPath))
+						continue;
+
+					var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+					if (texture)
+						return texture as T;
+				}
+			}
+
+			return null;
+		}
+#endif
 		
 		public static void ThrowIfCancelled(CancellationToken token = default)
 		{

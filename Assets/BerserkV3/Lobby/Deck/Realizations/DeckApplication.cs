@@ -24,7 +24,16 @@ namespace BerserkV3.Lobby.Deck
 		public async UniTask InitActiveDeckAsync(DeckData newOne = null)
 		{
 			if (User.ActiveDeck == null)
-				await SelectAsync(newOne ?? User.Decks.FirstOrDefault());
+			{
+				var deckToSelect = newOne ?? User.Decks.FirstOrDefault();
+				if (deckToSelect == null)
+				{
+					RRLogger.Log($"[{GetType().Name.Orange()}] InitActiveDeckAsync : No available deck to select.");
+					return;
+				}
+
+				await SelectAsync(deckToSelect);
+			}
 		}
 		
 		public async UniTask<bool> SaveAsync(DeckData deckModel)
@@ -57,7 +66,10 @@ namespace BerserkV3.Lobby.Deck
 		public async UniTask<bool> SelectAsync(DeckData deckModel)
 		{
 			if (deckModel == null)
-				throw new NullReferenceException("Can't select missed deck.");
+			{
+				RRLogger.Log($"[{GetType().Name.Orange()}] SelectAsync : Deck is null, skip selection.");
+				return false;
+			}
 			
 			await PatchDeckVulcaniteIfIsNull(deckModel).AddLoadingTask();
 			var model = new DeckSelectModel {DeckId = deckModel.Id};

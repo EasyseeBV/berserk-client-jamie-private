@@ -4,7 +4,6 @@ using Berserk.Shared.GameCore.Abstraction;
 using BerserkV3.GameCore.Controllers;
 using BerserkV3.GameCore.UI;
 using RR.Core.DebugSystem;
-
 namespace BerserkV3.GameCore.Cards
 {
 	public class HeroViewFactory : TableBaseFactory, IHeroViewFactory
@@ -37,9 +36,18 @@ namespace BerserkV3.GameCore.Cards
 			var heroSpawnPoint = isSelf ? gameContainers.SelfHeroContainer : gameContainers.OpponentHeroContainer;
 			var heroView = Create(runtimeHero, gameContainers.TableContainer);
 			heroView.SelfContainer.position = heroSpawnPoint.position;
+			EnsureHeroRenderPriority(heroView.SelfContainer);
 			holderControllers.Add(holderController);
 			holderController.Initialize();
 			return (IHeroView) heroView;
+		}
+
+		private static void EnsureHeroRenderPriority(UnityEngine.Transform heroTransform)
+		{
+			if (!heroTransform)
+				return;
+
+			heroTransform.SetAsLastSibling();
 		}
 
 		public override void Dispose()

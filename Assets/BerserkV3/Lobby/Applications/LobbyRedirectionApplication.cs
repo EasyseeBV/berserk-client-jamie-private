@@ -9,6 +9,7 @@ using BerserkV3.Startup.Applications;
 using BerserkV3.Startup.Authorization;
 using Cysharp.Threading.Tasks;
 using Lobby;
+using UI;
 
 namespace BerserkV3.Lobby.Applications
 {
@@ -25,11 +26,23 @@ namespace BerserkV3.Lobby.Applications
 			this.guestApplication = guestApplication;
 		}
 
-		public async UniTask<bool> RedirectAsync()
-		{
-			if (User.GetRedirections<LeagueAutoMatchRedirectArg>().Any())
+			public async UniTask<bool> RedirectAsync()
 			{
-				var leagueArg = User.GetRedirections<LeagueAutoMatchRedirectArg>().FirstOrDefault();
+				if (User.GetRedirections<SoloAdventuresRedirectArg>().Any())
+				{
+					var soloArg = User.GetRedirections<SoloAdventuresRedirectArg>().FirstOrDefault();
+					User.RemoveRedirections<SoloAdventuresRedirectArg>();
+
+					if (MenuView.Instance != null)
+					{
+						MenuView.Instance.ShowSoloAdventures(soloArg.OpenGauntletSelection);
+						return true;
+					}
+				}
+
+				if (User.GetRedirections<LeagueAutoMatchRedirectArg>().Any())
+				{
+					var leagueArg = User.GetRedirections<LeagueAutoMatchRedirectArg>().FirstOrDefault();
 				User.RemoveRedirections<LeagueAutoMatchRedirectArg>();
 				await LobbyLeaguesView.Instance.InitAndShowAsync(leagueArg.LeagueId, leagueArg.DeckId);
 				return true;

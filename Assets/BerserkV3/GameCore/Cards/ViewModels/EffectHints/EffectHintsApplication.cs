@@ -39,7 +39,7 @@ namespace BerserkV3.GameCore.Cards.EffectHints
 	public class EffectHintsApplication : IEffectHintsApplication
 	{
 		private const int SHOW_CARD_KEYWORDS_LIMIT = 3;
-		private const int SHOW_HERO_KEYWORDS_LIMIT = 2;
+		private const int SHOW_HERO_KEYWORDS_LIMIT = 3;
 		
 		private readonly IGameDatabase gameDatabase;
 		private readonly IGameLogicEventsSource gameLogicEventsSource;
@@ -159,7 +159,7 @@ namespace BerserkV3.GameCore.Cards.EffectHints
 						FormatDescription(effectData.Value, effectData.Length, keyword?.Description));
 				});
 
-			return innateHints.Concat(gainedHints).ToArray();
+			return gainedHints.Concat(innateHints).ToArray();
 		}
 		
 		private static string FormatDescription(int value, int lenght, string description)

@@ -3,7 +3,9 @@ using UnityEngine;
 using Lean.Pool;
 using System;
 using System.Collections;
+using System.Linq;
 using Audio;
+using RR.Core.DebugSystem;
 
 namespace Vulcan.VFX
 {
@@ -33,6 +35,7 @@ namespace Vulcan.VFX
 
 
 			initialized = true;
+			DisableBrokenRenderers();
 
 			if (TryGetComponent<ParticleSystem>(out var particle))
 			{
@@ -42,6 +45,31 @@ namespace Vulcan.VFX
 			transform.localRotation = Quaternion.identity;
 
 			return this;
+		}
+
+		private void DisableBrokenRenderers()
+		{
+			foreach (var renderer in GetComponentsInChildren<ParticleSystemRenderer>(true))
+			{
+				if (!renderer)
+					continue;
+
+				var materials = renderer.sharedMaterials;
+				if (materials == null || materials.Length == 0)
+					continue;
+
+				var hasBrokenMaterial = materials.Any(material =>
+					material == null
+					|| material.shader == null
+					|| material.shader.name == "Hidden/InternalErrorShader"
+					|| !material.shader.isSupported);
+
+				if (!hasBrokenMaterial)
+					continue;
+
+				renderer.enabled = false;
+				RRLogger.Warning($"Disabled broken legacy VFX renderer on {name}");
+			}
 		}
 
 		public VFXEntity SetPosition(Vector3 position)
