@@ -312,6 +312,7 @@ namespace BerserkV3.GameCore.Controllers
 				x.SetLocalState(RuntimeState.InTable);
 				x.SelfContainer.SetAnchorsInCenter();
 				x.SelfContainer.SetParent(gameContainers.TableContainer, false);
+				x.SelfContainer.localPosition = x.IsSelf ? new Vector3(0, -500, 0) : new Vector3(0, 500, 0);
 				x.SelfContainer.localRotation = Quaternion.identity;
 				x.SelfContainer.localScale = Vector3.one;
 				x.SelfContainer.SetAsLastSibling();
