@@ -221,7 +221,7 @@ namespace UI
 				"CAMPAIGN",
 				"The Quadrant Trials",
 				"0/129 Stars",
-				() => Debug.Log("[SoloAdventuresView] Campaign clicked - not implemented yet"));
+				ShowCampaignMode);
 
 			_gauntletProgressLabel = CreateModeCard(
 				cardsRow.transform,
@@ -277,6 +277,11 @@ namespace UI
 		public void ShowGauntletSelectionView()
 		{
 			ShowGauntletSelection();
+		}
+		
+		public void ShowCampaignModeView()
+		{
+			ShowCampaignMode();
 		}
 
 		private void CreateBackButton()
@@ -472,6 +477,19 @@ namespace UI
 			CreateChampionButton(list.transform, "DravenBtn", "DRAVEN ASHBORN", "Pressure and Removal", "bot_gauntlet_3");
 			CreateChampionButton(list.transform, "SerisBtn", "SERIS TIDECALLER", "Hard+ Controller", "bot_gauntlet_4");
 			CreateChampionButton(list.transform, "KronosBtn", "KRONOS THE UNBROKEN", "Brutal Final Boss", "bot_gauntlet_5");
+		}
+		
+		private void ShowCampaignMode()
+		{
+			var menuView = Owner as MenuView;
+			if (!menuView)
+				return;
+
+			Hide();
+			var campaignView = CampaignModeView.EnsureInstance(menuView);
+			campaignView.ApplyMenuBackground(_panelBackground ? _panelBackground.sprite : null);
+			campaignView.Show(menuView);
+			campaignView.ShowQuadrantSelection();
 		}
 
 		private void BuildGauntletProgressTrack()

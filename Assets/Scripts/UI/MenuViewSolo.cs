@@ -50,6 +50,14 @@ namespace UI
 			ShowSoloAdventures(false);
 		}
 
+		public void ShowCampaignAdventures()
+		{
+			var view = SoloAdventuresView.EnsureInstance(this);
+			view.ApplyMenuBackground(FadeImg ? FadeImg.sprite : null);
+			view.Show(this);
+			view.ShowCampaignModeView();
+		}
+
 		public void ShowSoloAdventures(bool openGauntletSelection)
 		{
 			GauntletMatchPresentation.Clear();

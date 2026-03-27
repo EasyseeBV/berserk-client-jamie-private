@@ -10,6 +10,7 @@ namespace Berserk.Shared.Data.Enums
 		Duel,
 		Ranked,
 		Practice,
+		Campaign,
 		Tutorial,
 		AutoTest
 	}
