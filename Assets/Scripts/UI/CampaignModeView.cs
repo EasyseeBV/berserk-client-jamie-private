@@ -9,11 +9,11 @@ namespace UI
 {
 	public class CampaignModeView : BaseView
 	{
-		private const string ButtonBackgroundResource = "UI/btn_background_fantasy";
 		private const string CardFrameResource = "UI/button-frame";
 
 		public static CampaignModeView Instance { get; private set; }
 
+		private GameObject _generalButtonPrefab;
 		private TMP_FontAsset _fontAsset;
 		private Material _fontMaterial;
 		private RectTransform _panelRoot;
@@ -48,6 +48,7 @@ namespace UI
 			root.transform.SetParent(parent, false);
 
 			var view = root.GetComponent<CampaignModeView>();
+			view._generalButtonPrefab = menuView.GeneralButtonPrefab;
 			view.ShowAtStart = false;
 			view.Concurrent = false;
 			view.AutoCloseChildren = true;
@@ -88,7 +89,7 @@ namespace UI
 			_subtitleLabel.text = "Choose a quadrant to begin your campaign run.";
 			_quadrantsRoot.gameObject.SetActive(true);
 			_stageMapRoot.gameObject.SetActive(false);
-			_backLabel.text = "BACK";
+			_backLabel.text = "BACK TO SOLO";
 		}
 
 		private void ShowStageMap(CampaignQuadrantDefinition quadrant)
@@ -538,8 +539,8 @@ namespace UI
 
 		private void CreateBackButton()
 		{
-			var buttonGo = new GameObject("BackButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
-			buttonGo.transform.SetParent(_panelRoot, false);
+			var buttonGo = Instantiate(_generalButtonPrefab, _panelRoot, false);
+			buttonGo.name = "BackButton";
 
 			var rect = buttonGo.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
@@ -547,20 +548,12 @@ namespace UI
 			rect.anchoredPosition = new Vector2(0f, 14f);
 			rect.sizeDelta = new Vector2(300f, 72f);
 
-			var image = buttonGo.GetComponent<Image>();
-			image.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
-			image.type = Image.Type.Sliced;
-			image.color = Color.white;
-
 			var button = buttonGo.GetComponent<Button>();
-			button.targetGraphic = image;
 			button.onClick.AddListener(HandleBackPressed);
 
-			_backLabel = CreateText("BackLabel", buttonGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(240f, 34f), 22f, "BACK");
-			_backLabel.fontStyle = FontStyles.Bold;
-			_backLabel.alignment = TextAlignmentOptions.Center;
-			_backLabel.color = new Color(0.95f, 0.85f, 0.6f, 1f);
-			buttonGo.transform.SetAsLastSibling();
+			_backLabel = buttonGo.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (_backLabel != null)
+				_backLabel.text = "BACK TO SOLO";
 		}
 
 		private void HandleBackPressed()
@@ -572,6 +565,7 @@ namespace UI
 			}
 
 			Hide();
+			SoloAdventuresView.Instance?.Show(Owner);
 		}
 
 		private RectTransform CreateRect(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
