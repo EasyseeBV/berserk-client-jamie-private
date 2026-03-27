@@ -13,6 +13,9 @@ namespace UI
 	public partial class MenuView
 	{
 		[SerializeField] private GameObject _menuButtonPrefab;
+		[SerializeField] private GameObject _generalButtonPrefab;
+		public GameObject MenuButtonPrefab => _menuButtonPrefab;
+		public GameObject GeneralButtonPrefab => _generalButtonPrefab;
 
 		private const string SHOP_ICON_RESOURCE = "UI/icon_shop_v2";
 		private const string COMMUNITY_ICON_RESOURCE = "UI/icon_community_v2";

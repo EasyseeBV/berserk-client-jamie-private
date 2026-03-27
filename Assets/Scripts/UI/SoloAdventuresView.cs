@@ -20,6 +20,9 @@ namespace UI
 {
 	public class SoloAdventuresView : BaseView
 	{
+		private GameObject _menuButtonPrefab;
+		private GameObject _generalButtonPrefab;
+
 		private const string ButtonBackgroundResource = "UI/btn_background_fantasy";
 		private const string CampaignCardResource = "UI/card_campaign";
 		private const string GauntletCardResource = "UI/card_gauntlet";
@@ -92,6 +95,8 @@ namespace UI
 			root.transform.SetParent(parent, false);
 
 			var view = root.GetComponent<SoloAdventuresView>();
+			view._menuButtonPrefab = menuView.MenuButtonPrefab;
+			view._generalButtonPrefab = menuView.GeneralButtonPrefab;
 			view.ShowAtStart = false;
 			view.Concurrent = false;
 			view.AutoCloseChildren = true;
@@ -169,7 +174,7 @@ namespace UI
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
-				new Vector2(0f, -42f),
+				new Vector2(0f, -10f),
 				new Vector2(520f, 48f),
 				34f,
 				"SOLO ADVENTURES");
@@ -247,7 +252,7 @@ namespace UI
 				new Vector2(0.5f, 0.5f),
 				new Vector2(0.5f, 0.5f),
 				new Vector2(0.5f, 0.5f),
-				new Vector2(0f, -18f),
+				new Vector2(0f, 40f),
 				new Vector2(620f, 470f));
 			BuildGauntletSelection();
 			_gauntletSelectionRoot.gameObject.SetActive(false);
@@ -276,13 +281,8 @@ namespace UI
 
 		private void CreateBackButton()
 		{
-			var buttonGo = new GameObject(
-				"BackButton",
-				typeof(RectTransform),
-				typeof(CanvasRenderer),
-				typeof(Image),
-				typeof(Button));
-			buttonGo.transform.SetParent(_panelRoot, false);
+			var buttonGo = Instantiate(_generalButtonPrefab, _panelRoot, false);
+			buttonGo.name = "BackButton";
 
 			var rect = buttonGo.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
@@ -290,33 +290,12 @@ namespace UI
 			rect.anchoredPosition = new Vector2(0f, 28f);
 			rect.sizeDelta = new Vector2(300f, 72f);
 
-			var image = buttonGo.GetComponent<Image>();
-			image.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
-			image.type = Image.Type.Sliced;
-			image.color = Color.white;
-
 			var button = buttonGo.GetComponent<Button>();
-			var colors = button.colors;
-			colors.normalColor = Color.white;
-			colors.highlightedColor = new Color(1f, 0.96f, 0.84f, 1f);
-			colors.pressedColor = new Color(0.88f, 0.82f, 0.7f, 1f);
-			button.colors = colors;
-			button.targetGraphic = image;
 			button.onClick.AddListener(HandleBackPressed);
 
-			_backButtonLabel = CreateText(
-				"BackLabel",
-				buttonGo.transform,
-				new Vector2(0.5f, 0.5f),
-				new Vector2(0.5f, 0.5f),
-				new Vector2(0.5f, 0.5f),
-				Vector2.zero,
-				new Vector2(220f, 34f),
-				22f,
-				"BACK");
-			_backButtonLabel.fontStyle = FontStyles.Bold;
-			_backButtonLabel.alignment = TextAlignmentOptions.Center;
-			_backButtonLabel.color = new Color(0.95f, 0.85f, 0.6f, 1f);
+			_backButtonLabel = buttonGo.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (_backButtonLabel != null)
+				_backButtonLabel.text = "BACK";
 		}
 
 		private TextMeshProUGUI CreateModeCard(
@@ -443,7 +422,7 @@ namespace UI
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
-				new Vector2(0f, -70f),
+				new Vector2(0f, -85f),
 				new Vector2(560f, 28f),
 				18f,
 				"FULL CLEAR ACHIEVED");
@@ -458,7 +437,7 @@ namespace UI
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
-				new Vector2(0f, -98f),
+				new Vector2(0f, -85f),
 				new Vector2(560f, 26f),
 				18f,
 				"Choose a champion to challenge");
@@ -503,7 +482,7 @@ namespace UI
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
-				new Vector2(0f, -28f),
+				new Vector2(0f, -20f),
 				new Vector2(560f, 44f));
 
 			for (var i = 0; i < GauntletProgressSettings.ChampionCount; i++)
