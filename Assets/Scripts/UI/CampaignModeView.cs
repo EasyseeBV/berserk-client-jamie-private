@@ -263,6 +263,10 @@ namespace UI
 
 			var button = go.GetComponent<Button>();
 			button.interactable = !quadrant.IsLocked;
+			var cardColors = button.colors;
+			cardColors.highlightedColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+			cardColors.pressedColor = new Color(0.3f, 0.3f, 0.3f, 1f);
+			button.colors = cardColors;
 			button.onClick.AddListener(() =>
 			{
 				if (quadrant.IsLocked)
