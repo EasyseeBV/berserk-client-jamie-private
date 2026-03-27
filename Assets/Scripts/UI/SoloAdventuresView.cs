@@ -873,7 +873,6 @@ namespace UI
 				var gauntletArenaTheme = GetGauntletArenaTheme(botDeckId);
 				GauntletMatchPresentation.Activate(gauntletArenaTheme);
 				ArenaThemeSettings.SetRuntimeOverride(gauntletArenaTheme);
-				BoardLayoutSettings.SetCompact(true);
 				BoardLayoutSettings.SetRuntimeOverride(true);
 
 			Close();
