@@ -54,7 +54,7 @@ namespace BerserkV3.GameCore.Cards
 
 			var cardWidth = Mathf.Max(1f, width);
 			var minimal = BoardLayoutSettings.IsMinimal();
-			var spacingMultiplier = minimal ? 1.35f : 1.08f;
+			var spacingMultiplier = minimal ? 1.35f : 1.25f;
 			var desiredSpacing = cardWidth * spacingMultiplier;
 			if (minimal)
 			{
