@@ -150,7 +150,7 @@ namespace UI
 			_quadrantsRoot = CreateRect("QuadrantsRoot", _panelRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(860f, 490f));
 			BuildQuadrantSelection();
 
-			_stageMapRoot = CreateRect("StageMapRoot", _panelRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -2f), new Vector2(860f, 520f));
+			_stageMapRoot = CreateRect("StageMapRoot", _panelRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(860f, 520f));
 			_stageMapRoot.gameObject.SetActive(false);
 
 			CreateBackButton();
@@ -189,7 +189,7 @@ namespace UI
 			if (_currentQuadrant == null)
 				return;
 
-			var summary = CreateRect("Summary", _stageMapRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(760f, 82f));
+			var summary = CreateRect("Summary", _stageMapRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -27f), new Vector2(760f, 82f));
 			var summaryBg = summary.gameObject.AddComponent<Image>();
 			summaryBg.color = new Color(0.05f, 0.06f, 0.08f, 0.72f);
 			var summaryOutline = summary.gameObject.AddComponent<Outline>();
@@ -206,15 +206,16 @@ namespace UI
 			summaryMeta.alignment = TextAlignmentOptions.Center;
 			summaryMeta.color = new Color(0.9f, 0.9f, 0.9f, 0.94f);
 
-			var track = CreateRect("StageTrack", _stageMapRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -18f), new Vector2(790f, 286f));
+			var track = CreateRect("StageTrack", _stageMapRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(790f, 286f));
 			var trackBg = track.gameObject.AddComponent<Image>();
 			trackBg.color = new Color(0.03f, 0.03f, 0.04f, 0.18f);
+			trackBg.enabled = false;
 
 			var nodeGrid = CreateRect("NodeGrid", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 34f), new Vector2(748f, 214f));
 			var nodeGridImage = nodeGrid.gameObject.AddComponent<Image>();
 			nodeGridImage.color = new Color(0.02f, 0.03f, 0.04f, 0.12f);
 
-			var divider = CreateRect("Divider", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(0f, 2f));
+			var divider = CreateRect("Divider", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 33f), new Vector2(0f, 2f));
 			var dividerImage = divider.gameObject.AddComponent<Image>();
 			dividerImage.color = new Color(0.95f, 0.75f, 0.2f, 0.22f);
 			var dividerRect = divider.GetComponent<RectTransform>();
@@ -700,7 +701,7 @@ namespace UI
 
 		private void BuildStageDetailPanel(Transform parent)
 		{
-			var panel = CreateRect("StageDetailPanel", parent, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(748f, 122f));
+			var panel = CreateRect("StageDetailPanel", parent, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, -59f), new Vector2(748f, 122f));
 			var panelImage = panel.gameObject.AddComponent<Image>();
 			panelImage.color = new Color(0.03f, 0.035f, 0.045f, 0.92f);
 			var outline = panel.gameObject.AddComponent<Outline>();
