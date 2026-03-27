@@ -12,7 +12,8 @@ namespace UI
 	/// </summary>
 	public partial class MenuView
 	{
-		private const string BUTTON_BACKGROUND_RESOURCE = "UI/btn_background_fantasy";
+		[SerializeField] private GameObject _menuButtonPrefab;
+
 		private const string SHOP_ICON_RESOURCE = "UI/icon_shop_v2";
 		private const string COMMUNITY_ICON_RESOURCE = "UI/icon_community_v2";
 		private const string HELP_ICON_RESOURCE = "UI/icon_help_v2";
@@ -90,64 +91,24 @@ namespace UI
 			CreateMenuButton(panelGO.transform, "HelpBtn", "HELP", HELP_URL, HELP_ICON_RESOURCE);
 		}
 
-		private void CreateMenuButton(Transform parent, string name, string label, string url, string iconResource)
+		private void CreateMenuButton(Transform parent, string buttonName, string label, string url, string iconResource)
 		{
-			var btnGO = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button), typeof(HorizontalLayoutGroup));
-			btnGO.transform.SetParent(parent, false);
+			var btnGO = Instantiate(_menuButtonPrefab, parent, false);
+			btnGO.name = buttonName;
 
 			var btnRect = btnGO.GetComponent<RectTransform>();
-			btnRect.sizeDelta = new Vector2(180f, 60f);
-
-			var btnImage = btnGO.GetComponent<Image>();
-			btnImage.sprite = Resources.Load<Sprite>(BUTTON_BACKGROUND_RESOURCE);
-			btnImage.type = Image.Type.Sliced;
-			btnImage.color = Color.white;
-			btnImage.raycastTarget = true;
+			btnRect.sizeDelta = new Vector2(226f, 60f);
 
 			var btn = btnGO.GetComponent<Button>();
-			var colors = btn.colors;
-			colors.normalColor = new Color(1f, 1f, 1f, 1f);
-			colors.highlightedColor = new Color(1f, 0.95f, 0.85f, 1f);
-			colors.pressedColor = new Color(0.9f, 0.85f, 0.75f, 1f);
-			colors.selectedColor = colors.normalColor;
-			btn.colors = colors;
-			btn.targetGraphic = btnImage;
-
 			btn.onClick.AddListener(() => OpenExternalUrl(url));
 
-			var layout = btnGO.GetComponent<HorizontalLayoutGroup>();
-			layout.childAlignment = TextAnchor.MiddleCenter;
-			layout.childControlWidth = false;
-			layout.childControlHeight = false;
-			layout.childForceExpandWidth = false;
-			layout.childForceExpandHeight = false;
-			layout.spacing = 8f;
-			layout.padding = new RectOffset(14, 14, 8, 8);
+			var iconImage = btnGO.transform.Find("Icon")?.GetComponent<Image>();
+			if (iconImage != null)
+				iconImage.sprite = Resources.Load<Sprite>(iconResource);
 
-			var iconGO = new GameObject("Icon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-			iconGO.transform.SetParent(btnGO.transform, false);
-
-			var iconRect = iconGO.GetComponent<RectTransform>();
-			iconRect.sizeDelta = new Vector2(40f, 40f);
-
-			var iconImage = iconGO.GetComponent<Image>();
-			iconImage.sprite = Resources.Load<Sprite>(iconResource);
-			iconImage.preserveAspect = true;
-			iconImage.color = Color.white;
-
-			var textGO = new GameObject("Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
-			textGO.transform.SetParent(btnGO.transform, false);
-
-			var textRect = textGO.GetComponent<RectTransform>();
-			textRect.sizeDelta = new Vector2(102f, 40f);
-
-			var tmp = textGO.GetComponent<TextMeshProUGUI>();
-			tmp.text = label;
-			tmp.fontSize = 18f;
-			tmp.alignment = TextAlignmentOptions.MidlineLeft;
-			tmp.color = new Color(0.95f, 0.85f, 0.6f, 1f);
-			tmp.fontStyle = FontStyles.Bold;
-			tmp.enableWordWrapping = false;
+			var tmp = btnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (tmp != null)
+				tmp.text = label;
 		}
 
 		private void OpenExternalUrl(string url)
