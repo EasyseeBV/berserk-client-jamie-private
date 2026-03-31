@@ -135,6 +135,7 @@ namespace BerserkV3.GameCore.Controllers
 				gameEndView.SetAllowPlayAgain(!string.IsNullOrWhiteSpace(gameContext.RuntimeData.LeagueId));
 				gameEndView.SetReason(GetReasonText(gameEndModel.Reason, defeat.UserName));
 				RegisterGauntletProgressIfNeeded(defeat, victory);
+				RegisterCampaignReturnIfNeeded(victory);
 				gameEndView.Show();
 				AudioController.Play(victory.UserId == User.Id ? Clip.VictoryPopup : Clip.LostPopup);
 			}
@@ -201,6 +202,19 @@ namespace BerserkV3.GameCore.Controllers
 					GauntletProgressSettings.RegisterVictory(botDeckId);
 
 				User.AddRedirection(new SoloAdventuresRedirectArg(true));
+			}
+
+			private void RegisterCampaignReturnIfNeeded(IRuntimePlayerData victory)
+			{
+				if (gameContext.RuntimeData?.MatchMode != MatchMode.Campaign)
+					return;
+
+				var redirects = User.GetRedirections<CampaignRedirectArg>();
+				if (redirects == null || redirects.Length == 0)
+					return;
+
+				User.RemoveRedirections<CampaignRedirectArg>();
+				User.AddRedirection(redirects[0].WithOutcome(victory.UserId == User.Id));
 			}
 
 			private static string GetFrameArtUrl(AssetData customisation)

@@ -28,6 +28,18 @@ namespace BerserkV3.Lobby.Applications
 
 			public async UniTask<bool> RedirectAsync()
 			{
+				if (User.GetRedirections<CampaignRedirectArg>().Any())
+				{
+					var campaignArg = User.GetRedirections<CampaignRedirectArg>().FirstOrDefault();
+					User.RemoveRedirections<CampaignRedirectArg>();
+
+					if (MenuView.Instance != null)
+					{
+						MenuView.Instance.ShowCampaignAdventures(campaignArg);
+						return true;
+					}
+				}
+
 				if (User.GetRedirections<SoloAdventuresRedirectArg>().Any())
 				{
 					var soloArg = User.GetRedirections<SoloAdventuresRedirectArg>().FirstOrDefault();

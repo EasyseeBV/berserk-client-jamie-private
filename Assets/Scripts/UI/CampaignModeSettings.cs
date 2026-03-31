@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using Berserk.Shared.Data.Enums;
 
 namespace UI
 {
 	public enum CampaignStageVisualType
 	{
 		Regular,
+		Special,
+		Puzzle,
 		Elite,
 		Epic
 	}
@@ -28,6 +31,7 @@ namespace UI
 	public sealed class CampaignQuadrantDefinition
 	{
 		public CampaignQuadrantDefinition(
+			Quadrant quadrant,
 			string id,
 			string displayName,
 			string subtitle,
@@ -38,6 +42,7 @@ namespace UI
 			bool isLocked,
 			IReadOnlyList<CampaignStageDefinition> stages)
 		{
+			Quadrant = quadrant;
 			Id = id;
 			DisplayName = displayName;
 			Subtitle = subtitle;
@@ -49,6 +54,7 @@ namespace UI
 			Stages = stages;
 		}
 
+		public Quadrant Quadrant { get; }
 		public string Id { get; }
 		public string DisplayName { get; }
 		public string Subtitle { get; }
@@ -85,11 +91,12 @@ namespace UI
 		private static CampaignQuadrantDefinition CreateBoreas()
 		{
 			return new CampaignQuadrantDefinition(
+				Quadrant.Boreas,
 				"boreas",
 				"BOREAS",
 				"Frozen beasts, siege trials, and the Frost King.",
 				"Boreas Arena",
-				"Reward: Boreas Crest + 8 Bosses",
+				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/boreas_bg",
 				"UI/Campaign/boreas_emblem",
 				false,
@@ -99,11 +106,12 @@ namespace UI
 		private static CampaignQuadrantDefinition CreateArcadia()
 		{
 			return new CampaignQuadrantDefinition(
+				Quadrant.Arcadia,
 				"arcadia",
 				"ARCADIA",
 				"Wildwood guardians, beast swarms, and the Blighted Heart.",
 				"Arcadia Arena",
-				"Reward: Arcadia Crest + 8 Bosses",
+				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/arcadia_bg",
 				"UI/Campaign/arcadia_emblem",
 				false,
@@ -113,11 +121,12 @@ namespace UI
 		private static CampaignQuadrantDefinition CreateNotus()
 		{
 			return new CampaignQuadrantDefinition(
+				Quadrant.Notus,
 				"notus",
 				"NOTUS",
 				"Desert fire, puzzle duels, and the Sun Pharaoh.",
 				"Notus Arena",
-				"Reward: Notus Crest + 8 Bosses",
+				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/notus_bg",
 				"UI/Campaign/notus_emblem",
 				false,
@@ -127,11 +136,12 @@ namespace UI
 		private static CampaignQuadrantDefinition CreateHades()
 		{
 			return new CampaignQuadrantDefinition(
+				Quadrant.Hades,
 				"hades",
 				"HADES",
 				"Death magic, attrition battles, and the Lord of the Dead.",
 				"Hades Arena",
-				"Reward: Hades Crest + 8 Bosses",
+				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/hades_bg",
 				"UI/Campaign/hades_emblem",
 				false,
@@ -141,19 +151,20 @@ namespace UI
 		private static CampaignQuadrantDefinition CreateVulcanCity()
 		{
 			return new CampaignQuadrantDefinition(
+				Quadrant.Vulcan_City,
 				"vulcan_city",
 				"VULCAN CITY",
-				"Three final trials against the forge elite.",
+				"Three final fights through the forge district, cinder arena, and Vulcan's throne.",
 				"Colosseum Arena",
-				"Unlock after all four quadrants are cleared",
+				"3 finale fights  •  forge siege  •  cinder arena  •  Vulcan throne",
 				"UI/Campaign/vulcan_city_bg",
 				"UI/Campaign/vulcan_city_emblem",
 				true,
 				new[]
 				{
-					new CampaignStageDefinition(1, "Forge Master", "Opening finale", CampaignStageVisualType.Elite),
-					new CampaignStageDefinition(2, "The Champion", "Arena gauntlet", CampaignStageVisualType.Elite),
-					new CampaignStageDefinition(3, "Vulcan", "Epic final boss", CampaignStageVisualType.Epic)
+					new CampaignStageDefinition(1, "Forge Master", "Break the molten gate", CampaignStageVisualType.Elite),
+					new CampaignStageDefinition(2, "The Champion", "Survive the cinder arena", CampaignStageVisualType.Elite),
+					new CampaignStageDefinition(3, "Vulcan", "Final throne confrontation", CampaignStageVisualType.Epic)
 				});
 		}
 
@@ -162,10 +173,18 @@ namespace UI
 			return new[]
 			{
 				new CampaignStageDefinition(1, $"{prefix} Trial I", "Regular encounter", CampaignStageVisualType.Regular),
-				new CampaignStageDefinition(2, $"{prefix} Trial II", "Regular encounter", CampaignStageVisualType.Regular),
-				new CampaignStageDefinition(3, $"{prefix} Trial III", "Regular encounter", CampaignStageVisualType.Regular),
-				new CampaignStageDefinition(4, $"{prefix} Trial IV", "Regular encounter", CampaignStageVisualType.Regular),
-				new CampaignStageDefinition(5, $"{prefix} Trial V", "Regular encounter", CampaignStageVisualType.Regular),
+				new CampaignStageDefinition(2, $"{prefix} Trial II",
+					prefix == "Frost" || prefix == "Death" ? "Puzzle duel" : "Regular encounter",
+					prefix == "Frost" || prefix == "Death" ? CampaignStageVisualType.Puzzle : CampaignStageVisualType.Regular),
+				new CampaignStageDefinition(3, $"{prefix} Trial III",
+					prefix == "Wild" ? "Special tempo encounter" : "Regular encounter",
+					prefix == "Wild" ? CampaignStageVisualType.Special : CampaignStageVisualType.Regular),
+				new CampaignStageDefinition(4, $"{prefix} Trial IV",
+					prefix == "Flame" ? "Puzzle duel" : prefix == "Frost" || prefix == "Death" ? "Special rule encounter" : "Regular encounter",
+					prefix == "Flame" ? CampaignStageVisualType.Puzzle : prefix == "Frost" || prefix == "Death" ? CampaignStageVisualType.Special : CampaignStageVisualType.Regular),
+				new CampaignStageDefinition(5, $"{prefix} Trial V",
+					prefix == "Wild" ? "Puzzle duel" : "Regular encounter",
+					prefix == "Wild" ? CampaignStageVisualType.Puzzle : CampaignStageVisualType.Regular),
 				new CampaignStageDefinition(6, $"{prefix} Elite I", "Elite encounter", CampaignStageVisualType.Elite),
 				new CampaignStageDefinition(7, $"{prefix} Elite II", "Elite encounter", CampaignStageVisualType.Elite),
 				new CampaignStageDefinition(8, $"{prefix} Epic Boss", "Epic boss encounter", CampaignStageVisualType.Epic)

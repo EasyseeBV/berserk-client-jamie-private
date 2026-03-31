@@ -9,11 +9,19 @@ namespace Berserk.Shared.Data.Campaign
 		public string DisplayName { get; set; }
 		public string Description { get; set; }
 		public string RewardLabel { get; set; }
+		public string ProgressLabel { get; set; }
+		public string RewardSummary { get; set; }
 		public bool IsFinaleQuadrant { get; set; }
 		public bool IsUnlocked { get; set; }
 		public bool IsCompleted { get; set; }
 		public int CompletedStages { get; set; }
 		public int TotalStages { get; set; }
+		public bool IsHeroicUnlocked { get; set; }
+		public bool IsHeroicCompleted { get; set; }
+		public int CompletedHeroicStages { get; set; }
+		public string HeroicProgressLabel { get; set; }
+		public string HeroicRewardSummary { get; set; }
 		public List<CampaignStageProgressModel> Stages { get; set; } = new();
+		public List<CampaignStageProgressModel> HeroicStages { get; set; } = new();
 	}
 }

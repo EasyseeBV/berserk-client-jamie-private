@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Berserk.Shared.Data.Enums;
 using TMPro;
 using UnityEngine;
 
@@ -52,10 +53,28 @@ namespace UI
 
 		public void ShowCampaignAdventures()
 		{
-			var view = SoloAdventuresView.EnsureInstance(this);
-			view.ApplyMenuBackground(FadeImg ? FadeImg.sprite : null);
-			view.Show(this);
-			view.ShowCampaignModeView();
+			ShowCampaignAdventures(null);
+		}
+
+		public void ShowCampaignAdventures(Quadrant? quadrant)
+		{
+			var campaignView = CampaignModeView.EnsureInstance(this);
+			campaignView.ApplyMenuBackground(FadeImg ? FadeImg.sprite : null);
+			campaignView.SetPendingResult(null);
+			campaignView.Show(this);
+			if (quadrant.HasValue)
+				campaignView.ShowQuadrantProgressView(quadrant.Value);
+			else
+				campaignView.ShowQuadrantSelection();
+		}
+
+		public void ShowCampaignAdventures(CampaignRedirectArg campaignResult)
+		{
+			var campaignView = CampaignModeView.EnsureInstance(this);
+			campaignView.ApplyMenuBackground(FadeImg ? FadeImg.sprite : null);
+			campaignView.SetPendingResult(campaignResult);
+			campaignView.Show(this);
+			campaignView.ShowQuadrantProgressView(campaignResult.Quadrant);
 		}
 
 		public void ShowSoloAdventures(bool openGauntletSelection)
