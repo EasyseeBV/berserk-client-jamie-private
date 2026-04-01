@@ -5,6 +5,8 @@ using BerserkV3.Startup.Authorization;
 using Berserk.Shared.Data.Lobby;
 using System.Linq;
 using System;
+using UnityEngine;
+using UI;
 
 
 namespace BerserkV3.Lobby.UI.LeaderBoard

@@ -1,4 +1,5 @@
 using RR.UI.FrameSystem;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -6,6 +7,8 @@ namespace UI
 {
 	public partial class ButtonView : BaseView
 	{
+		[Header("Custom View")]
+		public Image CustomView;
 		public Button Button { get; private set; }
 
 		protected void Awake()

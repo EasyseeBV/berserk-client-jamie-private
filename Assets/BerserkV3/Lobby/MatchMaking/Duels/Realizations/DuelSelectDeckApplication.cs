@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Berserk.Shared.Data.Abstraction;
 using Berserk.Shared.Data.Customisation;
@@ -176,7 +176,7 @@ namespace BerserkV3.Lobby.MatchMaking.Duels
 			var avatarUrl = heroData?.ArtUrl;
 			var frameUrl = customisationItemRepository.GetFirstEquipped(CustomisationType.AvatarFrame)?.PreviewURL;
 			var heroName = heroData?.Name;
-			var levelText = $"{heroData?.LevelAtSync.ToString() ?? "N/A"}";
+			var levelText = $"{heroData?.LevelAtSync.ToRoman() ?? "N/A"}";
 			
 			var description = gameDatabase
 				.GetEffects(heroData?.EffectsIds)

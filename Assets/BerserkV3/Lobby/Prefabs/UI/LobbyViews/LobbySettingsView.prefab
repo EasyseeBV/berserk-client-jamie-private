@@ -32,8 +32,8 @@ RectTransform:
   - {fileID: 8805409595112515679}
   m_Father: {fileID: 6576500827064677155}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.343, y: 0}
+  m_AnchorMax: {x: 0.343, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 44.857536, y: 98.95044}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -648,9 +648,9 @@ RectTransform:
   - {fileID: 193659600224193824}
   m_Father: {fileID: 163772962385937222}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 598.27704, y: -322.30734}
   m_SizeDelta: {x: 822.494, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8706997778073529224
@@ -995,9 +995,9 @@ RectTransform:
   - {fileID: 5223105310251970075}
   m_Father: {fileID: 472184702525265112}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 876.80975, y: -50}
   m_SizeDelta: {x: 571.0333, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6851368994206630396
@@ -1087,7 +1087,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 49.7}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7277676357527722708
 CanvasRenderer:
@@ -1732,6 +1732,7 @@ MonoBehaviour:
   SuppressAnyGesturesForOwners: 0
   SuppressBack: 0
   IsBlockingInteration: 0
+  ButtonPrefab: {fileID: 6983562005712677797, guid: de205a6ed5c9b49418732d30e711856f, type: 3}
   Container: {fileID: 7085809197785855771}
   Background: {fileID: 8845893174199189248}
   TitleImage: {fileID: 163772962948778631}
@@ -1740,6 +1741,59 @@ MonoBehaviour:
   TitleText: {fileID: 163772962835967428}
   BorderImage: {fileID: 163772961527144281}
   ButtonsPnl: {fileID: 163772962385937222}
+  VisualRoot: {fileID: 0}
+  ArenaBox: {fileID: 0}
+  ArenaPanel: {fileID: 0}
+  ArenaTitle: {fileID: 0}
+  ArenaHint: {fileID: 0}
+  Theme_classic: {fileID: 0}
+  Glow: {fileID: 0}
+  PreviewFrame: {fileID: 0}
+  BgPreview: {fileID: 0}
+  BoardPreview: {fileID: 0}
+  classic_Name: {fileID: 0}
+  classic_Active: {fileID: 0}
+  Theme_boreas: {fileID: 0}
+  Glow1: {fileID: 0}
+  PreviewFrame1: {fileID: 0}
+  BgPreview1: {fileID: 0}
+  BoardPreview1: {fileID: 0}
+  boreas_Name: {fileID: 0}
+  boreas_Active: {fileID: 0}
+  Theme_arcadia: {fileID: 0}
+  Glow2: {fileID: 0}
+  PreviewFrame2: {fileID: 0}
+  BgPreview2: {fileID: 0}
+  BoardPreview2: {fileID: 0}
+  arcadia_Name: {fileID: 0}
+  arcadia_Active: {fileID: 0}
+  Theme_hades: {fileID: 0}
+  Glow3: {fileID: 0}
+  PreviewFrame3: {fileID: 0}
+  BgPreview3: {fileID: 0}
+  BoardPreview3: {fileID: 0}
+  hades_Name: {fileID: 0}
+  hades_Active: {fileID: 0}
+  Theme_notus: {fileID: 0}
+  Glow4: {fileID: 0}
+  PreviewFrame4: {fileID: 0}
+  BgPreview4: {fileID: 0}
+  BoardPreview4: {fileID: 0}
+  notus_Name: {fileID: 0}
+  notus_Active: {fileID: 0}
+  Theme_colosseum: {fileID: 0}
+  Glow5: {fileID: 0}
+  PreviewFrame5: {fileID: 0}
+  BgPreview5: {fileID: 0}
+  BoardPreview5: {fileID: 0}
+  colosseum_Name: {fileID: 0}
+  colosseum_Active: {fileID: 0}
+  LayoutBox: {fileID: 0}
+  LayoutLabel: {fileID: 0}
+  LayoutHint: {fileID: 0}
+  LayoutToggle: {fileID: 0}
+  ToggleLabel: {fileID: 0}
+  AudioRoot: {fileID: 0}
   MusicContainer: {fileID: 3813639038028678194}
   MusicSlider: {fileID: 8845893173712407704}
   Background1: {fileID: 6967708617301824110}
@@ -1756,6 +1810,7 @@ MonoBehaviour:
   Handle2: {fileID: 336744248231475457}
   Handle11: {fileID: 8535407431623080151}
   AudioLabel: {fileID: 2459899634945463494}
+  FooterRoot: {fileID: 0}
   ButtonsPanel: {fileID: 472184702525265112}
   RestartTutorBtn: {fileID: 8845893174024234876}
   MaskImage1: {fileID: 8845893172801812432}
@@ -1767,6 +1822,13 @@ MonoBehaviour:
   BackgroundImage2: {fileID: 1372218551600747547}
   BorderImage2: {fileID: 2602805209601762618}
   OKText1: {fileID: 3583792271318578831}
+  TabBar: {fileID: 0}
+  VisualTab: {fileID: 0}
+  VisualTab_Lbl: {fileID: 0}
+  VisualTab_Line: {fileID: 0}
+  AudioTab: {fileID: 0}
+  AudioTab_Lbl: {fileID: 0}
+  AudioTab_Line: {fileID: 0}
 --- !u!1 &8845893172448896796
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,7 +1864,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 49.700096}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8845893172448896227
 CanvasRenderer:
@@ -2586,9 +2648,9 @@ RectTransform:
   - {fileID: 8845893172727495580}
   m_Father: {fileID: 472184702525265112}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 292.26993, y: -50}
   m_SizeDelta: {x: 571.0333, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8845893174024234818
@@ -2675,8 +2737,8 @@ RectTransform:
   - {fileID: 8845893172682130540}
   m_Father: {fileID: 8845893172500413010}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.343, y: 0}
+  m_AnchorMax: {x: 0.343, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 44.857536, y: 98.95044}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2796,9 +2858,9 @@ RectTransform:
   - {fileID: 1754783959717030425}
   m_Father: {fileID: 163772962385937222}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 598.27704, y: -510.161}
   m_SizeDelta: {x: 1169.0797, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6244130855705901497
@@ -2860,9 +2922,9 @@ RectTransform:
   - {fileID: 8845893172448896797}
   m_Father: {fileID: 163772962385937222}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 598.27704, y: -134.45367}
   m_SizeDelta: {x: 822.494, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8154227409037785803

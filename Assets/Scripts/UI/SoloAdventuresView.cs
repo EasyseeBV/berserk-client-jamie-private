@@ -66,6 +66,7 @@ namespace UI
 			public Image ThemeStripe;
 			public RawImage PortraitImage;
 			public RawImage PortraitFrameImage;
+			public Image PortraitMask;
 		}
 
 		private sealed class TrackerNodeState
@@ -234,11 +235,11 @@ namespace UI
 
 			_gauntletStarLabel = CreateText(
 				"GauntletStars",
-				_mainModesRoot,
+				_gauntletProgressLabel.transform.parent,
 				new Vector2(0.5f, 0f),
 				new Vector2(0.5f, 0f),
 				new Vector2(0.5f, 0f),
-				new Vector2(0f, 42f),
+				new Vector2(0f, 5f),
 				new Vector2(280f, 30f),
 				24f,
 				GauntletProgressSettings.GetStarTrackText());
@@ -588,9 +589,9 @@ namespace UI
 			rect.sizeDelta = new Vector2(520f, 68f);
 
 			var image = buttonGo.GetComponent<Image>();
-			image.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
+			//image.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
 			image.type = Image.Type.Sliced;
-			image.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+			image.color = Color.black;
 
 			var themeStripe = CreateFillImage("ThemeStripe", buttonGo.transform, GetChampionThemeColor(botDeckId));
 			themeStripe.rectTransform.anchorMin = new Vector2(0f, 0f);
@@ -658,16 +659,24 @@ namespace UI
 				new Vector2(100f, 0f),
 				new Vector2(50f, 50f));
 
-			var portraitBackdrop = portraitRoot.gameObject.AddComponent<Image>();
+			/*var portraitBackdrop = portraitRoot.gameObject.AddComponent<Image>();
 			portraitBackdrop.color = new Color(0.08f, 0.08f, 0.1f, 0.72f);
 
 			var portraitOutline = portraitRoot.gameObject.AddComponent<Outline>();
 			portraitOutline.effectColor = new Color(0.92f, 0.72f, 0.25f, 0.52f);
 			portraitOutline.effectDistance = new Vector2(1f, -1f);
-			portraitOutline.useGraphicAlpha = true;
+			portraitOutline.useGraphicAlpha = true;*/
+
+			var portraitMask = new GameObject("PortraitMask", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Mask));
+			portraitMask.transform.SetParent(portraitRoot, false);
+			var maskImg = portraitMask.GetComponent<Image>();
+			var maskRect = portraitMask.GetComponent<RectTransform>();
+			maskRect.anchorMin = maskRect.anchorMax = new Vector2(0.5f, 0.5f);
+			maskRect.pivot = new Vector2(0.5f, 0.5f);
+			maskRect.sizeDelta = new Vector2(46f, 46f);
 
 			var portraitGo = new GameObject("Portrait", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
-			portraitGo.transform.SetParent(portraitRoot, false);
+			portraitGo.transform.SetParent(portraitMask.transform, false);
 			var portraitRect = portraitGo.GetComponent<RectTransform>();
 			portraitRect.anchorMin = portraitRect.anchorMax = new Vector2(0.5f, 0.5f);
 			portraitRect.pivot = new Vector2(0.5f, 0.5f);
@@ -721,7 +730,7 @@ namespace UI
 				new Vector2(0f, 0.5f),
 				new Vector2(142f, -20f),
 				new Vector2(220f, 18f),
-				10f,
+				8f,
 				GetChampionMeta(botDeckId));
 			metaLabel.alignment = TextAlignmentOptions.MidlineLeft;
 			metaLabel.color = new Color(0.8f, 0.8f, 0.8f, 0.92f);
@@ -787,7 +796,8 @@ namespace UI
 				LockShade = lockShade,
 				ThemeStripe = themeStripe,
 				PortraitImage = portraitImage,
-				PortraitFrameImage = portraitFrameImage
+				PortraitFrameImage = portraitFrameImage,
+				PortraitMask = maskImg
 			});
 		}
 
@@ -932,7 +942,7 @@ namespace UI
 				var isCurrent = !isCleared && isUnlocked;
 
 				champion.Button.interactable = isUnlocked;
-				champion.Background.color = isUnlocked ? Color.white : new Color(0.62f, 0.62f, 0.62f, 0.9f);
+				champion.Background.color = isUnlocked ? Color.black : new Color(0.25f, 0.25f, 0.25f, 0.9f);
 				champion.AccentBar.enabled = isCurrent;
 				champion.LockShade.enabled = !isUnlocked;
 				champion.ThemeStripe.color = isUnlocked
@@ -1039,6 +1049,8 @@ namespace UI
 
 				if (champion.PortraitFrameImage)
 					tasks.Add(champion.PortraitFrameImage.LoadResourceAsync(GetChampionPortraitFrame(champion.BotDeckId)));
+				if (champion.PortraitMask)
+					tasks.Add(champion.PortraitMask.LoadResourceAsync(GetPortraitMask()));
 			}
 
 			await UniTask.WhenAll(tasks);
@@ -1048,12 +1060,12 @@ namespace UI
 		{
 			return botDeckId switch
 			{
-				"bot_gauntlet_1" => "Boreas Arena  •  Normal Brain",
-				"bot_gauntlet_2" => "Arcadia Arena  •  Normal+ Tempo",
-				"bot_gauntlet_3" => "Hades Arena  •  Hard Pressure",
-				"bot_gauntlet_4" => "Notus Arena  •  Hard+ Control",
-				"bot_gauntlet_5" => "Colosseum  •  Brutal Boss",
-				_ => "Custom Arena  •  Practice Battle"
+				"bot_gauntlet_1" => "Boreas Arena • Normal Brain",
+				"bot_gauntlet_2" => "Arcadia Arena • Normal + Tempo",
+				"bot_gauntlet_3" => "Hades Arena • Hard Pressure",
+				"bot_gauntlet_4" => "Notus Arena • Hard + Control",
+				"bot_gauntlet_5" => "Colosseum • Brutal Boss",
+				_ => "Custom Arena • Practice Battle"
 			};
 		}
 
@@ -1079,6 +1091,7 @@ namespace UI
 			};
 		}
 
+		private static string GetPortraitMask() => "Vulcanite_Mask";
 		private static string GetChampionPortraitFrame(string botDeckId)
 		{
 			return botDeckId switch

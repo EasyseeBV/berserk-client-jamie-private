@@ -20,11 +20,11 @@ namespace UI
 {
 	public class CampaignModeView : BaseView
 	{
-		private const string ButtonBackgroundResource = "UI/btn_background_fantasy";
 		private const string CardFrameResource = "UI/button-frame";
 
 		public static CampaignModeView Instance { get; private set; }
 
+		private GameObject _generalButtonPrefab;
 		private TMP_FontAsset _fontAsset;
 		private Material _fontMaterial;
 		private RectTransform _panelRoot;
@@ -74,6 +74,7 @@ namespace UI
 			root.transform.SetParent(parent, false);
 
 			var view = root.GetComponent<CampaignModeView>();
+			view._generalButtonPrefab = menuView.GeneralButtonPrefab;
 			view.ShowAtStart = false;
 			view.Concurrent = false;
 			view.AutoCloseChildren = true;
@@ -129,7 +130,7 @@ namespace UI
 			_subtitleLabel.text = "Choose a quadrant to begin your campaign run.";
 			_quadrantsRoot.gameObject.SetActive(true);
 			_stageMapRoot.gameObject.SetActive(false);
-			_backLabel.text = "BACK";
+			_backLabel.text = "BACK TO SOLO";
 			BuildQuadrantSelection();
 		}
 
@@ -182,7 +183,7 @@ namespace UI
 			dimmer.color = new Color(0f, 0f, 0f, 0.72f);
 			dimmer.raycastTarget = true;
 
-			_panelRoot = CreateRect("PanelRoot", transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(980f, 660f));
+			_panelRoot = BuildStretchedRect("PanelRoot", transform);
 			_panelBackground = _panelRoot.gameObject.AddComponent<Image>();
 			var panelBorder = _panelRoot.gameObject.AddComponent<Outline>();
 			panelBorder.effectColor = new Color(0.92f, 0.72f, 0.25f, 0.88f);
@@ -192,20 +193,21 @@ namespace UI
 			var headerBand = CreateRect("HeaderBand", _panelRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -58f), new Vector2(900f, 110f));
 			var headerBandImage = headerBand.gameObject.AddComponent<Image>();
 			headerBandImage.color = new Color(0.03f, 0.04f, 0.06f, 0.34f);
+			headerBandImage.enabled = false;
 
-			_titleLabel = CreateText("Title", _panelRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -42f), new Vector2(640f, 48f), 34f, "THE QUADRANT TRIALS");
+			_titleLabel = CreateText("Title", _panelRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -10f), new Vector2(640f, 48f), 34f, "THE QUADRANT TRIALS");
 			_titleLabel.color = new Color(0.98f, 0.84f, 0.38f, 1f);
 			_titleLabel.fontStyle = FontStyles.Bold;
 			_titleLabel.alignment = TextAlignmentOptions.Center;
 
-			_subtitleLabel = CreateText("Subtitle", _panelRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -86f), new Vector2(760f, 24f), 17f, "Choose a quadrant to begin your campaign run.");
+			_subtitleLabel = CreateText("Subtitle", _panelRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -50f), new Vector2(760f, 24f), 17f, "Choose a quadrant to begin your campaign run.");
 			_subtitleLabel.alignment = TextAlignmentOptions.Center;
 			_subtitleLabel.color = new Color(0.9f, 0.9f, 0.9f, 0.92f);
 
-			_quadrantsRoot = CreateRect("QuadrantsRoot", _panelRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -6f), new Vector2(860f, 490f));
+			_quadrantsRoot = BuildStretchedRect("QuadrantsRoot", _panelRoot);
 			BuildQuadrantSelection();
 
-			_stageMapRoot = CreateRect("StageMapRoot", _panelRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -2f), new Vector2(860f, 520f));
+			_stageMapRoot = BuildStretchedRect("StageMapRoot", _panelRoot);
 			_stageMapRoot.gameObject.SetActive(false);
 
 			CreateBackButton();
@@ -218,9 +220,10 @@ namespace UI
 			for (var i = _quadrantsRoot.childCount - 1; i >= 0; i--)
 				Destroy(_quadrantsRoot.GetChild(i).gameObject);
 
-			var layoutRoot = CreateRect("QuadrantGrid", _quadrantsRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(848f, 498f));
+			var layoutRoot = CreateRect("QuadrantGrid", _quadrantsRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(840f, 490f));
 			var backdrop = layoutRoot.gameObject.AddComponent<Image>();
 			backdrop.color = new Color(0.03f, 0.04f, 0.05f, 0.18f);
+			backdrop.enabled = false;
 
 			for (var i = 0; i < CampaignModeSettings.Quadrants.Count; i++)
 			{
@@ -231,14 +234,19 @@ namespace UI
 				var x = isVulcanCity ? 0f : (column == 0 ? -210f : 210f);
 				var y = row switch
 				{
-					0 => 108f,
-					1 => -74f,
-					_ => -202f
+					0 => 100f,
+					1 => -72f,
+					_ => -210f
 				};
-				var width = isVulcanCity ? 640f : 372f;
-				var height = isVulcanCity ? 102f : 166f;
+				var width = isVulcanCity ? 620f : 364f;
+				var height = isVulcanCity ? 92f : 160f;
 				CreateQuadrantCard(layoutRoot, quadrant, new Vector2(x, y), new Vector2(width, height), GetQuadrantProgress(quadrant.Quadrant));
 			}
+		}
+
+		private RectTransform BuildStretchedRect(string name, Transform parent)
+		{
+			return CreateRect(name, parent, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 		}
 
 		private void BuildStageMapContent()
@@ -254,7 +262,7 @@ namespace UI
 			var totalStages = quadrantProgress?.TotalStages ?? _currentQuadrant.Stages.Count;
 			var totalStars = GetDisplayedStageProgresses(quadrantProgress)?.Sum(x => x.Stars) ?? 0;
 
-			var summary = CreateRect("Summary", _stageMapRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(768f, 90f));
+			var summary = CreateRect("Summary", _stageMapRoot, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -70f), new Vector2(760f, 82f));
 			var summaryBg = summary.gameObject.AddComponent<Image>();
 			summaryBg.color = new Color(0.05f, 0.06f, 0.08f, 0.72f);
 			var summaryOutline = summary.gameObject.AddComponent<Outline>();
@@ -304,15 +312,15 @@ namespace UI
 					: new Color(0.75f, 0.75f, 0.78f, 0.94f);
 			}
 
-			var track = CreateRect("StageTrack", _stageMapRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(796f, 300f));
+			var track = CreateRect("StageTrack", _stageMapRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(790f, 286f));
 			var trackBg = track.gameObject.AddComponent<Image>();
 			trackBg.color = new Color(0.03f, 0.03f, 0.04f, 0.18f);
 
-			var nodeGrid = CreateRect("NodeGrid", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(760f, 226f));
+			var nodeGrid = CreateRect("NodeGrid", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 34f), new Vector2(748f, 214f));
 			var nodeGridImage = nodeGrid.gameObject.AddComponent<Image>();
 			nodeGridImage.color = new Color(0.02f, 0.03f, 0.04f, 0.12f);
 
-			var divider = CreateRect("Divider", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(0f, 2f));
+			var divider = CreateRect("Divider", track, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 33f), new Vector2(0f, 2f));
 			var dividerImage = divider.gameObject.AddComponent<Image>();
 			dividerImage.color = new Color(0.95f, 0.75f, 0.2f, 0.22f);
 			var dividerRect = divider.GetComponent<RectTransform>();
@@ -325,8 +333,8 @@ namespace UI
 				var stage = _currentQuadrant.Stages[i];
 				var topRow = i < 4;
 				var column = topRow ? i : i - 4;
-				var x = -288f + column * 192f;
-				var y = topRow ? 58f : -58f;
+				var x = -282f + column * 188f;
+				var y = topRow ? 54 : -54;
 				CreateStageNode(nodeGrid, _currentQuadrant, stage, new Vector2(x, y), GetStageNodeState(stage), GetStageProgress(_currentQuadrant, stage.Index));
 			}
 
@@ -661,8 +669,8 @@ namespace UI
 
 		private void CreateBackButton()
 		{
-			var buttonGo = new GameObject("BackButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
-			buttonGo.transform.SetParent(_panelRoot, false);
+			var buttonGo = Instantiate(_generalButtonPrefab, _panelRoot, false);
+			buttonGo.name = "BackButton";
 
 			var rect = buttonGo.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
@@ -670,19 +678,12 @@ namespace UI
 			rect.anchoredPosition = new Vector2(0f, 14f);
 			rect.sizeDelta = new Vector2(300f, 72f);
 
-			var image = buttonGo.GetComponent<Image>();
-			image.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
-			image.type = Image.Type.Sliced;
-			image.color = Color.white;
-
 			var button = buttonGo.GetComponent<Button>();
-			button.targetGraphic = image;
 			button.onClick.AddListener(HandleBackPressed);
 
-			_backLabel = CreateText("BackLabel", buttonGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(240f, 34f), 22f, "BACK");
-			_backLabel.fontStyle = FontStyles.Bold;
-			_backLabel.alignment = TextAlignmentOptions.Center;
-			_backLabel.color = new Color(0.95f, 0.85f, 0.6f, 1f);
+			_backLabel = buttonGo.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (_backLabel != null)
+				_backLabel.text = "BACK TO SOLO";
 			buttonGo.transform.SetAsLastSibling();
 		}
 
@@ -737,8 +738,8 @@ namespace UI
 			var rect = buttonGo.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
 			rect.pivot = new Vector2(1f, 1f);
-			rect.anchoredPosition = new Vector2(-22f, -18f);
-			rect.sizeDelta = new Vector2(184f, 42f);
+			rect.anchoredPosition = new Vector2(-10f, -10f);
+			rect.sizeDelta = new Vector2(160f, 42f);
 
 			var image = buttonGo.GetComponent<Image>();
 			image.color = new Color(0.12f, 0.12f, 0.14f, 0.9f);
@@ -751,7 +752,7 @@ namespace UI
 			button.targetGraphic = image;
 			button.onClick.AddListener(ShowGuideOverlay);
 
-			var label = CreateText("GuideButtonLabel", buttonGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(164f, 22f), 13f, "HOW CAMPAIGN WORKS");
+			var label = CreateText("GuideButtonLabel", buttonGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(164f, 22f), 11f, "HOW CAMPAIGN WORKS");
 			label.fontStyle = FontStyles.Bold;
 			label.alignment = TextAlignmentOptions.Center;
 			label.color = new Color(1f, 0.9f, 0.66f, 0.98f);
@@ -765,8 +766,8 @@ namespace UI
 			var rect = buttonGo.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
 			rect.pivot = new Vector2(0f, 1f);
-			rect.anchoredPosition = new Vector2(22f, -18f);
-			rect.sizeDelta = new Vector2(196f, 42f);
+			rect.anchoredPosition = new Vector2(10f, -10f);
+			rect.sizeDelta = new Vector2(160f, 42f);
 
 			var image = buttonGo.GetComponent<Image>();
 			image.color = new Color(0.12f, 0.12f, 0.14f, 0.9f);
@@ -779,7 +780,7 @@ namespace UI
 			button.targetGraphic = image;
 			button.onClick.AddListener(ShowRewardsOverlay);
 
-			var label = CreateText("RewardsButtonLabel", buttonGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(176f, 22f), 13f, "REWARDS & PROGRESS");
+			var label = CreateText("RewardsButtonLabel", buttonGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(176f, 22f), 11f, "REWARDS & PROGRESS");
 			label.fontStyle = FontStyles.Bold;
 			label.alignment = TextAlignmentOptions.Center;
 			label.color = new Color(1f, 0.9f, 0.66f, 0.98f);
@@ -1279,11 +1280,14 @@ namespace UI
 			cardTitle.color = new Color(0.98f, 0.84f, 0.38f, 1f);
 			cardTitle.alignment = TextAlignmentOptions.TopLeft;
 
-			var cardBody = CreateText($"{name}Body", card, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(16f, -38f), new Vector2(316f, 46f), 13.5f, body);
+			var cardBody = CreateText($"{name}Body", card, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -38f), new Vector2(316f, 46f), 13.5f, body);
 			cardBody.color = new Color(0.95f, 0.95f, 0.97f, 0.96f);
 			cardBody.alignment = TextAlignmentOptions.TopLeft;
 			cardBody.enableWordWrapping = true;
 			cardBody.overflowMode = TextOverflowModes.Ellipsis;
+			//proper stretching
+			cardBody.rectTransform.offsetMin = new Vector2(16f, cardBody.rectTransform.offsetMin.y);
+			cardBody.rectTransform.offsetMax = new Vector2(-16f, cardBody.rectTransform.offsetMax.y);
 		}
 
 		private async UniTaskVoid LoadCampaignProgressAsync()
@@ -1445,18 +1449,20 @@ namespace UI
 				CreateDeckSelectionCard(deckList, deck, quadrant, stage, new Vector2(x, y));
 			}
 
-			var cancelButton = CreateRect("CancelButton", _deckSelectionOverlay, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(240f, 58f));
-			var cancelImage = cancelButton.gameObject.AddComponent<Image>();
-			cancelImage.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
-			cancelImage.type = Image.Type.Sliced;
-			cancelImage.color = Color.white;
-			var cancel = cancelButton.gameObject.AddComponent<Button>();
-			cancel.targetGraphic = cancelImage;
+			var cancelGo = Instantiate(_generalButtonPrefab, _deckSelectionOverlay, false);
+			cancelGo.name = "CancelButton";
+			var rect = cancelGo.GetComponent<RectTransform>();
+			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
+			rect.pivot = new Vector2(0.5f, 0f);
+			rect.anchoredPosition = new Vector2(0f, 18f);
+			rect.sizeDelta = new Vector2(240f, 58f);
+
+			var cancel = cancelGo.GetComponent<Button>();
 			cancel.onClick.AddListener(HideDeckSelection);
-			var cancelLabel = CreateText("CancelLabel", cancelButton, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(180f, 28f), 18f, "CANCEL");
-			cancelLabel.fontStyle = FontStyles.Bold;
-			cancelLabel.alignment = TextAlignmentOptions.Center;
-			cancelLabel.color = new Color(0.95f, 0.85f, 0.6f, 1f);
+
+			var cancelLabel = cancelGo.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (cancelLabel != null)
+				cancelLabel.text = "CANCEL";
 
 			_deckSelectionOverlay.SetAsLastSibling();
 		}
@@ -1761,26 +1767,52 @@ namespace UI
 				treasureBody.enableWordWrapping = true;
 			}
 
-			var continueButton = CreateRect("ResultsContinueButton", _battleResultsOverlay, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(264f, 50f));
-			var continueImage = continueButton.gameObject.AddComponent<Image>();
-			continueImage.sprite = Resources.Load<Sprite>(ButtonBackgroundResource);
-			continueImage.type = Image.Type.Sliced;
-			continueImage.color = Color.white;
-			var continuePress = continueButton.gameObject.AddComponent<Button>();
-			continuePress.targetGraphic = continueImage;
+			var continueGo = Instantiate(_generalButtonPrefab, _battleResultsOverlay, false);
+			continueGo.name = "ResultsContinueButton";
+			var rect = continueGo.GetComponent<RectTransform>();
+			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
+			rect.pivot = new Vector2(0.5f, 0f);
+			rect.anchoredPosition = new Vector2(0f, 14f);
+			rect.sizeDelta = new Vector2(220, 26);
+
+			var continuePress = continueGo.GetComponent<Button>();
 			continuePress.onClick.AddListener(() =>
 			{
 				HideBattleResultsOverlay();
 				if (_campaignProgress?.PendingTreasureChoices?.Count > 0 && result.DidWin)
 					ShowTreasureSelection();
 			});
-			var continueLabel = CreateText("ResultsContinueLabel", continueButton, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(220f, 26f), 18f,
-				result.DidWin && _campaignProgress?.PendingTreasureChoices?.Count > 0 ? "CHOOSE TREASURE" : "CONTINUE CAMPAIGN");
-			continueLabel.alignment = TextAlignmentOptions.Center;
-			continueLabel.fontStyle = FontStyles.Bold;
-			continueLabel.color = new Color(0.95f, 0.85f, 0.6f, 1f);
+
+			var continueLabel = continueGo.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (continueLabel != null)
+			{
+				continueLabel.fontSize = 18f;
+				continueLabel.color = new Color(0.95f, 0.85f, 0.6f, 1f);
+				continueLabel.fontStyle = FontStyles.Bold;
+				continueLabel.text = result.DidWin && _campaignProgress?.PendingTreasureChoices?.Count > 0 ? "CHOOSE TREASURE" : "CONTINUE CAMPAIGN";
+			}
 
 			_battleResultsOverlay.SetAsLastSibling();
+		}
+
+		private void CreateBtn()
+		{
+			var buttonGo = Instantiate(_generalButtonPrefab, _panelRoot, false);
+			buttonGo.name = "BackButton";
+
+			var rect = buttonGo.GetComponent<RectTransform>();
+			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
+			rect.pivot = new Vector2(0.5f, 0f);
+			rect.anchoredPosition = new Vector2(0f, 14f);
+			rect.sizeDelta = new Vector2(300f, 72f);
+
+			var button = buttonGo.GetComponent<Button>();
+			button.onClick.AddListener(HandleBackPressed);
+
+			_backLabel = buttonGo.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+			if (_backLabel != null)
+				_backLabel.text = "BACK TO SOLO";
+			buttonGo.transform.SetAsLastSibling();
 		}
 
 		private void HideBattleResultsOverlay()
@@ -2007,7 +2039,7 @@ namespace UI
 
 		private void BuildStageDetailPanel(Transform parent)
 		{
-			var panel = CreateRect("StageDetailPanel", parent, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(780f, 176f));
+			var panel = CreateRect("StageDetailPanel", parent, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, -59f), new Vector2(748f, 122f));
 			var panelImage = panel.gameObject.AddComponent<Image>();
 			panelImage.color = new Color(0.03f, 0.035f, 0.045f, 0.92f);
 			var outline = panel.gameObject.AddComponent<Outline>();
@@ -2020,7 +2052,7 @@ namespace UI
 			innerShade.rectTransform.offsetMax = new Vector2(-8f, -8f);
 			innerShade.transform.SetAsFirstSibling();
 
-			var artRect = CreateRect("DetailArt", panel, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(18f, 4f), new Vector2(182f, 110f));
+			var artRect = CreateRect("DetailArt", panel, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(14f, 0f), new Vector2(150f, 84f));
 			var artFrame = artRect.gameObject.AddComponent<Image>();
 			artFrame.color = new Color(0f, 0f, 0f, 0.42f);
 			var artImageGo = new GameObject("DetailArtImage", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
@@ -2032,7 +2064,7 @@ namespace UI
 			artRectImage.offsetMax = new Vector2(-2f, -2f);
 			_stageDetailArt = artImageGo.GetComponent<RawImage>();
 
-			_stageDetailTitle = CreateText("DetailTitle", panel, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(220f, -16f), new Vector2(384f, 34f), 28f, "");
+			_stageDetailTitle = CreateText("DetailTitle", panel, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(178f, -12f), new Vector2(360f, 28f), 22f, "");
 			_stageDetailTitle.fontStyle = FontStyles.Bold;
 			_stageDetailTitle.color = new Color(0.98f, 0.84f, 0.38f, 1f);
 			_stageDetailTitle.enableAutoSizing = false;
@@ -2040,18 +2072,19 @@ namespace UI
 			_stageDetailTitle.enableWordWrapping = false;
 			_stageDetailTitle.overflowMode = TextOverflowModes.Ellipsis;
 
-			_stageDetailState = CreateText("DetailState", panel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-18f, -18f), new Vector2(170f, 24f), 13f, "");
+			_stageDetailState = CreateText("DetailState", panel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-16f, -14f), new Vector2(170f, 20f), 12f, "");
 			_stageDetailState.alignment = TextAlignmentOptions.TopRight;
 			_stageDetailState.fontStyle = FontStyles.Bold;
 
-			_stageDetailBody = CreateText("DetailBody", panel, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(220f, -54f), new Vector2(536f, 62f), 16.5f, "");
+			_stageDetailBody = CreateText("DetailBody", panel, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(178f, -46f), new Vector2(534f, 54f), 17f, "");
 			_stageDetailBody.color = new Color(0.97f, 0.97f, 0.97f, 0.98f);
 			_stageDetailBody.alignment = TextAlignmentOptions.TopLeft;
 			_stageDetailBody.enableWordWrapping = true;
-			_stageDetailBody.overflowMode = TextOverflowModes.Ellipsis;
+			_stageDetailBody.overflowMode = TextOverflowModes.Truncate;
 			_stageDetailBody.fontStyle = FontStyles.Normal;
-			_stageDetailBody.lineSpacing = 6f;
-			_stageDetailBody.margin = new Vector4(0f, 0f, 18f, 0f);
+			_stageDetailBody.lineSpacing = 0f;
+			_stageDetailBody.wordWrappingRatios = 0.35f;
+			_stageDetailBody.margin = new Vector4(0f, 0f, 8f, 0f);
 
 			_stageDetailInstruction = CreateText("DetailInstruction", panel, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(220f, -126f), new Vector2(536f, 28f), 14.5f, "");
 			_stageDetailInstruction.color = new Color(0.98f, 0.88f, 0.54f, 0.98f);
@@ -2062,7 +2095,7 @@ namespace UI
 			_stageDetailInstruction.lineSpacing = 1f;
 			_stageDetailInstruction.margin = new Vector4(0f, 0f, 10f, 0f);
 
-			var helper = CreateText("DetailHelper", panel, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-16f, 12f), new Vector2(320f, 18f), 11.5f, "Hover to preview  •  Click CURRENT to enter with your chosen deck");
+			var helper = CreateText("DetailHelper", panel, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-14f, 12f), new Vector2(210f, 14f), 9f, "Hover a node to inspect it");
 			helper.alignment = TextAlignmentOptions.BottomRight;
 			helper.color = new Color(0.84f, 0.84f, 0.88f, 0.62f);
 		}

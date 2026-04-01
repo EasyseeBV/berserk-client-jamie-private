@@ -32,7 +32,11 @@ namespace UI
 			public Image Glow;
 			public TextMeshProUGUI Label;
 			public TextMeshProUGUI Marker;
+			public Image MarkerHeader;
 		}
+
+		[Header("Button Prefab")]
+		public Button ButtonPrefab;
 
 		// ─── Runtime state ──────────────────────────────────────────
 		private readonly List<ThemeBtn> _themeBtns = new();
@@ -110,9 +114,9 @@ namespace UI
 			// --- Tab bar (just below the SETTINGS title) ---
 			_tabBar = MakeTopRect("TabBar", Container, -208f, new Vector2(520f, 50f));
 
-			(_visualTabBg, _visualTabTxt, _visualLine) =
+			(_visualTabBg, _visualTabTxt) =
 				MakeTab("VisualTab", _tabBar, new Vector2(-142f, 0f), "VISUAL", () => SwitchTab(SettingsTab.Visual));
-			(_audioTabBg, _audioTabTxt, _audioLine) =
+			(_audioTabBg, _audioTabTxt) =
 				MakeTab("AudioTab", _tabBar, new Vector2(142f, 0f), "AUDIO", () => SwitchTab(SettingsTab.Audio));
 
 			// --- Visual panel (arena picker + board layout) ---
@@ -168,16 +172,14 @@ namespace UI
 			if (_audioRoot)
 				SetActive(_audioRoot, !vis);
 
-			StyleTab(_visualTabBg, _visualTabTxt, _visualLine, vis);
-			StyleTab(_audioTabBg, _audioTabTxt, _audioLine, !vis);
+			StyleTab(_visualTabBg, vis);
+			StyleTab(_audioTabBg, !vis);
 		}
 
-		private static void StyleTab(Image bg, TextMeshProUGUI txt, Image line, bool on)
+		private static void StyleTab(Image bg, bool on)
 		{
-			if (!bg || !txt) return;
-			bg.color  = on ? new Color(0.88f, 0.66f, 0.18f, 0.95f) : new Color(0.18f, 0.12f, 0.08f, 0.92f);
-			txt.color = on ? new Color(0.18f, 0.10f, 0.04f, 1f)    : new Color(0.95f, 0.85f, 0.60f, 1f);
-			if (line) line.enabled = on;
+			if (!bg) return;
+			bg.color  = on ? new Color(0.04705882f, 0.7372549f, 0.6235294f, 1f) : new Color(0.04705882f, 0.7372549f, 0.6235294f, 0f);
 		}
 
 		// ═════════════════════════════════════════════════════════════
@@ -196,22 +198,38 @@ namespace UI
 			pr.SetAsFirstSibling();
 
 			// Title
-			var title = MakeText("ArenaTitle", _arenaBox, new Vector2(0f, 108f), new Vector2(420f, 38f), 24f);
+			var title = MakeText("ArenaTitle", _arenaBox, new Vector2(0f, 108f), new Vector2(420f, 38f), 35f);
 			title.text = "ARENA SKIN";
 			ApplySectionLabelStyle(title);
 
 			// Subtitle
-			var hint = MakeText("ArenaHint", _arenaBox, new Vector2(0f, 74f), new Vector2(600f, 28f), 16f);
+			var hint = MakeText("ArenaHint", _arenaBox, new Vector2(0f, 74f), new Vector2(600f, 28f), 25f);
 			hint.text = "Choose the battlefield theme used in your matches";
 			hint.color = new Color(0.9f, 0.9f, 0.9f, 0.98f);
 			hint.alignment = TextAlignmentOptions.Center;
 
 			// Theme buttons
 			var defs = ArenaThemeSettings.GetDefinitions();
-			const float step = 152f;
-			var startX = -((defs.Length - 1) * step * 0.5f);
-			for (var i = 0; i < defs.Length; i++)
-				MakeThemeButton(defs[i], new Vector2(startX + i * step, -16f));
+			const float stepX = 300f;
+			const float stepY = 180f;
+			const int columns = 3;
+
+			// center offset
+			float startX = -stepX;
+			float startY = -65;
+
+			for (int i = 0; i < defs.Length; i++)
+			{
+				int col = i % columns;
+				int row = i / columns;
+
+				var pos = new Vector2(
+					startX + col * stepX,
+					startY - row * stepY
+				);
+
+				MakeThemeButton(defs[i], pos);
+			}
 
 			RefreshThemeSelection();
 		}
@@ -223,10 +241,12 @@ namespace UI
 				typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
 			go.transform.SetParent(_arenaBox, false);
 
+			float mainSize = 200;
+
 			var rt = go.GetComponent<RectTransform>();
 			rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
 			rt.anchoredPosition = pos;
-			rt.sizeDelta = new Vector2(138f, 138f);
+			rt.sizeDelta = new Vector2(mainSize, mainSize);
 
 			var frame = go.GetComponent<Image>();
 			frame.color = new Color(0f, 0f, 0f, 0f);
@@ -245,36 +265,54 @@ namespace UI
 			btn.colors = c;
 			btn.onClick.AddListener(() => ArenaThemeSettings.SetSelected(def.PreferenceValue));
 
+			float glowX = mainSize;
+			float glowY = 130;
+			float diffX = 10;
+			float diffY = 10;
+
 			// Glow
-			var glowImg = MakeImage("Glow", go.transform, new Vector2(0f, -4f), new Vector2(126f, 76f),
+			var glowImg = MakeImage("Glow", go.transform, new Vector2(0f, 0f), new Vector2(glowX, glowY),
 				new Color(1f, 0.72f, 0.2f, 0.08f));
 			var glowRt = glowImg.GetComponent<RectTransform>();
 			glowRt.anchorMin = glowRt.anchorMax = new Vector2(0.5f, 1f);
 			glowRt.pivot = new Vector2(0.5f, 1f);
 
 			// Preview frame
-			MakePreview("PreviewFrame", go.transform, new Vector2(0f, -6f), new Vector2(126f, 74f),
+			MakePreview("PreviewFrame", go.transform, new Vector2(0f, -5f), new Vector2(glowX - diffX, glowY-diffY),
 				new Color(0.68f, 0.68f, 0.68f, 0.9f), true);
 
 			// Background preview (RawImage)
-			var bgPreview = MakeRawImage("BgPreview", go.transform, new Vector2(0f, -8f), new Vector2(120f, 68f));
+			var bgPreview = MakeRawImage("BgPreview", go.transform, new Vector2(0f, -10f), new Vector2(glowX - (diffX*2), glowY - (diffY *2)));
 			bgPreview.LoadResourceAsync(def.BackgroundResourceId).Forget();
 
 			// Board preview (RawImage, smaller, overlaid)
-			var boardPreview = MakeRawImage("BoardPreview", go.transform, new Vector2(0f, -46f), new Vector2(92f, 26f));
+			var boardPreview = MakeRawImage("BoardPreview", bgPreview.transform, new Vector2(0f, 0f), new Vector2(145f, 42f));
+			boardPreview.rectTransform.pivot = new(0.5f, 0f);
+			boardPreview.rectTransform.anchorMin = new(0.5f, 0f);
+			boardPreview.rectTransform.anchorMax = new(0.5f, 0f);
+
 			boardPreview.LoadResourceAsync(def.GameboardResourceId).Forget();
 
 			// Theme name
 			var label = MakeText($"{def.PreferenceValue}_Name", go.transform, new Vector2(0f, -54f),
-				new Vector2(138f, 26f), 16f);
+				new Vector2(138f, 26f), 25f);
 			label.text = def.DisplayName.ToUpperInvariant();
 			label.fontStyle = FontStyles.Bold;
 			label.color = new Color(0.98f, 0.84f, 0.38f, 1f);
 			label.alignment = TextAlignmentOptions.Bottom;
 
 			// "ACTIVE" marker
-			var marker = MakeText($"{def.PreferenceValue}_Active", go.transform, new Vector2(0f, 42f),
-				new Vector2(100f, 18f), 12f);
+			var markerHeader = MakeImage("ActiveBG", go.transform, new Vector2(0f, 55f), new Vector2(0, 30f), new Color(0f,0f,0f,0.7f));
+			markerHeader.rectTransform.anchorMin = new Vector2(0, 0.5f);
+			markerHeader.rectTransform.anchorMax = new Vector2(1, 0.5f);
+			markerHeader.rectTransform.offsetMin = new Vector2(10f, markerHeader.rectTransform.offsetMin.y);
+			markerHeader.rectTransform.offsetMax = new Vector2(-10f, markerHeader.rectTransform.offsetMax.y);
+			markerHeader.gameObject.SetActive(false);
+
+			var marker = MakeText($"{def.PreferenceValue}_Active", markerHeader.transform, new Vector2(0f, 0f),
+				new Vector2(100f, 18f), 20f);
+			marker.text = "ACTIVE";
+			marker.fontStyle = FontStyles.Bold;
 			marker.alignment = TextAlignmentOptions.Center;
 			marker.color = new Color(1f, 0.86f, 0.38f, 1f);
 
@@ -286,7 +324,7 @@ namespace UI
 			_themeBtns.Add(new ThemeBtn
 			{
 				Key = def.PreferenceValue, Frame = frame, Border = border,
-				Glow = glowImg, Label = label, Marker = marker
+				Glow = glowImg, Label = label, Marker = marker, MarkerHeader = markerHeader,
 			});
 		}
 
@@ -308,7 +346,7 @@ namespace UI
 				if (t.Label) t.Label.color = on
 					? new Color(1f, 0.86f, 0.38f, 1f)
 					: new Color(0.9f, 0.82f, 0.54f, 1f);
-				if (t.Marker) t.Marker.text = on ? "ACTIVE" : "";
+				if (t.MarkerHeader) t.MarkerHeader.gameObject.SetActive(on);
 			}
 		}
 
@@ -318,7 +356,7 @@ namespace UI
 
 		private void BuildLayoutToggle()
 		{
-			_layoutBox = MakeRect("LayoutBox", _visualRoot, new Vector2(0f, -110f), new Vector2(980f, 80f));
+			_layoutBox = MakeRect("LayoutBox", _visualRoot, new Vector2(0f, -320f), new Vector2(980f, 80f));
 
 			// Label
 			var lbl = MakeText("LayoutLabel", _layoutBox, new Vector2(-240f, 8f), new Vector2(360f, 30f), 24f);
@@ -327,7 +365,7 @@ namespace UI
 			lbl.alignment = TextAlignmentOptions.MidlineLeft;
 
 			// Hint
-			var hint = MakeText("LayoutHint", _layoutBox, new Vector2(-92f, -16f), new Vector2(620f, 26f), 16f);
+			var hint = MakeText("LayoutHint", _layoutBox, new Vector2(-92f, -25f), new Vector2(620f, 26f), 20f);
 			hint.text = "Strips away board chrome for a clean, full-screen arena";
 			hint.color = new Color(0.9f, 0.9f, 0.9f, 0.98f);
 			hint.alignment = TextAlignmentOptions.MidlineLeft;
@@ -385,7 +423,7 @@ namespace UI
 		{
 			if (!label) return;
 			label.enableAutoSizing = false;
-			label.fontSize = 24f;
+			label.fontSize = 35f;
 			label.fontStyle = FontStyles.Bold;
 			label.color = new Color(0.95f, 0.85f, 0.6f, 1f);
 			label.alignment = TextAlignmentOptions.Center;
@@ -476,37 +514,27 @@ namespace UI
 			return t;
 		}
 
-		private (Image bg, TextMeshProUGUI txt, Image line) MakeTab(
+		private (Image bg, TextMeshProUGUI txt) MakeTab(
 			string name, Transform parent, Vector2 pos, string label, Action onClick)
 		{
-			var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
-			go.transform.SetParent(parent, false);
-			var rt = go.GetComponent<RectTransform>();
+			var btn = Instantiate(ButtonPrefab);
+			btn.transform.SetParent(parent, false);
+			btn.gameObject.name = name;
+
+
+			var rt = btn.GetComponent<RectTransform>();
+			rt.sizeDelta = new Vector2(170f, 50f);
 			rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
 			rt.anchoredPosition = pos;
-			rt.sizeDelta = new Vector2(210f, 42f);
 
-			var bg = go.GetComponent<Image>();
-			var btn = go.GetComponent<Button>();
-			btn.targetGraphic = bg;
 			btn.onClick.AddListener(() => onClick?.Invoke());
 
-			var txt = MakeText($"{name}_Lbl", go.transform, Vector2.zero, new Vector2(200f, 32f), 20f);
-			txt.alignment = TextAlignmentOptions.Center;
-			txt.fontStyle = FontStyles.Bold;
+			var btnView = btn.GetComponent<ButtonView>();
+			var bg = btnView.CustomView;
+
+			var txt = btn.gameObject.GetComponentInChildren<TextMeshProUGUI>();
 			txt.text = label;
-
-			var lineGo = new GameObject($"{name}_Line", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-			lineGo.transform.SetParent(go.transform, false);
-			var lr = lineGo.GetComponent<RectTransform>();
-			lr.anchorMin = new Vector2(0.5f, 0f); lr.anchorMax = new Vector2(0.5f, 0f);
-			lr.pivot = new Vector2(0.5f, 0f);
-			lr.anchoredPosition = Vector2.zero;
-			lr.sizeDelta = new Vector2(150f, 3f);
-			var line = lineGo.GetComponent<Image>();
-			line.color = new Color(1f, 0.72f, 0.2f, 0.95f);
-
-			return (bg, txt, line);
+			return (bg, txt);
 		}
 
 		private static void AddPointerEvent(EventTrigger trigger, EventTriggerType type, Action action)
