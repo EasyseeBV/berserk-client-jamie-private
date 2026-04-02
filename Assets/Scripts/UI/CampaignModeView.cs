@@ -4,14 +4,15 @@ using System.Linq;
 using Berserk.Shared.Data.Campaign;
 using Berserk.Shared.Data.Enums;
 using Berserk.Shared.Data.Game;
-using TMPro;
 using BerserkV3.Common.Utils;
 using BerserkV3.Lobby.Deck;
 using BerserkV3.Lobby.MatchMaking.Practice;
 using BerserkV3.Lobby.Network;
 using BerserkV3.Startup.Authorization;
 using Cysharp.Threading.Tasks;
+using Global;
 using RR.UI.FrameSystem;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,6 +22,9 @@ namespace UI
 	public class CampaignModeView : BaseView
 	{
 		private const string CardFrameResource = "UI/button-frame";
+
+		private QuadrantView baseQuadrant;
+		private QuadrantView vulcanQuadrant;
 
 		public static CampaignModeView Instance { get; private set; }
 
@@ -85,6 +89,15 @@ namespace UI
 			view.Initialize();
 			view.gameObject.SetActive(false);
 			UIManager.StaticViews[nameof(CampaignModeView)] = view;
+
+			view.baseQuadrant = Resources.Load<QuadrantView>("Quadrants/BaseQuad_Revamp");
+			view.vulcanQuadrant = Resources.Load<QuadrantView>("Quadrants/VulcanQuad_Revamp");
+
+			if (view.baseQuadrant == null)
+				Debug.LogError("FAILED TO GET BASE QUAD PREFAB");
+			if (view.vulcanQuadrant == null)
+				Debug.LogError("FAILED TO GET VULCAN QUAD PREFAB");
+
 			return view;
 		}
 
@@ -96,6 +109,7 @@ namespace UI
 		protected override void OnShown()
 		{
 			base.OnShown();
+
 			LoadCampaignProgressAsync().Forget();
 		}
 
@@ -217,29 +231,66 @@ namespace UI
 
 		private void BuildQuadrantSelection()
 		{
+			Debug.Log("GETTING QUAD PREFABS");
+			baseQuadrant = baseQuadrant != null ? baseQuadrant : Resources.Load<QuadrantView>("Quadrants/BaseQuad_Revamp");
+			vulcanQuadrant = vulcanQuadrant != null ? vulcanQuadrant : Resources.Load<QuadrantView>("Quadrants/VulcanQuad_Revamp");
+
+			if (baseQuadrant == null)
+				Debug.LogError("FAILED TO GET BASE QUAD PREFAB");
+			if (vulcanQuadrant == null)
+				Debug.LogError("FAILED TO GET VULCAN QUAD PREFAB");
+
 			for (var i = _quadrantsRoot.childCount - 1; i >= 0; i--)
 				Destroy(_quadrantsRoot.GetChild(i).gameObject);
 
-			var layoutRoot = CreateRect("QuadrantGrid", _quadrantsRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(840f, 490f));
+			var layoutRoot = BuildStretchedRect("QuadrantGrid", _quadrantsRoot);
+			layoutRoot.offsetMin = new Vector2(layoutRoot.offsetMin.x, 100f);
+			layoutRoot.offsetMax = new Vector2(layoutRoot.offsetMax.x, -100f);
+
 			var backdrop = layoutRoot.gameObject.AddComponent<Image>();
 			backdrop.color = new Color(0.03f, 0.04f, 0.05f, 0.18f);
 			backdrop.enabled = false;
+
+			// Layout constants
+			const float cardWidth = 380f;
+			const float cardHeight = 160f;
+			const float gap = 0f;
+			const float vulcanHeight = 92f;
+			const float vulcanWidth = 620f;
+
+			// Total grid height = row0 + gap + row1
+			// Center the 2x2 block + vulcan vertically
+			// Top of grid row 0 center = +((cardHeight + vulcanHeight) / 2)
+			float totalHeight = cardHeight * 2 + gap + vulcanHeight;
+			float topRowY = (totalHeight / 2f) - (cardHeight / 2f);         // center of top row
+			float bottomRowY = topRowY - cardHeight - gap;                   // center of bottom row
+			float vulcanY = bottomRowY - (cardHeight / 2f) - (vulcanHeight / 2f); // flush below bottom row
+
 
 			for (var i = 0; i < CampaignModeSettings.Quadrants.Count; i++)
 			{
 				var quadrant = CampaignModeSettings.Quadrants[i];
 				var isVulcanCity = quadrant.Id == "vulcan_city";
-				var row = isVulcanCity ? 2 : i / 2;
-				var column = isVulcanCity ? 0 : i % 2;
-				var x = isVulcanCity ? 0f : (column == 0 ? -210f : 210f);
-				var y = row switch
+
+				float x, y, width, height;
+
+				if (isVulcanCity)
 				{
-					0 => 100f,
-					1 => -72f,
-					_ => -210f
-				};
-				var width = isVulcanCity ? 620f : 364f;
-				var height = isVulcanCity ? 92f : 160f;
+					x = 0f;
+					y = vulcanY;
+					width = vulcanWidth;
+					height = vulcanHeight;
+				}
+				else
+				{
+					var row = i / 2;
+					var column = i % 2;
+					x = column == 0 ? -(cardWidth / 2f) : (cardWidth / 2f);
+					y = row == 0 ? topRowY : bottomRowY;
+					width = cardWidth;
+					height = cardHeight;
+				}
+
 				CreateQuadrantCard(layoutRoot, quadrant, new Vector2(x, y), new Vector2(width, height), GetQuadrantProgress(quadrant.Quadrant));
 			}
 		}
@@ -345,32 +396,22 @@ namespace UI
 
 		private void CreateQuadrantCard(Transform parent, CampaignQuadrantDefinition quadrant, Vector2 anchoredPosition, Vector2 size, CampaignQuadrantProgressModel progress)
 		{
-			var go = new GameObject("QuadrantCard_" + quadrant.Id, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
-			go.transform.SetParent(parent, false);
+			var isVulcanCity = quadrant.Id == "vulcan_city";
 
-			var rect = go.GetComponent<RectTransform>();
+			var quadView = Instantiate(isVulcanCity ? vulcanQuadrant : baseQuadrant, parent);
+			quadView.transform.SetParent(parent, false);
+
+			var rect = quadView.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
 			rect.pivot = new Vector2(0.5f, 0.5f);
 			rect.anchoredPosition = anchoredPosition;
 			rect.sizeDelta = size;
 
 			var isLocked = progress != null ? !progress.IsUnlocked : quadrant.IsLocked;
-			var image = go.GetComponent<Image>();
-			image.color = isLocked ? new Color(0.11f, 0.11f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.09f, 0.9f);
+			Color col = isLocked ? new Color(0.11f, 0.11f, 0.12f, 0.95f) : new Color(0.6037736f, 0.6037736f, 0.6037736f, 1f);
+			quadView.SetBackgroundCol(col);
 
-			var outerGlow = go.gameObject.AddComponent<Outline>();
-			outerGlow.effectColor = isLocked ? new Color(0.44f, 0.44f, 0.46f, 0.72f) : new Color(1f, 0.34f, 0.05f, 0.72f);
-			outerGlow.effectDistance = new Vector2(2.5f, -2.5f);
-			outerGlow.useGraphicAlpha = true;
-
-			var innerOutline = go.gameObject.AddComponent<Shadow>();
-			innerOutline.effectColor = isLocked ? new Color(0f, 0f, 0f, 0.5f) : new Color(1f, 0.76f, 0.18f, 0.72f);
-			innerOutline.effectDistance = new Vector2(0f, 0f);
-			innerOutline.useGraphicAlpha = true;
-
-			var button = go.GetComponent<Button>();
-			button.interactable = !isLocked;
-			button.onClick.AddListener(() =>
+			quadView.SetButtonAcion(() => //TODO: Check what the void do
 			{
 				if (isLocked)
 				{
@@ -379,162 +420,17 @@ namespace UI
 				}
 
 				ShowStageMap(quadrant);
-			});
+			},
+			!isLocked);
 
-			var isVulcanCity = quadrant.Id == "vulcan_city";
-			var frameSprite = Resources.Load<Sprite>(CardFrameResource);
-			var outerHeat = CreateRect("OuterHeat", go.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size.x + 28f, size.y + 28f));
-			var outerHeatImage = outerHeat.gameObject.AddComponent<Image>();
-			outerHeatImage.color = isLocked ? new Color(0f, 0f, 0f, 0f) : new Color(1f, 0.36f, 0.06f, 0.1f);
-			var outerHeatOutline = outerHeat.gameObject.AddComponent<Outline>();
-			outerHeatOutline.effectColor = new Color(1f, 0.42f, 0.08f, 0.44f);
-			outerHeatOutline.effectDistance = new Vector2(7f, -7f);
-			outerHeatOutline.useGraphicAlpha = true;
-			outerHeat.transform.SetAsFirstSibling();
-			if (frameSprite)
-			{
-				var fireFrame = CreateRect("FireFrame", go.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size.x + 22f, size.y + 22f));
-				var fireFrameImage = fireFrame.gameObject.AddComponent<Image>();
-				fireFrameImage.sprite = frameSprite;
-				fireFrameImage.type = Image.Type.Sliced;
-				fireFrameImage.color = isLocked ? new Color(0f, 0f, 0f, 0f) : new Color(1f, 0.46f, 0.06f, 0.95f);
-				var fireOuterGlow = fireFrame.gameObject.AddComponent<Outline>();
-				fireOuterGlow.effectColor = new Color(1f, 0.58f, 0.12f, 0.95f);
-				fireOuterGlow.effectDistance = new Vector2(6f, -6f);
-				fireOuterGlow.useGraphicAlpha = true;
-				var fireInnerGlow = fireFrame.gameObject.AddComponent<Shadow>();
-				fireInnerGlow.effectColor = new Color(1f, 0.88f, 0.34f, 0.78f);
-				fireInnerGlow.effectDistance = new Vector2(0f, 0f);
-				fireInnerGlow.useGraphicAlpha = true;
-
-				var frame = CreateRect("Frame", go.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size.x + 10f, size.y + 10f));
-				var frameImage = frame.gameObject.AddComponent<Image>();
-				frameImage.sprite = frameSprite;
-				frameImage.type = Image.Type.Sliced;
-				frameImage.color = isLocked ? new Color(0.72f, 0.72f, 0.72f, 0.82f) : new Color(1f, 0.94f, 0.9f, 1f);
-				fireFrame.SetAsLastSibling();
-				frame.SetSiblingIndex(fireFrame.GetSiblingIndex() - 1);
-			}
-
-			var cardInset = CreateRect("CardInset", go.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size.x - 18f, size.y - 18f));
-			var cardInsetImage = cardInset.gameObject.AddComponent<Image>();
-			cardInsetImage.color = new Color(0.12f, 0.12f, 0.14f, 0.94f);
-
-			AddFireBorder(cardInset, isLocked, isVulcanCity);
-
-			var artHeight = isVulcanCity ? 44f : 76f;
-			var artFrame = CreateRect("ArtFrame", cardInset, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(cardInset.sizeDelta.x - 20f, artHeight));
-			var artMask = artFrame.gameObject.AddComponent<Image>();
-			artMask.color = new Color(0f, 0f, 0f, 0.55f);
-
-			var art = new GameObject("Art", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
-			art.transform.SetParent(artFrame, false);
-			var artRect = art.GetComponent<RectTransform>();
-			artRect.anchorMin = Vector2.zero;
-			artRect.anchorMax = Vector2.one;
-			artRect.offsetMin = Vector2.zero;
-			artRect.offsetMax = Vector2.zero;
-			var artImage = art.GetComponent<RawImage>();
-			artImage.texture = Resources.Load<Texture2D>(quadrant.PreviewTextureResource);
-			artImage.color = isLocked ? new Color(0.45f, 0.45f, 0.45f, 0.85f) : new Color(1f, 1f, 1f, 0.92f);
-
-			var artShade = CreateFillImage("ArtShade", art.transform, new Color(0.02f, 0.02f, 0.04f, 0.2f));
-			artShade.rectTransform.offsetMin = Vector2.zero;
-			artShade.rectTransform.offsetMax = Vector2.zero;
-
-			var emberGlow = CreateFillImage("EmberGlow", art.transform, isLocked ? new Color(0f, 0f, 0f, 0f) : new Color(1f, 0.42f, 0.08f, 0.22f));
-			emberGlow.rectTransform.anchorMin = new Vector2(0f, 0f);
-			emberGlow.rectTransform.anchorMax = new Vector2(1f, 0f);
-			emberGlow.rectTransform.pivot = new Vector2(0.5f, 0f);
-			emberGlow.rectTransform.sizeDelta = new Vector2(0f, 18f);
-
-			var body = CreateRect("Body", cardInset, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(cardInset.sizeDelta.x - 20f, isVulcanCity ? 48f : 76f));
-			var bodyImage = body.gameObject.AddComponent<Image>();
-			bodyImage.color = new Color(0.07f, 0.07f, 0.08f, isLocked ? 0.9f : 0.96f);
-			var bodyWidth = body.sizeDelta.x - 36f;
-
-			var emblem = new GameObject("Emblem", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
-			emblem.transform.SetParent(cardInset, false);
-			var emblemRect = emblem.GetComponent<RectTransform>();
-			emblemRect.anchorMin = emblemRect.anchorMax = new Vector2(0f, 1f);
-			emblemRect.pivot = new Vector2(0.5f, 0.5f);
-			emblemRect.anchoredPosition = isVulcanCity ? new Vector2(42f, -28f) : new Vector2(36f, -40f);
-			emblemRect.sizeDelta = isVulcanCity ? new Vector2(40f, 40f) : new Vector2(46f, 46f);
-			var emblemImage = emblem.GetComponent<RawImage>();
-			emblemImage.texture = Resources.Load<Texture2D>(quadrant.EmblemTextureResource);
-			emblemImage.color = isLocked ? new Color(0.62f, 0.62f, 0.62f, 0.78f) : new Color(1f, 1f, 1f, 0.96f);
-
-			var nameGlow = CreateFillImage("NameGlow", cardInset, isLocked ? new Color(0f, 0f, 0f, 0f) : new Color(1f, 0.52f, 0.14f, 0.12f));
-			nameGlow.rectTransform.anchorMin = new Vector2(0f, 0f);
-			nameGlow.rectTransform.anchorMax = new Vector2(1f, 0f);
-			nameGlow.rectTransform.pivot = new Vector2(0.5f, 0f);
-			nameGlow.rectTransform.anchoredPosition = new Vector2(0f, isVulcanCity ? 42f : 66f);
-			nameGlow.rectTransform.sizeDelta = new Vector2(0f, 28f);
-
-			var title = CreateText(
-				"Title",
-				body,
-				new Vector2(0f, 1f),
-				new Vector2(0f, 1f),
-				new Vector2(0f, 1f),
-				new Vector2(18f, -10f),
-				new Vector2(bodyWidth, 28f),
-				isVulcanCity ? 23f : 22f,
-				quadrant.DisplayName);
-			title.alignment = TextAlignmentOptions.TopLeft;
-			title.fontStyle = FontStyles.Bold;
-			title.color = quadrant.IsLocked ? new Color(0.76f, 0.76f, 0.76f, 0.92f) : new Color(0.98f, 0.84f, 0.38f, 1f);
-			title.enableAutoSizing = true;
-			title.fontSizeMin = 14f;
-			title.fontSizeMax = isVulcanCity ? 23f : 22f;
-			title.enableWordWrapping = false;
-			title.overflowMode = TextOverflowModes.Ellipsis;
-
-			var subtitle = CreateText(
-				"Subtitle",
-				body,
-				new Vector2(0f, 1f),
-				new Vector2(0f, 1f),
-				new Vector2(0f, 1f),
-				new Vector2(18f, isVulcanCity ? -34f : -35f),
-				new Vector2(bodyWidth, isVulcanCity ? 18f : 30f),
-				11f,
-				isVulcanCity ? "Final 3-stage finale" : (progress?.Description ?? quadrant.Subtitle));
-			subtitle.alignment = TextAlignmentOptions.TopLeft;
-			subtitle.color = new Color(0.9f, 0.9f, 0.9f, 0.94f);
-			subtitle.enableAutoSizing = false;
-			subtitle.enableWordWrapping = true;
-			subtitle.overflowMode = TextOverflowModes.Truncate;
-
+			quadView.SetBaseQuadrant(quadrant);
+			quadView.SetSubtitle(isVulcanCity ? "Final 3-stage finale" : (progress?.Description ?? quadrant.Subtitle));
 			var rewardText = isVulcanCity
 				? quadrant.RewardText
 				: progress != null
 					? $"{progress.CompletedStages}/{progress.TotalStages} cleared  •  {progress.Stages.Sum(x => x.Stars)} stars"
 					: quadrant.RewardText;
-
-			var reward = CreateText(
-				"Reward",
-				body,
-				new Vector2(0f, 0f),
-				new Vector2(0f, 0f),
-				new Vector2(0f, 0f),
-				new Vector2(18f, 8f),
-				new Vector2(bodyWidth, 18f),
-				11.5f,
-				rewardText.ToUpperInvariant());
-			reward.alignment = TextAlignmentOptions.BottomLeft;
-			reward.color = isLocked ? new Color(0.78f, 0.78f, 0.78f, 0.86f) : new Color(1f, 0.88f, 0.52f, 0.94f);
-			reward.fontStyle = FontStyles.Bold;
-			reward.enableAutoSizing = true;
-			reward.fontSizeMin = 9.5f;
-			reward.fontSizeMax = 11.5f;
-			reward.enableWordWrapping = false;
-			reward.overflowMode = TextOverflowModes.Ellipsis;
-
-			body.SetAsLastSibling();
-			title.transform.SetAsLastSibling();
-			subtitle.transform.SetAsLastSibling();
-			reward.transform.SetAsLastSibling();
+			quadView.SetReward(rewardText);
 		}
 
 		private void CreateStageNode(Transform parent, CampaignQuadrantDefinition quadrant, CampaignStageDefinition stage, Vector2 anchoredPosition, CampaignNodeState state, CampaignStageProgressModel stageProgress)
