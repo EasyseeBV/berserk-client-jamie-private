@@ -13,36 +13,31 @@ namespace BerserkV3.GameCore.UI
 		{
 		[SerializeField] private RawImage BackgroundImage;
 		[SerializeField] private RawImage Plane;
-		[SerializeField] private RawImage BottomLeftCorner;
+		/*[SerializeField] private RawImage BottomLeftCorner;
 		[SerializeField] private RawImage BottomRightCorner;
 		[SerializeField] private RawImage TopLeftCorner;
-		[SerializeField] private RawImage TopRightCorner;
+		[SerializeField] private RawImage TopRightCorner;*/
 
 		[Inject]
 		private void Construct()
 		{
-			ApplyFullscreenBackgroundLayout();
+			//ApplyFullscreenBackgroundLayout();
 			GameCustomisationsAdapter.Application.SubscribeOnReady(LoadArenaTheme);
 			ArenaThemeSettings.Changed += OnArenaThemeChanged;
-			BoardLayoutSettings.Changed += OnBoardLayoutChanged;
+			//BoardLayoutSettings.Changed += OnBoardLayoutChanged;
 		}
 
 		private async UniTask LoadArenaTheme()
 		{
-			ApplyFullscreenBackgroundLayout();
+			//ApplyFullscreenBackgroundLayout();
 			var token = this.GetCancellationTokenOnDestroy();
 			var selectedTheme = ArenaThemeSettings.Current;
 
 			await UniTask.WhenAll(
 					BackgroundImage.LoadResourceAsync(selectedTheme.BackgroundResourceId, token),
-					Plane.LoadResourceAsync(selectedTheme.GameboardResourceId, token),
-					BottomLeftCorner.LoadResourceAsync(selectedTheme.BottomLeftCornerResourceId, token),
-				BottomRightCorner.LoadResourceAsync(selectedTheme.BottomRightCornerResourceId, token),
-				TopLeftCorner.LoadResourceAsync(selectedTheme.TopLeftCornerResourceId, token),
-				TopRightCorner.LoadResourceAsync(selectedTheme.TopRightCornerResourceId, token))
-				.AttachExternalCancellation(token);
+					Plane.LoadResourceAsync(selectedTheme.GameboardResourceId, token).AttachExternalCancellation(token));
 
-			ApplyBoardLayoutVisibility();
+			//ApplyBoardLayoutVisibility();
 		}
 
 		private void OnArenaThemeChanged()
@@ -57,32 +52,32 @@ namespace BerserkV3.GameCore.UI
 
 			private void Update()
 			{
-				ApplyBoardLayoutVisibility();
+				//ApplyBoardLayoutVisibility();
 			}
 
 		private void ApplyFullscreenBackgroundLayout()
 		{
 			StretchToFill(transform as RectTransform);
 			StretchToFill(BackgroundImage ? BackgroundImage.rectTransform : null);
-			StretchToFill(Plane ? Plane.rectTransform : null);
+			//StretchToFill(Plane ? Plane.rectTransform : null);
 		}
 
 		private void ApplyBoardLayoutVisibility()
 		{
 			var isMinimal = BoardLayoutSettings.IsMinimal();
 			SetGraphicVisible(Plane, !isMinimal);
-			SetGraphicVisible(TableBase, !isMinimal);
-			SetGraphicVisible(TableBorders, !isMinimal);
-			ApplyCornerVisibility(!isMinimal);
+			/*SetGraphicVisible(TableBase, !isMinimal);
+			SetGraphicVisible(TableBorders, !isMinimal);*/
+			//ApplyCornerVisibility(!isMinimal);
 		}
 
-		private void ApplyCornerVisibility(bool isVisible)
+		/*private void ApplyCornerVisibility(bool isVisible)
 		{
 			SetGraphicVisible(BottomLeftCorner, isVisible);
 			SetGraphicVisible(BottomRightCorner, isVisible);
 			SetGraphicVisible(TopLeftCorner, isVisible);
 			SetGraphicVisible(TopRightCorner, isVisible);
-		}
+		}*/
 
 		private static void SetGraphicVisible(Graphic graphic, bool isVisible)
 		{
@@ -112,12 +107,12 @@ namespace BerserkV3.GameCore.UI
 		private void OnDestroy()
 		{
 			ArenaThemeSettings.Changed -= OnArenaThemeChanged;
-			BoardLayoutSettings.Changed -= OnBoardLayoutChanged;
+			//BoardLayoutSettings.Changed -= OnBoardLayoutChanged;
 			Plane.ReleaseResource();
-			BottomLeftCorner.ReleaseResource();
+			/*BottomLeftCorner.ReleaseResource();
 			BottomRightCorner.ReleaseResource();
 			TopLeftCorner.ReleaseResource();
-			TopRightCorner.ReleaseResource();
+			TopRightCorner.ReleaseResource();*/
 			BackgroundImage.ReleaseResource();
 		}
 	}

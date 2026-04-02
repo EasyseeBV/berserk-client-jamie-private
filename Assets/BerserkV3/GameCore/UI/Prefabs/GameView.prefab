@@ -31,9 +31,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4035402717029203797}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -28.1, y: -405}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 275, y: 200}
   m_SizeDelta: {x: 248, y: 248}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &86701514967061289
@@ -114,9 +114,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4035402717029203797}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -27.6, y: 405}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 248, y: 248}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &4943037732590618712
@@ -642,15 +642,15 @@ RectTransform:
   m_GameObject: {fileID: 8410921081017808183}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4035402717029203797}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -22, y: 45}
-  m_SizeDelta: {x: 1139.5674, y: 523.618}
+  m_AnchoredPosition: {x: 0, y: 75}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8410921081017808178
 CanvasRenderer:
@@ -674,7 +674,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arcSize: 7.6
   arcScale: {x: 1300, y: 777.8}
-  handCardLimit: 6
   splineType: 1
   splineCenter: {fileID: 8410921081017808176}
   debugPlaceTargets: []
@@ -705,15 +704,15 @@ RectTransform:
   m_GameObject: {fileID: 8410921081726404835}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4035402717029203797}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -21.999998, y: -53}
-  m_SizeDelta: {x: 900, y: 200}
+  m_AnchoredPosition: {x: 450, y: -60}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.7}
 --- !u!222 &8410921081726404638
 CanvasRenderer:
@@ -737,7 +736,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arcSize: 7.6
   arcScale: {x: 1300, y: 777.8}
-  handCardLimit: 6
   splineType: 0
   splineCenter: {fileID: 8410921081726404636}
   debugPlaceTargets: []
