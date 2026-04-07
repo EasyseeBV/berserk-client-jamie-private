@@ -160,6 +160,20 @@ namespace BerserkV3.GameCore.TargetSystem
 
 		private Vector3 GetDragPosition()
 		{
+
+			//if perspective camera do this =>
+			var screenPos = pointer.ReadValue<Vector2>();
+
+			// Use the source object's depth so the drag plane is consistent
+			// with where the card lives in world space
+			var fromWorldPos = Current?.From?.SelfContainer?.position ?? Vector3.zero;
+			float depth = gameCamera.WorldToScreenPoint(fromWorldPos).z;
+
+			return gameCamera.ScreenToWorldPoint(
+				new Vector3(screenPos.x, screenPos.y, depth)
+			);
+
+			//if ortographic camera do this =>
 			var position = pointer.ReadValue<Vector2>();
 			return gameCamera.ScreenToWorldPoint(position);
 		}
