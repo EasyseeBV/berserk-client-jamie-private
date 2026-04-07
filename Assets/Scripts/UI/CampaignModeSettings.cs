@@ -39,6 +39,7 @@ namespace UI
 			string rewardText,
 			string previewTextureResource,
 			string emblemTextureResource,
+			string topIconResource,
 			bool isLocked,
 			IReadOnlyList<CampaignStageDefinition> stages)
 		{
@@ -50,6 +51,7 @@ namespace UI
 			RewardText = rewardText;
 			PreviewTextureResource = previewTextureResource;
 			EmblemTextureResource = emblemTextureResource;
+			TopIconTextureResource = topIconResource;
 			IsLocked = isLocked;
 			Stages = stages;
 		}
@@ -62,6 +64,7 @@ namespace UI
 		public string RewardText { get; }
 		public string PreviewTextureResource { get; }
 		public string EmblemTextureResource { get; }
+		public string TopIconTextureResource { get; }
 		public bool IsLocked { get; }
 		public IReadOnlyList<CampaignStageDefinition> Stages { get; }
 	}
@@ -99,6 +102,7 @@ namespace UI
 				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/boreas_bg",
 				"UI/Campaign/boreas_emblem",
+				"UI/Campaign/boreas_top_banner",
 				false,
 				CreateStandardStageSet("Frost"));
 		}
@@ -114,6 +118,7 @@ namespace UI
 				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/arcadia_bg",
 				"UI/Campaign/arcadia_emblem",
+				"UI/Campaign/arcadia_top_banner",
 				false,
 				CreateStandardStageSet("Wild"));
 		}
@@ -129,6 +134,7 @@ namespace UI
 				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/notus_bg",
 				"UI/Campaign/notus_emblem",
+				"UI/Campaign/notus_top_banner",
 				false,
 				CreateStandardStageSet("Flame"));
 		}
@@ -144,6 +150,7 @@ namespace UI
 				"8 encounters  •  5 trials  •  2 elites  •  1 epic boss",
 				"UI/Campaign/hades_bg",
 				"UI/Campaign/hades_emblem",
+				"UI/Campaign/hades_top_banner",
 				false,
 				CreateStandardStageSet("Death"));
 		}
@@ -159,6 +166,7 @@ namespace UI
 				"3 finale fights  •  forge siege  •  cinder arena  •  Vulcan throne",
 				"UI/Campaign/vulcan_city_bg",
 				"UI/Campaign/vulcan_city_emblem",
+				"UI/Campaign/vulcan_city_top_banner",
 				true,
 				new[]
 				{

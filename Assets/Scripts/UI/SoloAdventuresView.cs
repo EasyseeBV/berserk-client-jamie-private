@@ -22,6 +22,7 @@ namespace UI
 	{
 		private GameObject _menuButtonPrefab;
 		private GameObject _generalButtonPrefab;
+		private GameObject _baseButtonPrefab;
 
 		private const string ButtonBackgroundResource = "UI/btn_background_fantasy";
 		private const string CampaignCardResource = "UI/card_campaign";
@@ -75,6 +76,8 @@ namespace UI
 			public TextMeshProUGUI Label;
 			public TextMeshProUGUI Caption;
 			public Image Connector;
+			public RawImage PortraitImage;
+			public string BotDeckId;
 		}
 
 		public static SoloAdventuresView EnsureInstance(MenuView menuView)
@@ -96,6 +99,7 @@ namespace UI
 			root.transform.SetParent(parent, false);
 
 			var view = root.GetComponent<SoloAdventuresView>();
+			view._baseButtonPrefab = menuView.BaseButtonPrefab;
 			view._menuButtonPrefab = menuView.MenuButtonPrefab;
 			view._generalButtonPrefab = menuView.GeneralButtonPrefab;
 			view.ShowAtStart = false;
@@ -149,14 +153,7 @@ namespace UI
 			dimmer.color = new Color(0f, 0f, 0f, 0.72f);
 			dimmer.raycastTarget = true;
 
-			_panelRoot = CreateRect(
-				"PanelRoot",
-				transform,
-				new Vector2(0.5f, 0.5f),
-				new Vector2(0.5f, 0.5f),
-				new Vector2(0.5f, 0.5f),
-				Vector2.zero,
-				new Vector2(860f, 620f));
+			_panelRoot = BuildStretchedRect("PanelRoot", transform);
 			_panelBackground = _panelRoot.gameObject.AddComponent<Image>();
 			_panelBackground.color = Color.white;
 			_panelBackground.type = Image.Type.Simple;
@@ -175,7 +172,7 @@ namespace UI
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
 				new Vector2(0.5f, 1f),
-				new Vector2(0f, -10f),
+				new Vector2(0f, 0f),
 				new Vector2(520f, 48f),
 				34f,
 				"SOLO ADVENTURES");
@@ -255,6 +252,7 @@ namespace UI
 				new Vector2(0.5f, 0.5f),
 				new Vector2(0f, 40f),
 				new Vector2(620f, 470f));
+
 			BuildGauntletSelection();
 			_gauntletSelectionRoot.gameObject.SetActive(false);
 
@@ -268,6 +266,11 @@ namespace UI
 
 			_panelBackground.sprite = backgroundSprite;
 			_panelBackground.color = backgroundSprite ? Color.white : new Color(0.06f, 0.06f, 0.07f, 0.92f);
+		}
+
+		private RectTransform BuildStretchedRect(string name, Transform parent)
+		{
+			return CreateRect(name, parent, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 		}
 
 		public void ShowMainModesView()
@@ -523,6 +526,17 @@ namespace UI
 				outline.effectDistance = new Vector2(1f, -1f);
 				outline.useGraphicAlpha = true;
 
+				var portrait = CreateRect(
+					"Portrait",
+					slot,
+					new Vector2(0.5f, 0.5f),
+					new Vector2(0.5f, 0.5f),
+					new Vector2(0.5f, 0.5f),
+					Vector2.zero,
+					new(37f, 37f)
+					);
+				var portraitImg = portrait.gameObject.AddComponent<RawImage>();
+
 				var label = CreateText(
 					"Label",
 					slot,
@@ -535,6 +549,7 @@ namespace UI
 					(i + 1).ToString());
 				label.alignment = TextAlignmentOptions.Center;
 				label.fontStyle = FontStyles.Bold;
+				label.gameObject.SetActive(false);//won't use label for now
 
 				var caption = CreateText(
 					"Caption",
@@ -565,7 +580,9 @@ namespace UI
 					Fill = fill,
 					Label = label,
 					Caption = caption,
-					Connector = connector
+					Connector = connector,
+					PortraitImage = portraitImg,
+					BotDeckId = $"bot_gauntlet_{i+1}"
 				});
 			}
 		}
@@ -625,6 +642,7 @@ namespace UI
 			var tierBadge = tierBadgeGo.GetComponent<Image>();
 			tierBadge.color = new Color(0.22f, 0.18f, 0.12f, 0.9f);
 
+
 			var tierBadgeRect = tierBadge.rectTransform;
 			tierBadgeRect.anchorMin = tierBadgeRect.anchorMax = new Vector2(0f, 0.5f);
 			tierBadgeRect.pivot = new Vector2(0.5f, 0.5f);
@@ -650,13 +668,15 @@ namespace UI
 			tierLabel.fontStyle = FontStyles.Bold;
 			tierLabel.color = new Color(1f, 0.82f, 0.34f, 1f);
 
+			tierBadge.gameObject.SetActive(false);//don't need it for now
+
 			var portraitRoot = CreateRect(
 				"PortraitRoot",
 				buttonGo.transform,
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
 				new Vector2(0.5f, 0.5f),
-				new Vector2(100f, 0f),
+				new Vector2(45f, 0f),
 				new Vector2(50f, 50f));
 
 			/*var portraitBackdrop = portraitRoot.gameObject.AddComponent<Image>();
@@ -701,7 +721,7 @@ namespace UI
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
-				new Vector2(142f, 14f),
+				new Vector2(100f, 14f),
 				new Vector2(220f, 22f),
 				18f,
 				title);
@@ -715,7 +735,7 @@ namespace UI
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
-				new Vector2(142f, -4f),
+				new Vector2(100f, -4f),
 				new Vector2(220f, 18f),
 				12f,
 				subtitle);
@@ -728,7 +748,7 @@ namespace UI
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
 				new Vector2(0f, 0.5f),
-				new Vector2(142f, -20f),
+				new Vector2(100f, -20f),
 				new Vector2(220f, 18f),
 				8f,
 				GetChampionMeta(botDeckId));
@@ -749,32 +769,23 @@ namespace UI
 			rewardLabel.color = new Color(1f, 0.82f, 0.34f, 0.95f);
 			rewardLabel.fontStyle = FontStyles.Bold;
 
-			var statusChipGo = new GameObject("StatusChip", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+			var statusChipGo = Instantiate(_baseButtonPrefab);
 			statusChipGo.transform.SetParent(buttonGo.transform, false);
-			var statusChip = statusChipGo.GetComponent<Image>();
-			statusChip.color = new Color(0.26f, 0.19f, 0.1f, 0.9f);
 
-			var statusChipRect = statusChip.rectTransform;
+			var statusChipRect = statusChipGo.transform as RectTransform;
 			statusChipRect.anchorMin = statusChipRect.anchorMax = new Vector2(1f, 0.5f);
 			statusChipRect.pivot = new Vector2(1f, 0.5f);
 			statusChipRect.anchoredPosition = new Vector2(-22f, 0f);
-			statusChipRect.sizeDelta = new Vector2(118f, 28f);
+			statusChipRect.sizeDelta = new Vector2(120f, 45f);
 
-			var statusOutline = statusChipGo.AddComponent<Outline>();
-			statusOutline.effectColor = new Color(0.92f, 0.72f, 0.25f, 0.58f);
-			statusOutline.effectDistance = new Vector2(1f, -1f);
-			statusOutline.useGraphicAlpha = true;
+			ButtonView btnView = statusChipGo.GetComponent<ButtonView>();
+			var statusChip = btnView.CustomView;
+			statusChip.color = new Color(0.3607843f, 0.2f, 0.07843138f, 1f);
 
-			var statusLabel = CreateText(
-				"Status",
-				statusChipGo.transform,
-				new Vector2(0.5f, 0.5f),
-				new Vector2(0.5f, 0.5f),
-				new Vector2(0.5f, 0.5f),
-				Vector2.zero,
-				new Vector2(100f, 22f),
-				16f,
-				"READY");
+
+			var statusLabel = btnView.GetComponentInChildren<TextMeshProUGUI>();
+			statusLabel.text = "READY";
+			statusLabel.fontSize = 15;
 			statusLabel.alignment = TextAlignmentOptions.Center;
 			statusLabel.fontStyle = FontStyles.Bold;
 
@@ -1032,6 +1043,12 @@ namespace UI
 						? new Color(0.76f, 1f, 0.73f, 0.66f)
 						: new Color(0.44f, 0.34f, 0.18f, 0.6f);
 				}
+
+				if(node.PortraitImage != null)
+				{
+					float alpha = isCleared || isCurrent ? 1f : 0.5f;
+					node.PortraitImage.color = new Color(1, 1, 1, alpha);
+				}
 			}
 		}
 
@@ -1051,6 +1068,12 @@ namespace UI
 					tasks.Add(champion.PortraitFrameImage.LoadResourceAsync(GetChampionPortraitFrame(champion.BotDeckId)));
 				if (champion.PortraitMask)
 					tasks.Add(champion.PortraitMask.LoadResourceAsync(GetPortraitMask()));
+			}
+
+			foreach (var tracker in _trackerNodes)
+			{
+				if (tracker.PortraitImage)
+					tasks.Add(tracker.PortraitImage.LoadResourceAsync(GetChampionPortraitArt(tracker.BotDeckId)));
 			}
 
 			await UniTask.WhenAll(tasks);

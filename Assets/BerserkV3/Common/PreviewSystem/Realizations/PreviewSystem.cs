@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Berserk.Shared.GameCore.Utils;
 using BerserkV3.Common.InputSystem;
 using RR.Core.DebugSystem;
@@ -147,30 +148,57 @@ namespace BerserkV3.Common.PreviewSystem
 													&& x.CanPreview()
 													&& InputHelper.IsPointerOver(x.TargetView), out previewable);
 		}
-		
-		private void OnPreviewInput(IInputContext context)
+		private int _hoverToken = 0;
+		private IPreviewable _currentHover = null;
+
+		private async void OnPreviewInput(IInputContext context)
 		{
 			if (!Enum.TryParse(context.Id, out PreviewType type))
 			{
-				RRLogger.Error($"[{GetType().Name.Orange()}] Unknown input : {context.Id}");
+				RRLogger.Error($"[{GetType().Name}] Unknown input : {context.Id}");
 				return;
 			}
-			
+
+			// If preview is already open
 			if (Current != null)
 			{
 				if (Current.PreviewSettings.PreviewType != type)
 					return;
-				
+
 				if (context.Canceled || !InputHelper.IsPointerOver(Current.TargetView))
+				{
+					_hoverToken++; // invalidate any pending previews
+					_currentHover = null;
 					Close();
-				
+				}
+
 				return;
 			}
 
+			// Hover started
 			if ((context.Started || context.Performed) && GetPreviewable(type, out var previewable))
-				Preview(previewable);
+			{
+				_currentHover = previewable;
+
+				int token = ++_hoverToken; // create a new hover session
+
+				await Task.Delay(500);
+
+				// Only proceed if this hover session is still valid
+				if (token == _hoverToken && _currentHover == previewable)
+				{
+					Preview(previewable);
+				}
+			}
+
+			// Hover canceled explicitly
+			if (context.Canceled)
+			{
+				_hoverToken++; // cancel pending delay
+				_currentHover = null;
+			}
 		}
-		
+
 		private void OnApplicationFocusChanged(bool focus)
 		{
 			if (!focus)

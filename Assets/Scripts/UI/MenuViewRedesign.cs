@@ -14,6 +14,8 @@ namespace UI
 	{
 		[SerializeField] private GameObject _menuButtonPrefab;
 		[SerializeField] private GameObject _generalButtonPrefab;
+		[SerializeField] private GameObject _baseButtonPrefab;
+		public GameObject BaseButtonPrefab => _baseButtonPrefab;
 		public GameObject MenuButtonPrefab => _menuButtonPrefab;
 		public GameObject GeneralButtonPrefab => _generalButtonPrefab;
 

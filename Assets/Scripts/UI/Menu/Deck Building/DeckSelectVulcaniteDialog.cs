@@ -68,8 +68,8 @@ namespace UI
 
 		private void SelectLand(Quadrant quadrant)
 		{
-			flagOutlines.ForEach(f => f.enabled = IsCurrentFlag(f, quadrant));
-			flagImages.ForEach(f => f.color = IsCurrentFlag(f, quadrant) ? Color.white : Color.gray);
+			flagOutlines?.ForEach(f => f.enabled = IsCurrentFlag(f, quadrant));
+			flagImages?.ForEach(f => f.color = IsCurrentFlag(f, quadrant) ? Color.white : Color.gray);
 			currentLand = quadrant;
 			RenderAsync().Forget();
 
