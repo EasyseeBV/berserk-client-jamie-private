@@ -54,7 +54,7 @@ namespace BerserkV3.GameCore.Cards
 
 			var cardWidth = Mathf.Max(1f, width);
 			var minimal = BoardLayoutSettings.IsMinimal();
-			var spacingMultiplier = minimal ? 1.35f : 1.25f;
+			var spacingMultiplier = minimal ? 1.35f : 1.35f;
 			var desiredSpacing = cardWidth * spacingMultiplier;
 			if (minimal)
 			{
@@ -63,7 +63,7 @@ namespace BerserkV3.GameCore.Cards
 			}
 
 			// Cap total spread so cards stay centered, not edge-to-edge
-			var maxSpread = minimal ? 1200f : 980f;
+			var maxSpread = minimal ? 1200f : 1200f;
 			return Mathf.Min(desiredSpacing, maxSpread / (objectsCount - 1));
 		}
 	}

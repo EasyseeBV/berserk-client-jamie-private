@@ -65,7 +65,9 @@ namespace BerserkV3.GameCore.EffectsVisual.Applications
 		{
 			parent = TryFixParent(parent);
 			var vfx = vfxFactory.Create(id.ToString(), parent);
+			Debug.Log(vfx.transform.localPosition);
 			vfx.SetPosition(GetPosition(parent));
+			Debug.Log("Yannick"+ vfx.transform.localPosition);
 			AudioController.Play(vfx.AudioKeyword);
 			return vfx;
 		}

@@ -27,7 +27,7 @@ namespace BerserkV3.GameCore.UI
 
 		public override void SetIsBot(bool value)
 		{
-			SetActive(BotIndicator, value);
+			//SetActive(BotIndicator, value);
 		}
 	}
 }

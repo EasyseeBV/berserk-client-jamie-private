@@ -13,8 +13,8 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 	[EffectVisual(EffectVisualKeyword.TakeHit)]
 	public class TakeHitVisual : EffectVisual
 	{
-		private readonly Vector3 hitIndicationScaleTo = new(1.2f, 1.2f);
-		private readonly Vector3 hitIndicationScaleEnd = Vector3.zero;
+		private readonly Vector3 hitIndicationScaleTo = new(1.2f, 1.2f, 1f);
+		private readonly Vector3 hitIndicationScaleEnd = new(0f, 0f, 1f);
 		private const float HIT_INDICATION_OFFSET_DURATION = 1f;
 		private const float HIT_INDICATION_SCALE_DURATION = 0.5f;
 		private const float HIT_DURATION = 0.75f;
@@ -48,10 +48,10 @@ namespace BerserkV3.GameCore.EffectsVisual.Visuals
 			indicator.SetupDetph();
 
 			var vfxTransform = indicator.transform;
-			var randomVector = new Vector3(Random.Range(-100, 100), 200, 0);
+			var randomVector = new Vector3(Random.Range(-100, 100), 0, 0);
 			var targetOffset = vfxTransform.localPosition + randomVector;
 			indicator.SetLocalRotation(Quaternion.identity);
-			indicator.SetScale(Vector3.zero);
+			indicator.SetScale(new Vector3(0f,0f,1f));
 			vfxTransform.DOScale(hitIndicationScaleTo, HIT_INDICATION_SCALE_DURATION).SetEase(Ease.OutBounce);
 			vfxTransform.DOLocalMove(targetOffset, HIT_INDICATION_OFFSET_DURATION * 2).SetEase(Ease.InQuad);
 			vfxTransform.DOScale(hitIndicationScaleEnd, HIT_INDICATION_SCALE_DURATION).SetDelay(HIT_INDICATION_OFFSET_DURATION).SetEase(Ease.InQuad);
